@@ -1,151 +1,282 @@
-const validVerbs = [ 'clicks', 'submits', 'selects', 'types', 'toggles', 'uploads', 'downloads', 'saves', 'deletes', 'waits for' ];
+export const validVerbs = [ 'clicks', 'submits', 'selects', 'types', 'toggles', 'uploads', 'downloads', 'saves', 'deletes', 'waits for' ];
+
+export const parseUIRefList = ( text ) => {
+    const refs = [];
+    let currentRef = '';
+    let nestedText = '';
+    let braceCount = 0;
+
+    console.log( 'Parsing UIRefList from text:', text );
+
+    for( let i = 0; i < text.length; i++ ) {
+        const char = text[ i ];
+
+        if( char === '(' ) {
+            braceCount++;
+            if( braceCount === 1 ) {
+                currentRef = currentRef.trim();
+                continue;
+            }
+        } else if( char === ')' ) {
+            braceCount--;
+            if( braceCount === 0 ) {
+                refs.push( {
+                    id: currentRef.trim(),
+                    nested: parseUIRefList( nestedText )
+                } );
+                console.log( 'Nested UIRefList:', nestedText );
+                currentRef = '';
+                nestedText = '';
+                continue;
+            }
+        }
+
+        if( braceCount > 0 ) {
+            nestedText += char;
+        } else if( char === ',' ) {
+            if( braceCount === 0 ) {
+                refs.push( { id: currentRef.trim(), nested: [] } );
+                currentRef = '';
+            } else {
+                nestedText += char;
+            }
+        } else {
+            currentRef += char;
+        }
+    }
+
+    if( currentRef.trim() !== '' ) {
+        refs.push( { id: currentRef.trim(), nested: [] } );
+    }
+
+    console.log( 'Extracted UIRefs:', refs );
+    return refs;
+};
 
 export const parseUITDL = ( text ) => {
-    const lines = text.split( '\n' ).map( line => line.trim() );
+    const lines = text.split( '\n' );
     const result = {
-        uitd: '',
-        uis: {},
-        fragments: []
+        uis: [],
+        fragments: [],
+        errors: [],
     };
-
     let currentSection = null;
     let currentUI = null;
-    let currentFragment = null;
-    let insideUITD = false;
+    let braceStack = [];
 
-    const validateUIREF = ( uiref ) => {
-        const stack = [];
-        const tokens = uiref.replace( /[\{\},]/g, ' $& ' ).split( /\s+/ );
-        for( let token of tokens ) {
-            if( token.match( /^\d+$/ ) ) {
-                continue;
-            } else if( token === '{' ) {
-                stack.push( '{' );
-            } else if( token === '}' ) {
-                if( stack.length === 0 || stack.pop() !== '{' ) {
-                    throw new Error( `Mismatched braces in UIREF: ${uiref}` );
-                }
-            } else if( token === ',' ) {
-                continue;
-            } else {
-                throw new Error( `Invalid token in UIREF: ${token}` );
-            }
-        }
-        if( stack.length !== 0 ) {
-            throw new Error( `Mismatched braces in UIREF: ${uiref}` );
-        }
-    };
+    console.log( 'Starting parse of UITDL' );
 
-    const validateTransitionAction = ( action ) => {
-        const match = action.match( new RegExp( `^(${validVerbs.join( '|' )})\\s+"([^"]+)"\\s*(\\d+\\s+(milliseconds|seconds|minutes|hours|days|weeks))?$` ) );
-        if( !match ) {
-            throw new Error( `Invalid action format: ${action}` );
-        }
-    };
+    lines.forEach( ( line, index ) => {
+        const lineNumber = index + 1;
+        const trimmedLine = line.trim();
 
-    const parseLine = ( line, lineNumber ) => {
-        if( line.startsWith( 'UITD' ) ) {
-            const match = line.match( /^UITD\s+"([^"]+)"\s*{/ );
-            if( match ) {
-                if( insideUITD ) {
-                    throw new Error( `Invalid syntax at line ${lineNumber}. Nested UITD blocks are not allowed.` );
-                }
-                result.uitd = match[ 1 ];
-                currentSection = 'uitd';
-                insideUITD = true;
-            } else {
-                throw new Error( `Invalid UITD declaration at line ${lineNumber}. Correct format: UITD "title" {` );
-            }
-        } else if( insideUITD && line.startsWith( 'UI' ) ) {
-            const match = line.match( /^UI\s+(\d+)\s+"([^"]+)"\s+actions\s*{/ );
-            if( match ) {
-                currentUI = match[ 1 ];
-                result.uis[ currentUI ] = {
-                    name: match[ 2 ],
-                    actions: []
-                };
-                currentSection = 'ui';
-            } else {
-                throw new Error( `Invalid UI declaration at line ${lineNumber}. Correct format: UI id "name" actions {` );
-            }
-        } else if( insideUITD && currentSection === 'ui' && validVerbs.some( verb => line.startsWith( verb ) ) ) {
-            const verbMatch = validVerbs.find( verb => line.startsWith( verb ) );
-            const actionMatch = line.match( new RegExp( `^${verbMatch}\\s+"([^"]+)"` ) );
-            if( actionMatch ) {
-                result.uis[ currentUI ].actions.push( {
-                    action: verbMatch,
-                    target: actionMatch[ 1 ]
-                } );
-            } else {
-                throw new Error( `Invalid action at line ${lineNumber}. Correct format: ${verbMatch} "target"` );
-            }
-        } else if( insideUITD && line.startsWith( 'FRAGMENT' ) ) {
-            const match = line.match( /^FRAGMENT\s+"([^"]+)"\s*{/ );
-            if( match ) {
-                currentFragment = match[ 1 ];
-                result.fragments.push( {
-                    name: match[ 1 ],
-                    draw: [],
-                    transitions: []
-                } );
-                currentSection = 'fragment';
-            } else {
-                throw new Error( `Invalid FRAGMENT declaration at line ${lineNumber}. Correct format: FRAGMENT "name" {` );
-            }
-        } else if( insideUITD && currentSection === 'fragment' && line.startsWith( 'DRAW' ) ) {
-            const match = line.match( /^DRAW\s+(.+)/ );
-            if( match ) {
-                const drawItems = match[ 1 ].split( ',' ).map( item => item.trim() );
-                try {
-                    drawItems.forEach( item => validateUIREF( item ) );
-                } catch( error ) {
-                    throw new Error( `Invalid DRAW declaration at line ${lineNumber}. ${error.message}` );
-                }
-                result.fragments[ result.fragments.length - 1 ].draw = drawItems;
-            } else {
-                throw new Error( `Invalid DRAW declaration at line ${lineNumber}. Correct format: DRAW ui_refs` );
-            }
-        } else if( insideUITD && currentSection === 'fragment' && line.startsWith( 'TRANSITION' ) ) {
-            const match = line.match( /^TRANSITION\s+from\s+(\d+)\s+to\s+(\d+)\s+if\s+user\s+(\w+)\s+"([^"]+)"\s*(AND\s+"([^"]+)")?/ );
-            if( match ) {
-                const action = `${match[ 3 ]} "${match[ 4 ]}"`;
-                validateTransitionAction( action );
-                result.fragments[ result.fragments.length - 1 ].transitions.push( {
-                    from: parseInt( match[ 1 ], 10 ),
-                    to: parseInt( match[ 2 ], 10 ),
-                    action: match[ 3 ],
-                    target: match[ 4 ],
-                    condition: match[ 6 ] || ''
-                } );
-            } else {
-                throw new Error( `Invalid TRANSITION declaration at line ${lineNumber}. Correct format: TRANSITION from sourceUI to targetUI if user action "target" AND "condition"` );
-            }
-        } else if( line === '}' ) {
-            if( insideUITD ) {
-                if( currentSection === 'ui' ) {
+        try {
+            console.log( `Parsing line ${lineNumber}:`, trimmedLine );
+
+            if( !trimmedLine ) {
+                // Do nothing
+            } else if( trimmedLine === '}' ) {
+                let popped = braceStack.pop();
+                currentSection = braceStack[ braceStack.length - 1 ];
+                if( braceStack.length === 0 ) {
+                    currentSection = null;
                     currentUI = null;
+                    console.log( 'Exited section', popped );
+                }
+            } else if( currentSection == null ) {
+                if( trimmedLine.startsWith( 'UITD' ) ) {
+                    if( !trimmedLine.match( /^UITD\s+"[^"]+"\s*{\s*$/ ) ) {
+                        throw new Error( `Invalid UITD declaration` );
+                    }
                     currentSection = 'uitd';
-                } else if( currentSection === 'fragment' ) {
-                    currentFragment = null;
-                    currentSection = 'uitd';
+                    braceStack.push( 'uitd' );
+                    console.log( 'Entered UITD section' );
+
                 } else {
-                    insideUITD = false;
+                    throw new Error( `Invalid syntax at line ${lineNumber}. All content must be inside UITD "name" {` );
+                }
+            } else if( currentSection == 'uitd' ) {
+                if( trimmedLine.startsWith( 'UI' ) ) {
+                    const uiMatch = trimmedLine.match( /^UI\s+(\d+)\s+"[^"]+"\s+actions\s*{\s*$/ );
+                    if( !uiMatch ) {
+                        throw new Error( `Invalid UI declaration` );
+                    }
+                    currentUI = parseInt( uiMatch[ 1 ], 10 );
+                    result.uis.push( { id: currentUI, actions: [], lineNumber } );
+                    currentSection = 'ui';
+                    braceStack.push( 'ui' );
+                    console.log( 'Entered UI section:', currentUI );
+                } else if( trimmedLine.startsWith( 'FRAGMENT' ) ) {
+                    if( !trimmedLine.match( /^FRAGMENT\s+"[^"]+"\s*{\s*$/ ) ) {
+                        throw new Error( `Invalid FRAGMENT declaration` );
+                    }
+                    result.fragments.push( { name: trimmedLine.match( /^FRAGMENT\s+"([^"]+)"/ )[ 1 ], draws: [], transitions: [], lineNumber } );
+                    currentSection = 'fragment';
+                    braceStack.push( 'fragment' );
+                    console.log( 'Entered FRAGMENT section' );
+                } else {
+                    throw new Error( `Invalid placement of content. Only UI or FRAGMENT sections allowed here.` );
+                }
+            } else if( currentSection == 'ui' ) {
+                if( validVerbs.some( verb => trimmedLine.startsWith( verb ) ) ) {
+                    const actionMatch = trimmedLine.match( new RegExp( `^(${validVerbs.join( '|' )})\\s+"([^"]+)"` ) );
+                    if( !actionMatch ) {
+                        throw new Error( `Invalid action declaration` );
+                    }
+                    result.uis.find( ui => ui.id === currentUI ).actions.push( { verb: actionMatch[ 1 ], target: actionMatch[ 2 ], lineNumber: index + 1 } );
+                    console.log( 'Added action to UI', currentUI, ':', actionMatch[ 1 ], actionMatch[ 2 ] );
+                } else {
+                    throw new Error( `Only actions are allowed here` );
+                }
+            } else if( currentSection == 'fragment' ) {
+                if( trimmedLine.startsWith( 'DRAW' ) ) {
+                    const drawMatch = trimmedLine.match( /^DRAW\s+(.+)/ );
+                    if( drawMatch ) {
+                        const uiRefs = parseUIRefList( drawMatch[ 1 ] );
+                        result.fragments[ result.fragments.length - 1 ].draws.push( { uiRefs, lineNumber } );
+                        console.log( 'Parsed DRAW statement:', uiRefs );
+                    } else {
+                        throw new Error( `Invalid DRAW declaration at line ${lineNumber}` );
+                    }
+                } else if( trimmedLine.startsWith( 'TRANSITION' ) ) {
+                    const match = trimmedLine.match( /^TRANSITION\s+from\s+(\d+(\(\d+\))*)\s+to\s+(\d+(\(\d+\))*)\s+if\s+user\s+(\w+)\s+"([^"]+)"\s*(AND\s+"([^"]+)")?/ );
+                    if( match ) {
+                        result.fragments[ result.fragments.length - 1 ].transitions.push( {
+                            from: match[ 1 ],
+                            to: match[ 3 ],
+                            action: match[ 5 ],
+                            target: match[ 6 ],
+                            condition: match[ 8 ] || '',
+                            lineNumber: index + 1
+                        } );
+                        console.log( 'Parsed TRANSITION statement:', result.fragments[ result.fragments.length - 1 ].transitions.slice( -1 )[ 0 ] );
+                    } else {
+                        throw new Error( `Invalid TRANSITION declaration at line ${lineNumber}. Correct format: TRANSITION from sourceUI to targetUI if user action "target" AND "condition"` );
+                    }
+                } else {
+                    throw new Error( `Only DRAW or TRANSITION statements allowed here.` );
+                }
+            } else {
+                if( currentSection === 'ui' || currentSection === 'fragment' ) {
+                    throw new Error( `Invalid syntax at line ${lineNumber}. All content must be inside UITD "name" {` );
                 }
             }
-        } else if( line !== '' && !insideUITD && !line.startsWith( 'UITD' ) ) {
-            throw new Error( `Invalid syntax at line ${lineNumber}. All content must be inside UITD "name" {` );
-        } else if( insideUITD && currentSection !== 'ui' && currentSection !== 'fragment' && validVerbs.some( verb => line.startsWith( verb ) ) ) {
-            throw new Error( `Invalid action at line ${lineNumber}. Actions must be inside UI blocks.` );
-        } else if( insideUITD && currentSection === 'uitd' && ( line.startsWith( 'TRANSITION' ) || line.startsWith( 'DRAW' ) ) ) {
-            throw new Error( `Invalid syntax at line ${lineNumber}. Transitions and Draws must be inside FRAGMENT blocks.` );
-        } else if( insideUITD && currentSection === 'ui' && !line.startsWith( '}' ) && !validVerbs.some( verb => line.startsWith( verb ) ) ) {
-            throw new Error( `Invalid UI action at line ${lineNumber}. Actions must be valid.` );
-        } else if( insideUITD && currentSection === 'fragment' && !line.startsWith( 'DRAW' ) && !line.startsWith( 'TRANSITION' ) && !line.startsWith( '}' ) && !line.startsWith( 'EXTEND' ) && !line.startsWith( 'PUT' ) ) {
-            throw new Error( `Invalid FRAGMENT content at line ${lineNumber}. Content must be valid.` );
+        } catch( e ) {
+            console.error( 'Error:', e.message );
+            result.errors.push( {
+                startLineNumber: lineNumber,
+                lineNumber: lineNumber,
+                message: e.message,
+                startColumn: 1,
+                endColumn: 3
+            } );
         }
-    };
+    } );
 
-    lines.forEach( ( line, index ) => parseLine( line, index + 1 ) );
-
+    console.log( 'Parsed result:', result );
     return result;
+};
+
+export const validateData = ( parsedData ) => {
+    const markers = [];
+
+    // Check for UIs with no actions
+    parsedData.uis.forEach( ui => {
+        if( ui.actions.length === 0 ) {
+            markers.push( {
+                severity: monaco.MarkerSeverity.Error,
+                startLineNumber: ui.lineNumber,
+                startColumn: 1,
+                endLineNumber: ui.lineNumber,
+                endColumn: 3,
+                message: `UI ${ui.id} has no actions defined`,
+            } );
+        }
+    } );
+
+    parsedData.fragments.forEach( fragment => {
+        const drawnUIs = new Set();
+        const definedUIs = new Set( parsedData.uis.map( ui => ui.id.toString() ) );
+        const processRef = ( ref, parentId = null, drawLineNumber ) => {
+            if( parentId ) {
+                drawnUIs.add( `${parentId}(${ref.id})` );
+            } else {
+                drawnUIs.add( ref.id );
+            }
+            if( !definedUIs.has( ref.id ) ) {
+                markers.push( {
+                    severity: monaco.MarkerSeverity.Error,
+                    startLineNumber: drawLineNumber,
+                    startColumn: 1,
+                    endLineNumber: drawLineNumber,
+                    endColumn: 3,
+                    message: `UI ${ref.id} is drawn but not defined`,
+                } );
+            }
+            ref.nested.forEach( nestedRef => processRef( nestedRef, ref.id, drawLineNumber ) );
+        };
+
+        // Process each draw list
+        fragment.draws.forEach( ( { uiRefs, lineNumber } ) => {
+            uiRefs.forEach( ref => {
+                processRef( ref, null, lineNumber );
+            } );
+        } );
+
+        console.log( 'Drawn UIs:', Array.from( drawnUIs ) );
+
+        fragment.transitions.forEach( transition => {
+            const checkUI = ( uiRef ) => {
+                if( !drawnUIs.has( uiRef ) ) {
+                    markers.push( {
+                        severity: monaco.MarkerSeverity.Error,
+                        startLineNumber: transition.lineNumber,
+                        startColumn: 1,
+                        endLineNumber: transition.lineNumber,
+                        endColumn: 3,
+                        message: `Undrawn UI referenced in transition: ${uiRef}`,
+                    } );
+                }
+            };
+
+            checkUI( transition.from );
+            checkUI( transition.to );
+
+            // Validate that transition actions are defined in the origin UI
+            const originUI = parsedData.uis.find( ui => ui.id.toString() === transition.from.split( '(' )[ 0 ] );
+            if( !originUI || !originUI.actions.some( action => action.verb === transition.action && action.target === transition.target ) ) {
+                markers.push( {
+                    severity: monaco.MarkerSeverity.Error,
+                    startLineNumber: transition.lineNumber,
+                    startColumn: 1,
+                    endLineNumber: transition.lineNumber,
+                    endColumn: 3,
+                    message: `Action "${transition.action} ${transition.target}" in transition is not defined in UI ${transition.from}`,
+                } );
+            }
+        } );
+    } );
+
+    parsedData.uis.forEach( ui => {
+        ui.actions.forEach( action => {
+            const used = parsedData.fragments.some( fragment =>
+                fragment.transitions.some( transition =>
+                    transition.action === action.verb && transition.target === action.target
+                )
+            );
+            if( !used ) {
+                markers.push( {
+                    severity: monaco.MarkerSeverity.Warning,
+                    startLineNumber: action.lineNumber,
+                    startColumn: 1,
+                    endLineNumber: action.lineNumber,
+                    endColumn: 3,
+                    message: `Unused action: ${action.verb} "${action.target}"`,
+                } );
+            }
+        } );
+    } );
+
+    console.log( 'Validation markers:', markers );
+    return markers;
 };

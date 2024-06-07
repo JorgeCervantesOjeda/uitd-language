@@ -1,65 +1,34 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 import * as monaco from 'monaco-editor';
-import { parseUITDL } from '../utils/Parser';
-
-const validVerbs = [ 'clicks', 'submits', 'selects', 'types', 'toggles', 'uploads', 'downloads', 'saves', 'deletes', 'waits for' ];
+import { parseUITDL, validateData, validVerbs } from '../utils/Parser';
 
 const Editor = ( { value, onChange } ) => {
     const editorRef = useRef( null );
-    const [ markers, setMarkers ] = useState( [] );
-
-    const validateAndSetMarkers = ( value, monaco ) => {
-        try {
-            parseUITDL( value );
-            monaco.editor.setModelMarkers( editorRef.current.getModel(), 'owner', [] );
-        } catch( error ) {
-            const lineNumberMatch = error.message.match( /line (\d+)/ );
-            const lineNumber = lineNumberMatch ? parseInt( lineNumberMatch[ 1 ] ) : 1;
-            const message = error.message.replace( / at line \d+/, '' );
-            monaco.editor.setModelMarkers( editorRef.current.getModel(), 'owner', [ {
-                startLineNumber: lineNumber,
-                startColumn: 1,
-                endLineNumber: lineNumber,
-                endColumn: 1,
-                message: message,
-                severity: monaco.MarkerSeverity.Error,
-            } ] );
-        }
-    };
 
     const handleEditorChange = ( value ) => {
-        try {
-            onChange( value );
-            validateAndSetMarkers( value, monaco );
-        } catch( error ) {
-            console.error( "Error in handleEditorChange:", error );
-        }
+        onChange( value );
     };
 
     const handleEditorDidMount = ( editor, monaco ) => {
         editorRef.current = editor;
 
-        // Register a new language
         monaco.languages.register( { id: 'uitdl' } );
 
-        // Register a tokens provider for the language
         monaco.languages.setMonarchTokensProvider( 'uitdl', {
             tokenizer: {
                 root: [
-                    [ /\b(clicks|submits|selects|types|toggles|uploads|downloads|saves|deletes|waits for)\b/, 'keyword' ],
+                    [ new RegExp( validVerbs.join( '|' ) ), 'keyword' ],
                     [ /\b(UITD|UI|actions|FRAGMENT|DRAW|TRANSITION|from|to|if|user|AND)\b/, 'keyword' ],
                     [ /[{}]/, '@brackets' ],
                     [ /\d+/, 'number' ],
-                    [ /".*?"/, 'string' ],
-                    [ /\w+/, 'identifier' ],
+                    [ /"[^"]*"/, 'string' ],
+                    [ /\b[\w-]+\b/, 'identifier' ],
                 ],
             },
         } );
 
-        // Define a completion item provider for the language
         monaco.languages.registerCompletionItemProvider( 'uitdl', {
             provideCompletionItems: () => {
                 const suggestions = [
@@ -78,16 +47,9 @@ const Editor = ( { value, onChange } ) => {
                         documentation: 'Define a UI with an ID, name, and actions',
                     },
                     {
-                        label: 'AND',
-                        kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'AND "${1:condition}"\n',
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        documentation: 'Define a condition',
-                    },
-                    {
                         label: 'FRAGMENT',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW ${2:id}\n\tTRANSITION from ${3:sourceUI} to ${4:targetUI} if user \n}',
+                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW ${2:id}\n\tTRANSITION from ${3:id} to ${4:id} if user \n}',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define a fragment with draw and transitions',
                     },
@@ -101,9 +63,16 @@ const Editor = ( { value, onChange } ) => {
                     {
                         label: 'TRANSITION',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'TRANSITION from ${1:sourceUI} to ${2:targetUI} if user ',
+                        insertText: 'TRANSITION from ${1:id} to ${2:id} if user ',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define a transition between UIs with conditions',
+                    },
+                    {
+                        label: 'AND',
+                        kind: monaco.languages.CompletionItemKind.Snippet,
+                        insertText: 'AND "${1:condition}"',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Define the UITD structure with a title',
                     },
                     ...validVerbs.map( verb => ( {
                         label: verb,
@@ -117,7 +86,6 @@ const Editor = ( { value, onChange } ) => {
             },
         } );
 
-        // Configure auto-closing pairs for braces and quotes
         monaco.languages.setLanguageConfiguration( 'uitdl', {
             autoClosingPairs: [
                 { open: '{', close: '}' },
@@ -125,42 +93,38 @@ const Editor = ( { value, onChange } ) => {
             ],
         } );
 
-        // Add custom validation
-        const model = editor.getModel();
-        try {
-            validateAndSetMarkers( model.getValue(), monaco );
-        } catch( error ) {
-            console.error( "Error during editor mount validation:", error );
-        }
-        model.onDidChangeContent( () => {
-            try {
-                validateAndSetMarkers( model.getValue(), monaco );
-            } catch( error ) {
-                console.error( "Error during content change validation:", error );
-            }
-        } );
+        const validateAndSetMarkers = () => {
+            const model = editor.getModel();
+            const text = model.getValue();
+            const parsed = parseUITDL( text );
+            const markers = [
+                ...parsed.errors.map( error => ( {
+                    severity: monaco.MarkerSeverity.Error,
+                    startLineNumber: error.lineNumber,
+                    startColumn: error.startColumn,
+                    endLineNumber: error.lineNumber,
+                    endColumn: error.endColumn,
+                    message: error.message,
+                } ) ),
+                ...validateData( parsed ),
+            ];
+            monaco.editor.setModelMarkers( model, 'uitdl', markers );
+        };
+
+        validateAndSetMarkers();
+        editor.getModel().onDidChangeContent( validateAndSetMarkers );
     };
 
     return (
-        <ResizableBox
-            width={ Math.max( window.innerWidth * 0.3, 500 ) }
-            height={ window.innerHeight }
-            minConstraints={ [ 500, window.innerHeight ] }
-            maxConstraints={ [ window.innerWidth * 0.7, window.innerHeight ] }
-            axis="x"
-            resizeHandles={ [ 'e' ] }
-            style={ { display: 'flex', flexDirection: 'column' } }
-        >
-            <MonacoEditor
-                height={ 800 }
-                width={ 1000 }
-                defaultLanguage="uitdl"
-                value={ value }
-                onChange={ handleEditorChange }
-                onMount={ handleEditorDidMount }
-                options={ { automaticLayout: true } }
-            />
-        </ResizableBox>
+        <MonacoEditor
+            height={ 800 }
+            width={ 1000 }
+            defaultLanguage="uitdl"
+            value={ value }
+            onChange={ handleEditorChange }
+            onMount={ handleEditorDidMount }
+            options={ { automaticLayout: true } }
+        />
     );
 };
 
