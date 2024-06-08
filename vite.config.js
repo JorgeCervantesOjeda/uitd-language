@@ -1,7 +1,11 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import reactRefresh from '@vitejs/plugin-react-refresh';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
+export default defineConfig( {
+  plugins: [ reactRefresh() ],
+  server: {
+    hmr: {
+      overlay: true, // Ensure that the overlay is enabled for error messages
+    },
+  },
+} );

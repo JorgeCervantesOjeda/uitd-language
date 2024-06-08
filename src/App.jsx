@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Editor from './components/Editor';
-import Renderer from './components/Renderer';
+import RendererD2 from './components/RendererD2';
 import { parseUITDL } from './utils/Parser';
 
 const App = () => {
@@ -17,7 +17,7 @@ const App = () => {
     <div style={ { display: 'flex', height: '100vh' } }>
       <Editor value={ uitdlText } onChange={ handleEditorChange } />
       <div style={ { flexGrow: 1, overflow: 'auto' } }>
-        <Renderer data={ parsedData } />
+        <RendererD2 data={ parsedData } />
       </div>
     </div>
   );

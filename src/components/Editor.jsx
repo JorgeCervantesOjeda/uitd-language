@@ -5,6 +5,8 @@ import * as monaco from 'monaco-editor';
 import { parseUITDL, validateData, validVerbs } from '../utils/Parser';
 
 const Editor = ( { value, onChange } ) => {
+    console.log( 'Editor', value );
+
     const editorRef = useRef( null );
 
     const handleEditorChange = ( value ) => {
@@ -90,6 +92,7 @@ const Editor = ( { value, onChange } ) => {
             autoClosingPairs: [
                 { open: '{', close: '}' },
                 { open: '"', close: '"' },
+                { open: '(', close: ')' },
             ],
         } );
 
@@ -118,7 +121,7 @@ const Editor = ( { value, onChange } ) => {
     return (
         <MonacoEditor
             height={ 800 }
-            width={ 1000 }
+            width={ 800 }
             defaultLanguage="uitdl"
             value={ value }
             onChange={ handleEditorChange }
