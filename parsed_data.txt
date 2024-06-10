@@ -1,0 +1,209 @@
+{
+  "name": "title",
+  "uis": [
+    {
+      "id": 1,
+      "name": "Login",
+      "actions": [
+        {
+          "verb": "clicks",
+          "target": "Login",
+          "lineNumber": 3
+        }
+      ],
+      "lineNumber": 2
+    },
+    {
+      "id": 2,
+      "name": "Admin",
+      "actions": [
+        {
+          "verb": "deletes",
+          "target": "user",
+          "lineNumber": 6
+        }
+      ],
+      "lineNumber": 5
+    },
+    {
+      "id": 3,
+      "name": "Normal",
+      "actions": [
+        {
+          "verb": "clicks",
+          "target": "play",
+          "lineNumber": 9
+        }
+      ],
+      "lineNumber": 8
+    },
+    {
+      "id": 4,
+      "name": "Standings",
+      "actions": [
+        {
+          "verb": "selects",
+          "target": "level",
+          "lineNumber": 12
+        }
+      ],
+      "lineNumber": 11
+    },
+    {
+      "id": 5,
+      "name": "Events",
+      "actions": [
+        {
+          "verb": "selects",
+          "target": "level",
+          "lineNumber": 15
+        }
+      ],
+      "lineNumber": 14
+    },
+    {
+      "id": 0,
+      "name": "Menu",
+      "actions": [
+        {
+          "verb": "clicks",
+          "target": "Home",
+          "lineNumber": 18
+        },
+        {
+          "verb": "clicks",
+          "target": "Standings",
+          "lineNumber": 19
+        },
+        {
+          "verb": "clicks",
+          "target": "Events",
+          "lineNumber": 20
+        },
+        {
+          "verb": "clicks",
+          "target": "Logout",
+          "lineNumber": 21
+        }
+      ],
+      "lineNumber": 17
+    }
+  ],
+  "fragments": [
+    {
+      "name": "name",
+      "draws": [
+        {
+          "uiRefs": [
+            {
+              "id": "1",
+              "nested": []
+            },
+            {
+              "id": "0",
+              "nested": []
+            }
+          ],
+          "lineNumber": 24
+        },
+        {
+          "uiRefs": [
+            {
+              "id": "2",
+              "nested": [
+                {
+                  "id": "3",
+                  "nested": [
+                    {
+                      "id": "0",
+                      "nested": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "4",
+              "nested": [
+                {
+                  "id": "0",
+                  "nested": []
+                }
+              ]
+            },
+            {
+              "id": "5",
+              "nested": [
+                {
+                  "id": "0",
+                  "nested": []
+                }
+              ]
+            }
+          ],
+          "lineNumber": 25
+        }
+      ],
+      "transitions": [
+        {
+          "from": "0",
+          "to": "2",
+          "action": "clicks",
+          "target": "Home",
+          "condition": "is Admin",
+          "lineNumber": 26
+        },
+        {
+          "from": "0",
+          "to": "2(3)",
+          "action": "clicks",
+          "target": "Home",
+          "condition": "is Normal",
+          "lineNumber": 27
+        },
+        {
+          "from": "0",
+          "to": "4",
+          "action": "clicks",
+          "target": "Standings",
+          "condition": "",
+          "lineNumber": 28
+        },
+        {
+          "from": "0",
+          "to": "5",
+          "action": "clicks",
+          "target": "Events",
+          "condition": "",
+          "lineNumber": 29
+        },
+        {
+          "from": "0",
+          "to": "1",
+          "action": "clicks",
+          "target": "Logout",
+          "condition": "",
+          "lineNumber": 30
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "action": "clicks",
+          "target": "Login",
+          "condition": "is Admin",
+          "lineNumber": 31
+        },
+        {
+          "from": "1",
+          "to": "2(3)",
+          "action": "clicks",
+          "target": "Login",
+          "condition": "is Normal",
+          "lineNumber": 32
+        }
+      ],
+      "lineNumber": 23
+    }
+  ],
+  "errors": []
+}

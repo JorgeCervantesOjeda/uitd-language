@@ -6,8 +6,6 @@ export const parseUIRefList = ( text ) => {
     let nestedText = '';
     let braceCount = 0;
 
-    console.log( 'Parsing UIRefList from text:', text );
-
     for( let i = 0; i < text.length; i++ ) {
         const char = text[ i ];
 
@@ -20,11 +18,12 @@ export const parseUIRefList = ( text ) => {
         } else if( char === ')' ) {
             braceCount--;
             if( braceCount === 0 ) {
-                refs.push( {
-                    id: currentRef.trim(),
-                    nested: parseUIRefList( nestedText )
-                } );
-                console.log( 'Nested UIRefList:', nestedText );
+                if( currentRef.trim() !== '' ) {  // Ensure the currentRef is not empty
+                    refs.push( {
+                        id: currentRef.trim(),
+                        nested: parseUIRefList( nestedText )
+                    } );
+                }
                 currentRef = '';
                 nestedText = '';
                 continue;
@@ -35,7 +34,9 @@ export const parseUIRefList = ( text ) => {
             nestedText += char;
         } else if( char === ',' ) {
             if( braceCount === 0 ) {
-                refs.push( { id: currentRef.trim(), nested: [] } );
+                if( currentRef.trim() !== '' ) {  // Ensure the currentRef is not empty
+                    refs.push( { id: currentRef.trim(), nested: [] } );
+                }
                 currentRef = '';
             } else {
                 nestedText += char;
@@ -49,7 +50,6 @@ export const parseUIRefList = ( text ) => {
         refs.push( { id: currentRef.trim(), nested: [] } );
     }
 
-    console.log( 'Extracted UIRefs:', refs );
     return refs;
 };
 
@@ -65,20 +65,15 @@ export const parseUITDL = ( text ) => {
     let currentUI = null;
     let braceStack = [];
 
-    console.log( 'Starting parse of UITDL' );
-
     lines.forEach( ( line, index ) => {
         const lineNumber = index + 1;
         const trimmedLine = line.trim();
 
         try {
-            console.log( `Parsing line ${lineNumber}:`, trimmedLine );
-
             if( !trimmedLine ) {
                 // Do nothing
             } else if( trimmedLine === '}' ) {
                 let popped = braceStack.pop();
-                console.log( 'Exited section', popped );
                 currentSection = braceStack[ braceStack.length - 1 ];
                 if( braceStack.length === 0 ) {
                     currentSection = null;
@@ -93,7 +88,6 @@ export const parseUITDL = ( text ) => {
                     result.name = match[ 1 ];
                     currentSection = 'uitd';
                     braceStack.push( 'uitd' );
-                    console.log( 'Entered UITD section' );
 
                 } else {
                     throw new Error( `Invalid syntax at line ${lineNumber}. All content must be inside UITD "name" {` );
@@ -108,7 +102,6 @@ export const parseUITDL = ( text ) => {
                     result.uis.push( { id: currentUI, name: uiMatch[ 2 ], actions: [], lineNumber: lineNumber } );
                     currentSection = 'ui';
                     braceStack.push( 'ui' );
-                    console.log( 'Entered UI section:', currentUI );
                 } else if( trimmedLine.startsWith( 'FRAGMENT' ) ) {
                     if( !trimmedLine.match( /^FRAGMENT\s+"[^"]+"\s*{\s*$/ ) ) {
                         throw new Error( `Invalid FRAGMENT declaration` );
@@ -116,7 +109,6 @@ export const parseUITDL = ( text ) => {
                     result.fragments.push( { name: trimmedLine.match( /^FRAGMENT\s+"([^"]+)"/ )[ 1 ], draws: [], transitions: [], lineNumber: lineNumber } );
                     currentSection = 'fragment';
                     braceStack.push( 'fragment' );
-                    console.log( 'Entered FRAGMENT section' );
                 } else {
                     throw new Error( `Invalid placement of content. Only UI or FRAGMENT sections allowed here.` );
                 }
@@ -127,7 +119,6 @@ export const parseUITDL = ( text ) => {
                         throw new Error( `Invalid action declaration` );
                     }
                     result.uis.find( ui => ui.id === currentUI ).actions.push( { verb: actionMatch[ 1 ], target: actionMatch[ 2 ], lineNumber: lineNumber } );
-                    console.log( 'Added action to UI', currentUI, ':', actionMatch[ 1 ], actionMatch[ 2 ] );
                 } else {
                     throw new Error( `Only actions are allowed here` );
                 }
@@ -137,7 +128,6 @@ export const parseUITDL = ( text ) => {
                     if( drawMatch ) {
                         const uiRefs = parseUIRefList( drawMatch[ 1 ] );
                         result.fragments[ result.fragments.length - 1 ].draws.push( { uiRefs, lineNumber } );
-                        console.log( 'Parsed DRAW statement:', uiRefs );
                     } else {
                         throw new Error( `Invalid DRAW declaration at line ${lineNumber}` );
                     }
@@ -152,7 +142,6 @@ export const parseUITDL = ( text ) => {
                             condition: match[ 8 ] || '',
                             lineNumber: lineNumber
                         } );
-                        console.log( 'Parsed TRANSITION statement:', result.fragments[ result.fragments.length - 1 ].transitions.slice( -1 )[ 0 ] );
                     } else {
                         throw new Error( `Invalid TRANSITION declaration at line ${lineNumber}. Correct format: TRANSITION from sourceUI to targetUI if user action "target" AND "condition"` );
                     }
@@ -183,7 +172,6 @@ export const validateData = ( parsedData ) => {
     const markers = [];
 
 
-    console.log( 'validating data' );
     // Check for UIs with no actions
     parsedData.uis.forEach( ui => {
         if( ui.actions.length === 0 ) {
@@ -226,8 +214,6 @@ export const validateData = ( parsedData ) => {
                 processRef( ref, null, lineNumber );
             } );
         } );
-
-        console.log( 'Drawn UIs:', Array.from( drawnUIs ) );
 
         fragment.transitions.forEach( transition => {
             const checkUI = ( uiRef ) => {
@@ -281,6 +267,5 @@ export const validateData = ( parsedData ) => {
         } );
     } );
 
-    console.log( 'Validation markers:', markers );
     return markers;
 };

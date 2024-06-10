@@ -1,0 +1,333 @@
+UITD "TOP-Racing" {
+    UI 0 "Navigation" actions {
+        clicks "Banner"
+        clicks "Welcome Page"
+        clicks "Standings"
+        clicks "Event Priorities"
+        clicks "Past Registrations"
+        clicks "Forum"
+        clicks "News"
+        clicks "Login"
+        clicks "Edit Profile"
+        clicks "Contact"
+        clicks "Logout"
+    }
+    UI 1 "Login" actions {
+        clicks "Login"
+        clicks "Create Account"
+        clicks "Request a password reset"
+    }
+    UI 2 "Contact" actions {
+        clicks "OK"
+    }
+    UI 3 "Welcome" actions {
+        clicks "What is TOP-Racing"
+        clicks "FAQ"  
+        clicks "Map" 
+    }
+    UI 4 "Standings" actions {
+        types "in a search field"
+        selects "territorial level"
+        selects "temporal level"
+    }
+    UI 5 "Priorities" actions {
+        types "in a search field"
+        selects "territorial level"
+        selects "temporal level"
+        clicks "on an Event"
+        clicks "Create Event"
+    }
+    UI 6 "Past Registrations" actions {
+        types "in a search field"
+    }
+    UI 7 "View/Edit Event" actions {
+        clicks "Previous"
+        clicks "Next"
+        clicks "Next Status"
+        clicks "View/Edit Event registrations"
+        clicks "View Variants"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 8 "View/Edit Event Registrations" actions {
+        selects "Registration status"
+        clicks "Save Data"
+        clicks "Create Registration"
+        clicks "Return"
+    }
+    UI 9 "View/Edit Registration" actions {
+        clicks "View Drivers"
+        clicks "View Vehicles"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 10 "View Drivers" actions {
+        selects "Driver"
+        clicks "Return"
+    }
+    UI 11 "View Vehicles" actions {
+        selects "Vehicle"
+        clicks "Create Vehicle"
+        clicks "on a Vehicle"
+    }
+    UI 12 "Edit Vehicle" actions {
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 13 "Variants" actions {
+        types "in a search field"
+        clicks "Create Variant"
+        clicks "Select"
+        clicks "on a Variant"
+        clicks "Return"
+    }
+    UI 14 "View/Edit Variant" actions {
+        clicks "View Venues"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 15 "Venues" actions {
+        types "in a search field"
+        clicks "Create Venue"
+        clicks "Select"
+        clicks "View in Map"
+        clicks "on a Venue"
+        clicks "Return"
+    }
+    UI 16 "View/Edit Venue" actions {
+        clicks "View Province Regions"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 17 "Province Regions" actions {
+        types "in a search field"
+        clicks "Create Province Region"
+        clicks "Select"
+        clicks "on a Province Region"
+        clicks "Return"
+    }
+    UI 18 "View/Edit Province Region" actions {
+        clicks "View Provinces"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 19 "Provinces" actions {
+        types "in a search field"
+        clicks "Create Province"
+        clicks "Select"
+        clicks "on a Province"
+        clicks "Return"
+    }
+    UI 20 "View/Edit Province" actions {
+        clicks "View Country Regions"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 21 "Country Regions" actions {
+        types "in a search field"
+        clicks "Create Country Region"
+        clicks "Select"
+        clicks "on a Country Region"
+        clicks "Return"
+    }
+    UI 22 "View/Edit Country Region" actions {
+        clicks "View Countries"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 23 "Countries" actions {
+        types "in a search field"
+        clicks "Create Country"
+        clicks "Select"
+        clicks "on a Country"
+        clicks "Return"
+    }
+    UI 24 "View/Edit Country" actions {
+        clicks "View Planet Regions"
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 25 "Planet Regions" actions {
+        types "in a search field"
+        clicks "Create Planet Region"
+        clicks "Select"
+        clicks "on a Planet Region"
+        clicks "Return"
+    }
+    UI 26 "View/Edit Planet Region" actions {
+        clicks "Save Data"
+        clicks "Return"
+    }
+    UI 27 "Edit Profile" actions {
+        clicks "View Venues"
+        clicks "Save Data"
+    }
+    UI 28 "Map" actions {
+        clicks "on Map"
+        clicks "Return"
+    }
+    UI 29 "Forum" actions {
+    }
+    UI 30 "News" actions {
+    }
+    UI 31 "Login Failed Alert" actions {
+        clicks "OK"
+    }
+    UI 32 "Account Creation Failed Alert" actions {
+        clicks "OK"
+    }
+    UI 33 "Password Reset Success Alert" actions {
+        clicks "OK"
+    }
+    UI 34 "Next Status Alert" actions {
+        clicks "OK"
+    }
+
+    FRAGMENT "Navigation" {
+        DRAW 0, 1(0), 2(0), 3(0), 4(0), 5(0), 6(0), 27, 29, 30
+
+        TRANSITION from 0 to 1 if user clicks "Login" AND "has no open session"
+        TRANSITION from 0 to 2 if user clicks "Contact"
+        TRANSITION from 0 to 3 if user clicks "Welcome Page"
+        NEW 3 if user clicks "Banner" at 0
+        TRANSITION from 0 to 4 if user clicks "Standings"
+        TRANSITION from 0 to 5 if user clicks "Event Priorities"
+        TRANSITION from 0 to 6 if user clicks "Past Registrations"
+        NEW 29 if user clicks "Forum" at 0
+        NEW 30 if user clicks "News" at 0
+        TRANSITION from 0 to 27 if user clicks "Edit Profile" AND "has an open session"
+        TRANSITION from 0 to 3 if user clicks "Logout" AND "has an open session"
+
+        TRANSITION from 4 to 4 if user types "in a search field"
+        TRANSITION from 4 to 4 if user selects "territorial level"
+        TRANSITION from 4 to 4 if user selects "temporal level"
+
+        TRANSITION from 6 to 6 if user types "in a search field"
+    }
+
+    FRAGMENT "Login" {
+        DRAW 1, 3, 27, 31, 32, 33
+
+        TRANSITION from 1 to 3 if user clicks "Login" AND "e-mail/password correct"
+        TRANSITION from 1 to 31 if user clicks "Login" AND "e-mail or password incorrect"
+        TRANSITION from 1 to 27 if user clicks "Create Account"
+        TRANSITION from 27 to 32 if user clicks "Save Data" AND "Creation fails"  
+        TRANSITION from 1 to 33 if user clicks "Request a password reset" AND "email given"
+        TRANSITION from 31 to 1 if user clicks "OK"
+        TRANSITION from 32 to 1 if user clicks "OK"
+        TRANSITION from 33 to 1 if user clicks "OK"
+    }
+
+    FRAGMENT "Priorities" {
+        DRAW 1, 5, 7, 34, 8, 9, 10, 11, 12, 13, 14, 15, 16, 28, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26
+
+        TRANSITION from 5 to 5 if user types "in a search field"
+        TRANSITION from 5 to 5 if user selects "territorial level"
+        TRANSITION from 5 to 5 if user selects "temporal level"
+        TRANSITION from 5 to 7 if user clicks "on an Event" 
+        TRANSITION from 5 to 7 if user clicks "Create Event"
+
+        TRANSITION from 7 to 7 if user clicks "Previous"
+        TRANSITION from 7 to 7 if user clicks "Next"
+        TRANSITION from 7 to 34 if user clicks "Next Status"
+        TRANSITION from 34 to 7 if user clicks "OK"
+        TRANSITION from 7 to 8 if user clicks "View/Edit Event registrations" AND "is logged in"
+        TRANSITION from 7 to 1 if user clicks "View/Edit Event registrations" AND "is not logged in"
+        TRANSITION from 7 to 13 if user clicks "View Variants"
+        TRANSITION from 7 to 7 if user clicks "Save Data" AND "is the event creator"
+        TRANSITION from 7 to 5 if user clicks "Return"
+
+        TRANSITION from 8 to 8 if user selects "Registration status" AND "is Event creator"
+        TRANSITION from 8 to 8 if user clicks "Save Data" AND "is Event creator"
+        TRANSITION from 8 to 9 if user clicks "Create Registration"
+        TRANSITION from 8 to 7 if user clicks "Return"
+
+        TRANSITION from 9 to 10 if user clicks "View Drivers" AND "is Registration creator"
+        TRANSITION from 9 to 11 if user clicks "View Vehicles" AND "is Registration creator"
+        TRANSITION from 9 to 9 if user clicks "Save Data" AND "is Registration cretaor"
+        TRANSITION from 9 to 8 if user clicks "Return"
+
+        TRANSITION from 10 to 9 if user selects "Driver"
+        TRANSITION from 10 to 9 if user clicks "Return"
+
+        TRANSITION from 11 to 9 if user selects "Vehicle"
+        TRANSITION from 11 to 12 if user clicks "Create Vehicle"
+        TRANSITION from 11 to 12 if user clicks "on a Vehicle"
+
+        TRANSITION from 12 to 12 if user clicks "Save Data"
+        TRANSITION from 12 to 11 if user clicks "Return"
+
+        TRANSITION from 13 to 13 if user types "in a search field"
+        TRANSITION from 13 to 14 if user clicks "Create Variant"
+        TRANSITION from 13 to 7 if user clicks "Select" AND "is Event creator"
+        TRANSITION from 13 to 14 if user clicks "on a Variant" 
+        TRANSITION from 13 to 7 if user clicks "Return"
+
+        TRANSITION from 14 to 15 if user clicks "View Venues"
+        TRANSITION from 14 to 14 if user clicks "Save Data" AND "is the variant creator"
+        TRANSITION from 14 to 13 if user clicks "Return"
+
+        TRANSITION from 15 to 15 if user types "in a search field"
+        TRANSITION from 15 to 16 if user clicks "Create Venue"
+        TRANSITION from 15 to 14 if user clicks "Select" AND "is Variant creator"
+        TRANSITION from 15 to 28 if user clicks "View in Map"
+        TRANSITION from 15 to 16 if user clicks "on a Venue"
+        TRANSITION from 15 to 14 if user clicks "Return"
+
+        TRANSITION from 28 to 28 if user clicks "on Map" AND "is the venue creator"
+        TRANSITION from 28 to 15 if user clicks "Return"
+
+        TRANSITION from 16 to 17 if user clicks "View Province Regions"
+        TRANSITION from 16 to 16 if user clicks "Save Data" AND "is the venue creator"
+        TRANSITION from 16 to 15 if user clicks "Return"
+
+        TRANSITION from 17 to 17 if user types "in a search field"
+        TRANSITION from 17 to 18 if user clicks "Create Province Region"
+        TRANSITION from 17 to 16 if user clicks "Select" AND "is Venue creator"
+        TRANSITION from 17 to 18 if user clicks "on a Province Region" 
+        TRANSITION from 17 to 16 if user clicks "Return"
+
+        TRANSITION from 18 to 19 if user clicks "View Provinces"
+        TRANSITION from 18 to 18 if user clicks "Save Data" AND "is the Province Region creator"
+        TRANSITION from 18 to 17 if user clicks "Return"
+
+        TRANSITION from 19 to 19 if user types "in a search field"
+        TRANSITION from 19 to 20 if user clicks "Create Province"
+        TRANSITION from 19 to 18 if user clicks "Select" AND "is Province Region creator"
+        TRANSITION from 19 to 20 if user clicks "on a Province" 
+        TRANSITION from 19 to 18 if user clicks "Return"
+
+        TRANSITION from 20 to 21 if user clicks "View Country Regions"
+        TRANSITION from 20 to 20 if user clicks "Save Data" AND "is the Province creator"
+        TRANSITION from 20 to 19 if user clicks "Return"
+
+        TRANSITION from 21 to 21 if user types "in a search field"
+        TRANSITION from 21 to 22 if user clicks "Create Country Region"
+        TRANSITION from 21 to 20 if user clicks "Select" AND "is Province creator"
+        TRANSITION from 21 to 22 if user clicks "on a Country Region" 
+        TRANSITION from 21 to 20 if user clicks "Return"
+
+        TRANSITION from 22 to 23 if user clicks "View Countries"
+        TRANSITION from 22 to 22 if user clicks "Save Data" AND "is the Country Region creator"
+        TRANSITION from 22 to 21 if user clicks "Return"
+
+        TRANSITION from 23 to 23 if user types "in a search field"
+        TRANSITION from 23 to 24 if user clicks "Create Country"
+        TRANSITION from 23 to 22 if user clicks "Select" AND "is Country Region creator"
+        TRANSITION from 23 to 24 if user clicks "on a Country"
+        TRANSITION from 23 to 22 if user clicks "Return"
+
+        TRANSITION from 24 to 25 if user clicks "View Planet Regions"
+        TRANSITION from 24 to 24 if user clicks "Save Data" AND "is Country creator"
+        TRANSITION from 24 to 23 if user clicks "Return"
+
+        TRANSITION from 25 to 25 if user types "in a search field"
+        TRANSITION from 25 to 26 if user clicks "Create Planet Region"
+        TRANSITION from 25 to 24 if user clicks "Select" AND "is Country creator"
+        TRANSITION from 25 to 26 if user clicks "on a Planet Region"
+        TRANSITION from 25 to 24 if user clicks "Return"
+
+        TRANSITION from 26 to 26 if user clicks "Save Data" AND "is Planet Region creator"
+        TRANSITION from 26 to 25 if user clicks "Return"
+    }
+}

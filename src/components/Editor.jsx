@@ -5,8 +5,6 @@ import * as monaco from 'monaco-editor';
 import { parseUITDL, validateData, validVerbs } from '../utils/Parser';
 
 const Editor = ( { value, onChange } ) => {
-    console.log( 'Editor', value );
-
     const editorRef = useRef( null );
 
     const handleEditorChange = ( value ) => {
