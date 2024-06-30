@@ -12,36 +12,37 @@ const App = () => {
   const [ uitdlText, setUitdlText ] = useState(
     `UITD "title" {
     UI 1 "Login" actions {
-    clicks "Login" 
+      clicks "Login" 
     }
     UI 2 "Admin" actions {
-    deletes "user" 
+      deletes "user" 
     }
     UI 3 "Normal" actions {
-    clicks "play" 
+      clicks "play" 
     }
     UI 4 "Standings" actions {
-    selects "level" 
+      selects "level" 
     }
     UI 5 "Events" actions {
-    selects "level" 
+      selects "level" 
     }
     UI 0 "Menu" actions {
-    clicks "Home" 
-        clicks "Standings" 
-        clicks "Events" 
-        clicks "Logout" 
+      clicks "Home" 
+      clicks "Standings" 
+      clicks "Events" 
+      clicks "Logout" 
     }
     FRAGMENT "name" {
-    DRAW 1, 0
-        DRAW 2(3( 0 ) ), 4( 0 ), 5( 0 )
-        TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin"
-        TRANSITION from 0 to 2( 3 ) if user clicks "Home" AND "is Normal"
-        TRANSITION from 0 to 4 if user clicks "Standings"
-        TRANSITION from 0 to 5 if user clicks "Events"
-        TRANSITION from 0 to 1 if user clicks "Logout"  
-        TRANSITION from 1 to 2 if user clicks "Login" AND "is Admin"
-        TRANSITION from 1 to 2( 3 ) if user clicks "Login" AND "is Normal"
+      DRAW 1, 0
+      DRAW 2(3(0)), 4(0), 5(0)
+      TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin"
+      TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal"
+      TRANSITION from 0 to 4 if user clicks "Standings"
+      TRANSITION from 0 to 5 if user clicks "Events"
+      TRANSITION from 0 to 1 if user clicks "Logout"  
+      TRANSITION from 1 to 2 if user clicks "Login" AND "is Admin"
+      TRANSITION from 1 to 2(3) if user clicks "Login" AND "is Normal"
+      TRANSITION from 1 to 1 if user clicks "Login" AND "not OK"
     }
 }`  );
   const [ parsedData, setParsedData ] = useState( parseUITDL( uitdlText ) );
@@ -169,9 +170,9 @@ const App = () => {
       </div>
       <div style={ { flex: 1, display: 'flex', flexDirection: 'column', width: '50vw' } }>
         <div style={ { display: 'flex', justifyContent: 'center', marginBottom: '10px' } }>
-          <button onClick={ () => setSelectedTab( 'Renderer' ) }>Renderer</button>
-          <button onClick={ () => setSelectedTab( 'RendererD2' ) }>RendererD2</button>
-          <button onClick={ () => setSelectedTab( 'RendererParsed' ) }>RendererParsed</button>
+          <button hidden onClick={ () => setSelectedTab( 'Renderer' ) }>Renderer</button>
+          <button hidden onClick={ () => setSelectedTab( 'RendererD2' ) }>RendererD2</button>
+          <button hidden onClick={ () => setSelectedTab( 'RendererParsed' ) }>RendererParsed</button>
         </div>
         { renderContent() }
       </div>

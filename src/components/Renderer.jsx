@@ -11,94 +11,130 @@ const Renderer = ( { data } ) => {
 
         let yPosition = 20;
         const xStart = 20;
-        const initialHeight = 50;
+        const initialHeight = 30;
         const initialWidth = 150;
         const verticalSpacing = 40;
         const horizontalPadding = 20;
         const verticalPadding = 20;
 
-        const uiPositions = {};
-        const transitions = [];
+        const uiPositions = {}; // Store the positions of each UI element for transitions
+        const arrowData = []; // Store data for all arrows to check overlaps
 
         data.fragments.forEach( fragment => {
-            fragment.draws.forEach( draw => {
-                let xPosition = xStart;
-                let maxHeight = 0;
+            let xPosition = xStart;
+            let maxHeight = 0; // Reset maxHeight for each row
 
+            fragment.draws.forEach( draw => {
+                console.log( 'draw', draw );
                 draw.uiRefs.forEach( ref => {
+                    console.log( 'ref', ref );
                     const dimensions = drawUI( ref, xPosition, yPosition, initialWidth, initialHeight, svg );
-                    uiPositions[ ref.id ] = { x: xPosition, y: yPosition, width: initialWidth, height: dimensions.height };
-                    xPosition += initialWidth + horizontalPadding;
+                    xPosition += dimensions.width + horizontalPadding;
                     maxHeight = Math.max( maxHeight, dimensions.height );
                 } );
-                yPosition += maxHeight + verticalSpacing;
+                xPosition = xStart; // Reset xPosition after each row
+                yPosition += maxHeight + verticalSpacing; // Move yPosition down by maxHeight and verticalSpacing
             } );
+
+            console.log( 'uiPositions', uiPositions );
 
             fragment.transitions.forEach( transition => {
-                const transitionData = prepareTransition( transition, uiPositions );
-                if( transitionData ) transitions.push( transitionData );
+                console.log( 'Transition', transition );
+                const arrow = calculateArrowPosition( transition, uiPositions );
+                if( arrow ) arrowData.push( arrow );
             } );
+
+            // Draw arrows after calculating all positions to handle overlaps
+            adjustAndDrawArrows( arrowData, svg );
         } );
 
-        transitions.forEach( ( { line } ) => svg.appendChild( line ) );
+        function drawUI( ref, x, y, initialWidth, initialHeight, svgElement, parentId = null ) {
+            let uiId;
+            if( parentId ) {
+                const firstCloseParenIndex = parentId.indexOf( ")" );
+                if( firstCloseParenIndex === -1 ) {
+                    uiId = `${parentId}(${ref.id})`;
+                } else {
+                    const partBefore = parentId.substring( 0, firstCloseParenIndex );
+                    const partAfter = parentId.substring( firstCloseParenIndex );
+                    uiId = `${partBefore}(${ref.id})${partAfter}`;
+                }
+            } else {
+                uiId = ref.id.toString();
+            }
 
-        checkAndAdjustOverlaps( transitions );
+            const uiData = data.uis.find( ui => ui.id.toString() === ref.id );
+            console.log( 'uiData', uiData );
+            if( !uiData ) {
+                return { width: 0, height: 0 };
+            }
 
-        function drawUI( ref, x, y, width, height, svgElement, parentId = null ) {
-            const uiId = parentId ? `${parentId}(${ref.id})` : ref.id;
+            // Initial setup for the UI rectangle
             const rect = document.createElementNS( "http://www.w3.org/2000/svg", "rect" );
+            const text = document.createElementNS( "http://www.w3.org/2000/svg", "text" );
+            text.setAttribute( "x", x + 10 );
+            text.setAttribute( "y", y + 15 );
+            text.textContent = `${ref.id}: ${uiData.name}`;
+            text.setAttribute( "fill", "black" );
+
+            // Append text first to measure
+            svgElement.appendChild( text );
+
+            var maxWidth = initialWidth;
+            var totalHeight = initialHeight;
+            var nestedY = y + 30; // Start position for nested UIs
+
+            // Process nested UIs if any
+            if( ref.nested && ref.nested.length > 0 ) {
+                ref.nested.forEach( nestedRef => {
+                    const nestedInitialWidth = initialWidth;
+                    const nestedDimensions = drawUI( nestedRef, x + 10, nestedY, nestedInitialWidth, initialHeight, svgElement, uiId );
+                    console.log( 'nestedDimensions', nestedDimensions );
+                    nestedY += nestedDimensions.height + 10; // Increment Y position for the next nested UI
+                    maxWidth = Math.max( maxWidth, nestedDimensions.width + 20 ); // Adjust width if nested UI is wider
+                    totalHeight += nestedDimensions.height + 10; // Increment total height to fit all nested UIs
+                } );
+            }
+
+            // Set dimensions for the current UI rect
             rect.setAttribute( "x", x );
             rect.setAttribute( "y", y );
-            rect.setAttribute( "width", width );
-            rect.setAttribute( "height", height );
+            rect.setAttribute( "width", maxWidth );
+            rect.setAttribute( "height", totalHeight );
             rect.setAttribute( "fill", "none" );
             rect.setAttribute( "stroke", "black" );
 
-            const text = document.createElementNS( "http://www.w3.org/2000/svg", "text" );
-            text.setAttribute( "x", x + 10 );
-            text.setAttribute( "y", y + 20 );
-            text.textContent = `${ref.id}: ${data.uis.find( ui => ui.id.toString() === ref.id ).name}`;
-            svgElement.appendChild( rect );
-            svgElement.appendChild( text );
+            // Append the rect after adjusting dimensions
+            svgElement.insertBefore( rect, text ); // Ensure text is on top of the rectangle
 
-            let nestedHeight = height;
-            if( ref.nested && ref.nested.length > 0 ) {
-                let nestedY = y + height + verticalPadding;
-                ref.nested.forEach( nestedRef => {
-                    const nestedDimensions = drawUI( nestedRef, x + horizontalPadding, nestedY, width - 2 * horizontalPadding, height, svgElement, uiId );
-                    nestedY += nestedDimensions.height + verticalPadding;
-                    nestedHeight = nestedY - y;
-                } );
-            }
-            rect.setAttribute( "height", nestedHeight );
-            return { width, height: nestedHeight };
+            uiPositions[ uiId ] = { x, y, width: maxWidth, height: totalHeight };
+            console.log( 'uiPositions[uiId]', uiPositions[ uiId ] );
+
+            return { width: maxWidth, height: totalHeight };
         }
 
-        function prepareTransition( transition, positions ) {
-            const fromId = getNestedId( transition.from, positions );
-            const toId = getNestedId( transition.to, positions );
-            const fromPos = positions[ fromId ];
-            const toPos = positions[ toId ];
+        function calculateArrowPosition( transition, positions ) {
+            const fromPos = positions[ transition.from ];
+            const toPos = positions[ transition.to ];
+            return fromPos && toPos ? { from: { x: fromPos.x + fromPos.width * Math.random(), y: fromPos.y + fromPos.height }, to: { x: toPos.x + toPos.width * Math.random(), y: toPos.y }, transition } : null;
+        }
 
-            if( !fromPos || !toPos ) return null;
+        function adjustAndDrawArrows( arrows, svgElement ) {
+            arrows.forEach( arrow => {
+                adjustArrow( arrow, svgElement );
+            } );
+        }
 
+        function adjustArrow( arrow, svgElement ) {
             const line = document.createElementNS( "http://www.w3.org/2000/svg", "line" );
-            line.setAttribute( "x1", fromPos.x + fromPos.width / 2 );
-            line.setAttribute( "y1", fromPos.y + fromPos.height );
-            line.setAttribute( "x2", toPos.x + toPos.width / 2 );
-            line.setAttribute( "y2", toPos.y );
+            line.setAttribute( "x1", arrow.from.x );
+            line.setAttribute( "y1", arrow.from.y );
+            line.setAttribute( "x2", arrow.to.x );
+            line.setAttribute( "y2", arrow.to.y );
             line.setAttribute( "stroke", "blue" );
             line.setAttribute( "marker-end", "url(#arrowhead)" );
-
-            return { line, fromPos, toPos, transition };
-        }
-
-        function checkAndAdjustOverlaps( transitions ) {
-            // Logic to detect and adjust overlapping transitions
-        }
-
-        function getNestedId( idPath, positions ) {
-            return Object.keys( positions ).find( key => key.endsWith( `(${idPath})` ) || key === idPath );
+            svgElement.appendChild( line );
+            console.log( 'Line', line );
         }
 
         const defs = document.createElementNS( "http://www.w3.org/2000/svg", "defs" );
@@ -117,7 +153,7 @@ const Renderer = ( { data } ) => {
         svg.appendChild( defs );
     }, [ data ] );
 
-    return <svg ref={ svgRef } width="100%" height="1000" style={ { border: '1px solid black', backgroundColor: 'white' } }></svg>;
+    return <svg ref={ svgRef } width="100%" height="10000" style={ { border: '1px solid black', backgroundColor: 'white' } }></svg>;
 };
 
 export default Renderer;
