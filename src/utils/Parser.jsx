@@ -18,7 +18,7 @@ export const parseUIRefList = ( text ) => {
         } else if( char === ')' ) {
             braceCount--;
             if( braceCount === 0 ) {
-                if( currentRef.trim() !== '' ) {  // Ensure the currentRef is not empty
+                if( currentRef.trim() !== '' ) { // Ensure the currentRef is not empty
                     refs.push( {
                         id: currentRef.trim(),
                         nested: parseUIRefList( nestedText )
@@ -34,7 +34,7 @@ export const parseUIRefList = ( text ) => {
             nestedText += char;
         } else if( char === ',' ) {
             if( braceCount === 0 ) {
-                if( currentRef.trim() !== '' ) {  // Ensure the currentRef is not empty
+                if( currentRef.trim() !== '' ) { // Ensure the currentRef is not empty
                     refs.push( { id: currentRef.trim(), nested: [] } );
                 }
                 currentRef = '';
@@ -170,19 +170,48 @@ export const parseUITDL = ( text ) => {
 
 export const validateData = ( parsedData ) => {
     const markers = [];
+    const uiNames = new Set();
+    const fragmentNames = new Set();
 
-
-    // Check for UIs with no actions
+    // Check for UIs with no actions and duplicate UI names
     parsedData.uis.forEach( ui => {
         if( ui.actions.length === 0 ) {
             markers.push( {
-                severity: monaco.MarkerSeverity.Error,
+                severity: 'Error',
                 startLineNumber: ui.lineNumber,
                 startColumn: 1,
                 endLineNumber: ui.lineNumber,
                 endColumn: 3,
                 message: `UI ${ui.id} has no actions defined`,
             } );
+        }
+        if( uiNames.has( ui.name ) ) {
+            markers.push( {
+                severity: 'Error',
+                startLineNumber: ui.lineNumber,
+                startColumn: 1,
+                endLineNumber: ui.lineNumber,
+                endColumn: 3,
+                message: `Duplicate UI name: ${ui.name}`,
+            } );
+        } else {
+            uiNames.add( ui.name );
+        }
+    } );
+
+    // Check for duplicate fragment names
+    parsedData.fragments.forEach( fragment => {
+        if( fragmentNames.has( fragment.name ) ) {
+            markers.push( {
+                severity: 'Error',
+                startLineNumber: fragment.lineNumber,
+                startColumn: 1,
+                endLineNumber: fragment.lineNumber,
+                endColumn: 3,
+                message: `Duplicate fragment name: ${fragment.name}`,
+            } );
+        } else {
+            fragmentNames.add( fragment.name );
         }
     } );
 
@@ -195,9 +224,9 @@ export const validateData = ( parsedData ) => {
             } else {
                 drawnUIs.add( ref.id );
             }
-            if( ref.id != "" && !definedUIs.has( ref.id ) ) {
+            if( ref.id !== "" && !definedUIs.has( ref.id ) ) {
                 markers.push( {
-                    severity: monaco.MarkerSeverity.Error,
+                    severity: 'Error',
                     startLineNumber: drawLineNumber,
                     startColumn: 1,
                     endLineNumber: drawLineNumber,
@@ -219,7 +248,7 @@ export const validateData = ( parsedData ) => {
             const checkUI = ( uiRef ) => {
                 if( !drawnUIs.has( uiRef ) ) {
                     markers.push( {
-                        severity: monaco.MarkerSeverity.Error,
+                        severity: 'Error',
                         startLineNumber: transition.lineNumber,
                         startColumn: 1,
                         endLineNumber: transition.lineNumber,
@@ -236,7 +265,7 @@ export const validateData = ( parsedData ) => {
             const originUI = parsedData.uis.find( ui => ui.id.toString() === transition.from.split( '(' )[ 0 ] );
             if( !originUI || !originUI.actions.some( action => action.verb === transition.action && action.target === transition.target ) ) {
                 markers.push( {
-                    severity: monaco.MarkerSeverity.Error,
+                    severity: 'Error',
                     startLineNumber: transition.lineNumber,
                     startColumn: 1,
                     endLineNumber: transition.lineNumber,
@@ -256,7 +285,7 @@ export const validateData = ( parsedData ) => {
             );
             if( !used ) {
                 markers.push( {
-                    severity: monaco.MarkerSeverity.Warning,
+                    severity: 'Warning',
                     startLineNumber: action.lineNumber,
                     startColumn: 1,
                     endLineNumber: action.lineNumber,

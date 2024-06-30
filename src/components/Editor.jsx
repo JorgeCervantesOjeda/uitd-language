@@ -11,7 +11,13 @@ const Editor = ( { value, onChange } ) => {
         onChange( value );
     };
 
+
     const handleEditorDidMount = ( editor, monaco ) => {
+        // Set cursor position (line, column)
+        const initialCursorPosition = new monaco.Position( 2, 5 ); // Example: line 2, column 5
+        editor.setPosition( initialCursorPosition );
+        editor.focus();
+
         editorRef.current = editor;
 
         monaco.languages.register( { id: 'uitdl' } );
@@ -49,7 +55,7 @@ const Editor = ( { value, onChange } ) => {
                     {
                         label: 'FRAGMENT',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW ${2:id}\n\tTRANSITION from ${3:id} to ${4:id} if user \n}',
+                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW ${2:id}\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb}\n}',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define a fragment with draw and transitions',
                     },
@@ -118,12 +124,13 @@ const Editor = ( { value, onChange } ) => {
 
     return (
         <MonacoEditor
-            height={ 800 }
-            width={ 800 }
+            height="100%"
+            width="100%"
             defaultLanguage="uitdl"
             value={ value }
             onChange={ handleEditorChange }
             onMount={ handleEditorDidMount }
+            theme="vs-dark"
             options={ { automaticLayout: true } }
         />
     );

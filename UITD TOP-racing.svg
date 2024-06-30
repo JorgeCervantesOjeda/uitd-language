@@ -1,0 +1,3527 @@
+<?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 d2Version="v0.6.5-HEAD"
+	 preserveAspectRatio="xMidYMid meet"
+	 viewBox="0 0 2405 6044"><svg id="d2-svg"
+		 class="d2-2170071961"
+		 width="2405"
+		 height="6044"
+		 viewBox="-89 -89 2405 6044">
+		<rect x="-89.000000"
+			  y="-89.000000"
+			  width="2405.000000"
+			  height="6044.000000"
+			  rx="0.000000"
+			  class=" fill-N7"
+			  stroke-width="0" />
+		<style type="text/css">
+			<![CDATA[
+			.d2-2170071961 .text {
+				font-family: "d2-2170071961-font-regular";
+			}
+
+			@font-face {
+				font-family: d2-2170071961-font-regular;
+				src: url("data:application/font-woff;base64,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");
+			}
+
+			.d2-2170071961 .text-bold {
+				font-family: "d2-2170071961-font-bold";
+			}
+
+			@font-face {
+				font-family: d2-2170071961-font-bold;
+				src: url("data:application/font-woff;base64,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");
+			}
+
+			.d2-2170071961 .text-italic {
+				font-family: "d2-2170071961-font-italic";
+			}
+
+			@font-face {
+				font-family: d2-2170071961-font-italic;
+				src: url("data:application/font-woff;base64,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");
+			}
+			]]>
+		</style>
+		<style type="text/css">
+			<![CDATA[
+			.shape {
+				shape-rendering: geometricPrecision;
+				stroke-linejoin: round;
+			}
+
+			.connection {
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
+
+			.blend {
+				mix-blend-mode: multiply;
+				opacity: 0.5;
+			}
+
+			.d2-2170071961 .fill-N1 {
+				fill: #0A0F25;
+			}
+
+			.d2-2170071961 .fill-N2 {
+				fill: #676C7E;
+			}
+
+			.d2-2170071961 .fill-N3 {
+				fill: #9499AB;
+			}
+
+			.d2-2170071961 .fill-N4 {
+				fill: #CFD2DD;
+			}
+
+			.d2-2170071961 .fill-N5 {
+				fill: #DEE1EB;
+			}
+
+			.d2-2170071961 .fill-N6 {
+				fill: #EEF1F8;
+			}
+
+			.d2-2170071961 .fill-N7 {
+				fill: #FFFFFF;
+			}
+
+			.d2-2170071961 .fill-B1 {
+				fill: #0D32B2;
+			}
+
+			.d2-2170071961 .fill-B2 {
+				fill: #0D32B2;
+			}
+
+			.d2-2170071961 .fill-B3 {
+				fill: #E3E9FD;
+			}
+
+			.d2-2170071961 .fill-B4 {
+				fill: #E3E9FD;
+			}
+
+			.d2-2170071961 .fill-B5 {
+				fill: #EDF0FD;
+			}
+
+			.d2-2170071961 .fill-B6 {
+				fill: #F7F8FE;
+			}
+
+			.d2-2170071961 .fill-AA2 {
+				fill: #4A6FF3;
+			}
+
+			.d2-2170071961 .fill-AA4 {
+				fill: #EDF0FD;
+			}
+
+			.d2-2170071961 .fill-AA5 {
+				fill: #F7F8FE;
+			}
+
+			.d2-2170071961 .fill-AB4 {
+				fill: #EDF0FD;
+			}
+
+			.d2-2170071961 .fill-AB5 {
+				fill: #F7F8FE;
+			}
+
+			.d2-2170071961 .stroke-N1 {
+				stroke: #0A0F25;
+			}
+
+			.d2-2170071961 .stroke-N2 {
+				stroke: #676C7E;
+			}
+
+			.d2-2170071961 .stroke-N3 {
+				stroke: #9499AB;
+			}
+
+			.d2-2170071961 .stroke-N4 {
+				stroke: #CFD2DD;
+			}
+
+			.d2-2170071961 .stroke-N5 {
+				stroke: #DEE1EB;
+			}
+
+			.d2-2170071961 .stroke-N6 {
+				stroke: #EEF1F8;
+			}
+
+			.d2-2170071961 .stroke-N7 {
+				stroke: #FFFFFF;
+			}
+
+			.d2-2170071961 .stroke-B1 {
+				stroke: #0D32B2;
+			}
+
+			.d2-2170071961 .stroke-B2 {
+				stroke: #0D32B2;
+			}
+
+			.d2-2170071961 .stroke-B3 {
+				stroke: #E3E9FD;
+			}
+
+			.d2-2170071961 .stroke-B4 {
+				stroke: #E3E9FD;
+			}
+
+			.d2-2170071961 .stroke-B5 {
+				stroke: #EDF0FD;
+			}
+
+			.d2-2170071961 .stroke-B6 {
+				stroke: #F7F8FE;
+			}
+
+			.d2-2170071961 .stroke-AA2 {
+				stroke: #4A6FF3;
+			}
+
+			.d2-2170071961 .stroke-AA4 {
+				stroke: #EDF0FD;
+			}
+
+			.d2-2170071961 .stroke-AA5 {
+				stroke: #F7F8FE;
+			}
+
+			.d2-2170071961 .stroke-AB4 {
+				stroke: #EDF0FD;
+			}
+
+			.d2-2170071961 .stroke-AB5 {
+				stroke: #F7F8FE;
+			}
+
+			.d2-2170071961 .background-color-N1 {
+				background-color: #0A0F25;
+			}
+
+			.d2-2170071961 .background-color-N2 {
+				background-color: #676C7E;
+			}
+
+			.d2-2170071961 .background-color-N3 {
+				background-color: #9499AB;
+			}
+
+			.d2-2170071961 .background-color-N4 {
+				background-color: #CFD2DD;
+			}
+
+			.d2-2170071961 .background-color-N5 {
+				background-color: #DEE1EB;
+			}
+
+			.d2-2170071961 .background-color-N6 {
+				background-color: #EEF1F8;
+			}
+
+			.d2-2170071961 .background-color-N7 {
+				background-color: #FFFFFF;
+			}
+
+			.d2-2170071961 .background-color-B1 {
+				background-color: #0D32B2;
+			}
+
+			.d2-2170071961 .background-color-B2 {
+				background-color: #0D32B2;
+			}
+
+			.d2-2170071961 .background-color-B3 {
+				background-color: #E3E9FD;
+			}
+
+			.d2-2170071961 .background-color-B4 {
+				background-color: #E3E9FD;
+			}
+
+			.d2-2170071961 .background-color-B5 {
+				background-color: #EDF0FD;
+			}
+
+			.d2-2170071961 .background-color-B6 {
+				background-color: #F7F8FE;
+			}
+
+			.d2-2170071961 .background-color-AA2 {
+				background-color: #4A6FF3;
+			}
+
+			.d2-2170071961 .background-color-AA4 {
+				background-color: #EDF0FD;
+			}
+
+			.d2-2170071961 .background-color-AA5 {
+				background-color: #F7F8FE;
+			}
+
+			.d2-2170071961 .background-color-AB4 {
+				background-color: #EDF0FD;
+			}
+
+			.d2-2170071961 .background-color-AB5 {
+				background-color: #F7F8FE;
+			}
+
+			.d2-2170071961 .color-N1 {
+				color: #0A0F25;
+			}
+
+			.d2-2170071961 .color-N2 {
+				color: #676C7E;
+			}
+
+			.d2-2170071961 .color-N3 {
+				color: #9499AB;
+			}
+
+			.d2-2170071961 .color-N4 {
+				color: #CFD2DD;
+			}
+
+			.d2-2170071961 .color-N5 {
+				color: #DEE1EB;
+			}
+
+			.d2-2170071961 .color-N6 {
+				color: #EEF1F8;
+			}
+
+			.d2-2170071961 .color-N7 {
+				color: #FFFFFF;
+			}
+
+			.d2-2170071961 .color-B1 {
+				color: #0D32B2;
+			}
+
+			.d2-2170071961 .color-B2 {
+				color: #0D32B2;
+			}
+
+			.d2-2170071961 .color-B3 {
+				color: #E3E9FD;
+			}
+
+			.d2-2170071961 .color-B4 {
+				color: #E3E9FD;
+			}
+
+			.d2-2170071961 .color-B5 {
+				color: #EDF0FD;
+			}
+
+			.d2-2170071961 .color-B6 {
+				color: #F7F8FE;
+			}
+
+			.d2-2170071961 .color-AA2 {
+				color: #4A6FF3;
+			}
+
+			.d2-2170071961 .color-AA4 {
+				color: #EDF0FD;
+			}
+
+			.d2-2170071961 .color-AA5 {
+				color: #F7F8FE;
+			}
+
+			.d2-2170071961 .color-AB4 {
+				color: #EDF0FD;
+			}
+
+			.d2-2170071961 .color-AB5 {
+				color: #F7F8FE;
+			}
+
+			.appendix text.text {
+				fill: #0A0F25
+			}
+
+			.md {
+				--color-fg-default: #0A0F25;
+				--color-fg-muted: #676C7E;
+				--color-fg-subtle: #9499AB;
+				--color-canvas-default: #FFFFFF;
+				--color-canvas-subtle: #EEF1F8;
+				--color-border-default: #0D32B2;
+				--color-border-muted: #0D32B2;
+				--color-neutral-muted: #EEF1F8;
+				--color-accent-fg: #0D32B2;
+				--color-accent-emphasis: #0D32B2;
+				--color-attention-subtle: #676C7E;
+				--color-danger-fg: red;
+			}
+
+			.sketch-overlay-B1 {
+				fill: url(#streaks-darker);
+				mix-blend-mode: lighten
+			}
+
+			.sketch-overlay-B2 {
+				fill: url(#streaks-darker);
+				mix-blend-mode: lighten
+			}
+
+			.sketch-overlay-B3 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-B4 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-B5 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-B6 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-AA2 {
+				fill: url(#streaks-dark);
+				mix-blend-mode: overlay
+			}
+
+			.sketch-overlay-AA4 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-AA5 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-AB4 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-AB5 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-N1 {
+				fill: url(#streaks-darker);
+				mix-blend-mode: lighten
+			}
+
+			.sketch-overlay-N2 {
+				fill: url(#streaks-dark);
+				mix-blend-mode: overlay
+			}
+
+			.sketch-overlay-N3 {
+				fill: url(#streaks-normal);
+				mix-blend-mode: color-burn
+			}
+
+			.sketch-overlay-N4 {
+				fill: url(#streaks-normal);
+				mix-blend-mode: color-burn
+			}
+
+			.sketch-overlay-N5 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-N6 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.sketch-overlay-N7 {
+				fill: url(#streaks-bright);
+				mix-blend-mode: darken
+			}
+
+			.light-code {
+				display: block
+			}
+
+			.dark-code {
+				display: none
+			}
+			]]>
+		</style>
+		<g id="TOP-Racing">
+			<g class="shape">
+				<rect x="12.000000"
+					  y="12.000000"
+					  width="2203.000000"
+					  height="5842.000000"
+					  class=" stroke-B1 fill-B4"
+					  style="stroke-width:2;" />
+			</g><text x="1113.500000"
+				  y="45.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:28px">TOP-Racing</text>
+		</g>
+		<g id="TOP-Racing.Navigation">
+			<g class="shape">
+				<rect x="638.000000"
+					  y="62.000000"
+					  width="950.000000"
+					  height="1594.000000"
+					  class=" stroke-B1 fill-B5"
+					  style="stroke-width:2;" />
+			</g><text x="1113.000000"
+				  y="91.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:24px">Navigation</text>
+		</g>
+		<g id="TOP-Racing.Login">
+			<g class="shape">
+				<rect x="333.000000"
+					  y="1676.000000"
+					  width="1561.000000"
+					  height="471.000000"
+					  class=" stroke-B1 fill-B5"
+					  style="stroke-width:2;" />
+			</g><text x="1113.500000"
+				  y="1705.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:24px">Login</text>
+		</g>
+		<g id="TOP-Racing.Edit results">
+			<g class="shape">
+				<rect x="226.000000"
+					  y="2166.000000"
+					  width="1774.000000"
+					  height="743.000000"
+					  class=" stroke-B1 fill-B5"
+					  style="stroke-width:2;" />
+			</g><text x="1113.000000"
+				  y="2195.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:24px">Edit results</text>
+		</g>
+		<g id="TOP-Racing.Priorities">
+			<g class="shape">
+				<rect x="62.000000"
+					  y="2929.000000"
+					  width="2103.000000"
+					  height="2874.000000"
+					  class=" stroke-B1 fill-B5"
+					  style="stroke-width:2;" />
+			</g><text x="1113.500000"
+				  y="2958.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:24px">Priorities</text>
+		</g>
+		<g id="TOP-Racing.Navigation.0">
+			<g class="shape">
+				<rect x="688.000000"
+					  y="583.000000"
+					  width="134.000000"
+					  height="320.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="693.000000"
+					  y="588.000000"
+					  width="124.000000"
+					  height="310.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="755.000000"
+				  y="748.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.1">
+			<g class="shape">
+				<rect x="1304.000000"
+					  y="112.000000"
+					  width="234.000000"
+					  height="166.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="137.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:20px">1 Login</text>
+		</g>
+		<g id="TOP-Racing.Navigation.2">
+			<g class="shape">
+				<rect x="1304.000000"
+					  y="298.000000"
+					  width="234.000000"
+					  height="166.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1309.000000"
+					  y="303.000000"
+					  width="224.000000"
+					  height="156.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="323.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:20px">2 Contact</text>
+		</g>
+		<g id="TOP-Racing.Navigation.3">
+			<g class="shape">
+				<rect x="1304.000000"
+					  y="484.000000"
+					  width="234.000000"
+					  height="166.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="509.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:20px">3 Welcome</text>
+		</g>
+		<g id="TOP-Racing.Navigation.4">
+			<g class="shape">
+				<rect x="1304.000000"
+					  y="809.000000"
+					  width="234.000000"
+					  height="166.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1309.000000"
+					  y="814.000000"
+					  width="224.000000"
+					  height="156.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="834.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:20px">4 Standings</text>
+		</g>
+		<g id="TOP-Racing.Navigation.5">
+			<g class="shape">
+				<rect x="1304.000000"
+					  y="995.000000"
+					  width="234.000000"
+					  height="166.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="1020.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:20px">5 Priorities</text>
+		</g>
+		<g id="TOP-Racing.Navigation.6">
+			<g class="shape">
+				<rect x="1304.000000"
+					  y="1254.000000"
+					  width="234.000000"
+					  height="166.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1309.000000"
+					  y="1259.000000"
+					  width="224.000000"
+					  height="156.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="1279.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:20px">6 Past Registrations</text>
+		</g>
+		<g id="TOP-Racing.Navigation.27">
+			<g class="shape">
+				<rect x="1304.000000"
+					  y="1440.000000"
+					  width="234.000000"
+					  height="166.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="1465.000000"
+				  class="text fill-N1"
+				  style="text-anchor:middle;font-size:20px">27 Edit Profile</text>
+		</g>
+		<g id="TOP-Racing.Navigation.29">
+			<g class="shape">
+				<rect x="700.000000"
+					  y="923.000000"
+					  width="111.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="755.500000"
+				  y="961.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">29 Forum</text>
+		</g>
+		<g id="TOP-Racing.Navigation.30">
+			<g class="shape">
+				<rect x="703.000000"
+					  y="1009.000000"
+					  width="104.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="755.000000"
+				  y="1047.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">30 News</text>
+		</g>
+		<g id="TOP-Racing.Login.1">
+			<g class="shape">
+				<rect x="383.000000"
+					  y="1866.000000"
+					  width="95.000000"
+					  height="160.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="430.500000"
+				  y="1951.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">1 Login</text>
+		</g>
+		<g id="TOP-Racing.Login.3">
+			<g class="shape">
+				<rect x="1573.000000"
+					  y="1735.000000"
+					  width="121.000000"
+					  height="80.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1633.500000"
+				  y="1780.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">3 Welcome</text>
+		</g>
+		<g id="TOP-Racing.Login.27">
+			<g class="shape">
+				<rect x="1075.000000"
+					  y="1792.000000"
+					  width="145.000000"
+					  height="80.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1147.500000"
+				  y="1837.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">27 Edit Profile</text>
+		</g>
+		<g id="TOP-Racing.Login.31">
+			<g class="shape">
+				<rect x="989.000000"
+					  y="1892.000000"
+					  width="189.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="994.000000"
+					  y="1897.000000"
+					  width="179.000000"
+					  height="56.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1083.500000"
+				  y="1930.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">31 Login Failed Alert</text>
+		</g>
+		<g id="TOP-Racing.Login.32">
+			<g class="shape">
+				<rect x="1573.000000"
+					  y="1939.000000"
+					  width="271.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1578.000000"
+					  y="1944.000000"
+					  width="261.000000"
+					  height="56.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1708.500000"
+				  y="1977.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">32 Account Creation Failed Alert</text>
+		</g>
+		<g id="TOP-Racing.Login.33">
+			<g class="shape">
+				<rect x="989.000000"
+					  y="1978.000000"
+					  width="274.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="994.000000"
+					  y="1983.000000"
+					  width="264.000000"
+					  height="56.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1126.000000"
+				  y="2016.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">33 Password Reset Success Alert</text>
+		</g>
+		<g id="TOP-Racing.Edit results.7">
+			<g class="shape">
+				<rect x="276.000000"
+					  y="2337.000000"
+					  width="169.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="360.500000"
+				  y="2375.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">7 View/Edit Event</text>
+		</g>
+		<g id="TOP-Racing.Edit results.8">
+			<g class="shape">
+				<rect x="877.000000"
+					  y="2305.000000"
+					  width="267.000000"
+					  height="160.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="882.000000"
+					  y="2310.000000"
+					  width="257.000000"
+					  height="150.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1010.500000"
+				  y="2390.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">8 View/Edit Event Registrations</text>
+		</g>
+		<g id="TOP-Racing.Edit results.9">
+			<g class="shape">
+				<rect x="1734.000000"
+					  y="2437.000000"
+					  width="216.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1739.000000"
+					  y="2442.000000"
+					  width="206.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1842.000000"
+				  y="2542.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">9 View/Edit Registration</text>
+		</g>
+		<g id="TOP-Racing.Edit results.10">
+			<g class="shape">
+				<rect x="991.000000"
+					  y="2574.000000"
+					  width="153.000000"
+					  height="80.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="996.000000"
+					  y="2579.000000"
+					  width="143.000000"
+					  height="70.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1067.500000"
+				  y="2619.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">10 View Drivers</text>
+		</g>
+		<g id="TOP-Racing.Edit results.11">
+			<g class="shape">
+				<rect x="984.000000"
+					  y="2706.000000"
+					  width="160.000000"
+					  height="120.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="989.000000"
+					  y="2711.000000"
+					  width="150.000000"
+					  height="110.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1064.000000"
+				  y="2771.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">11 View Vehicles</text>
+		</g>
+		<g id="TOP-Racing.Edit results.12">
+			<g class="shape">
+				<rect x="1734.000000"
+					  y="2739.000000"
+					  width="147.000000"
+					  height="120.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1739.000000"
+					  y="2744.000000"
+					  width="137.000000"
+					  height="110.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1807.500000"
+				  y="2804.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">12 Edit Vehicle</text>
+		</g>
+		<g id="TOP-Racing.Priorities.1">
+			<g class="shape">
+				<rect x="1930.000000"
+					  y="3205.000000"
+					  width="95.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1977.500000"
+				  y="3243.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">1 Login</text>
+		</g>
+		<g id="TOP-Racing.Priorities.5">
+			<g class="shape">
+				<rect x="130.000000"
+					  y="3052.000000"
+					  width="123.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="191.500000"
+				  y="3157.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">5 Priorities</text>
+		</g>
+		<g id="TOP-Racing.Priorities.7">
+			<g class="shape">
+				<rect x="1127.000000"
+					  y="3088.000000"
+					  width="169.000000"
+					  height="320.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+			</g><text x="1211.500000"
+				  y="3253.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">7 View/Edit Event</text>
+		</g>
+		<g id="TOP-Racing.Priorities.34">
+			<g class="shape">
+				<rect x="1930.000000"
+					  y="3291.000000"
+					  width="185.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1935.000000"
+					  y="3296.000000"
+					  width="175.000000"
+					  height="56.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="2022.500000"
+				  y="3329.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">34 Next Status Alert</text>
+		</g>
+		<g id="TOP-Racing.Priorities.13">
+			<g class="shape">
+				<rect x="130.000000"
+					  y="3425.000000"
+					  width="123.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="135.000000"
+					  y="3430.000000"
+					  width="113.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="191.500000"
+				  y="3530.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">13 Variants</text>
+		</g>
+		<g id="TOP-Racing.Priorities.14">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="3590.000000"
+					  width="187.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="3595.000000"
+					  width="177.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1241.500000"
+				  y="3695.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">14 View/Edit Variant</text>
+		</g>
+		<g id="TOP-Racing.Priorities.15">
+			<g class="shape">
+				<rect x="138.000000"
+					  y="3811.000000"
+					  width="115.000000"
+					  height="240.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="143.000000"
+					  y="3816.000000"
+					  width="105.000000"
+					  height="230.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="195.500000"
+				  y="3936.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">15 Venues</text>
+		</g>
+		<g id="TOP-Racing.Priorities.16">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="3899.000000"
+					  width="179.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="3904.000000"
+					  width="169.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1237.500000"
+				  y="4004.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">16 View/Edit Venue</text>
+		</g>
+		<g id="TOP-Racing.Priorities.28">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="4208.000000"
+					  width="95.000000"
+					  height="80.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="4213.000000"
+					  width="85.000000"
+					  height="70.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1195.500000"
+				  y="4253.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">28 Map</text>
+		</g>
+		<g id="TOP-Racing.Priorities.17">
+			<g class="shape">
+				<rect x="112.000000"
+					  y="4220.000000"
+					  width="186.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="117.000000"
+					  y="4225.000000"
+					  width="176.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="205.000000"
+				  y="4325.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">17 Province Regions</text>
+		</g>
+		<g id="TOP-Racing.Priorities.18">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="4397.000000"
+					  width="250.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="4402.000000"
+					  width="240.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1273.000000"
+				  y="4502.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">18 View/Edit Province Region</text>
+		</g>
+		<g id="TOP-Racing.Priorities.19">
+			<g class="shape">
+				<rect x="122.000000"
+					  y="4577.000000"
+					  width="134.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="127.000000"
+					  y="4582.000000"
+					  width="124.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="189.000000"
+				  y="4682.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">19 Provinces</text>
+		</g>
+		<g id="TOP-Racing.Priorities.20">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="4706.000000"
+					  width="199.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="4711.000000"
+					  width="189.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1247.500000"
+				  y="4811.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">20 View/Edit Province</text>
+		</g>
+		<g id="TOP-Racing.Priorities.21">
+			<g class="shape">
+				<rect x="112.000000"
+					  y="4886.000000"
+					  width="182.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="117.000000"
+					  y="4891.000000"
+					  width="172.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="203.000000"
+				  y="4991.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">21 Country Regions</text>
+		</g>
+		<g id="TOP-Racing.Priorities.22">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="5015.000000"
+					  width="246.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="5020.000000"
+					  width="236.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1271.000000"
+				  y="5120.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">22 View/Edit Country Region</text>
+		</g>
+		<g id="TOP-Racing.Priorities.23">
+			<g class="shape">
+				<rect x="122.000000"
+					  y="5195.000000"
+					  width="134.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="127.000000"
+					  y="5200.000000"
+					  width="124.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="189.000000"
+				  y="5300.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">23 Countries</text>
+		</g>
+		<g id="TOP-Racing.Priorities.24">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="5324.000000"
+					  width="195.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="5329.000000"
+					  width="185.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1245.500000"
+				  y="5429.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">24 View/Edit Country</text>
+		</g>
+		<g id="TOP-Racing.Priorities.25">
+			<g class="shape">
+				<rect x="112.000000"
+					  y="5521.000000"
+					  width="171.000000"
+					  height="200.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="117.000000"
+					  y="5526.000000"
+					  width="161.000000"
+					  height="190.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="197.500000"
+				  y="5626.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">25 Planet Regions</text>
+		</g>
+		<g id="TOP-Racing.Priorities.26">
+			<g class="shape">
+				<rect x="1148.000000"
+					  y="5633.000000"
+					  width="235.000000"
+					  height="120.000000"
+					  class=" stroke-B1 fill-B6"
+					  style="stroke-width:2;" />
+				<rect x="1153.000000"
+					  y="5638.000000"
+					  width="225.000000"
+					  height="110.000000"
+					  fill="transparent"
+					  class=" stroke-B1"
+					  style="stroke-width:2;" />
+			</g><text x="1265.500000"
+				  y="5698.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">26 View/Edit Planet Region</text>
+		</g>
+		<g id="TOP-Racing.Navigation.1.0">
+			<g class="shape">
+				<rect x="1354.000000"
+					  y="162.000000"
+					  width="134.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-N7"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="200.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.2.0">
+			<g class="shape">
+				<rect x="1354.000000"
+					  y="348.000000"
+					  width="134.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-N7"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="386.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.3.0">
+			<g class="shape">
+				<rect x="1354.000000"
+					  y="534.000000"
+					  width="134.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-N7"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="572.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.4.0">
+			<g class="shape">
+				<rect x="1354.000000"
+					  y="859.000000"
+					  width="134.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-N7"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="897.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.5.0">
+			<g class="shape">
+				<rect x="1354.000000"
+					  y="1045.000000"
+					  width="134.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-N7"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="1083.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.6.0">
+			<g class="shape">
+				<rect x="1354.000000"
+					  y="1304.000000"
+					  width="134.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-N7"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="1342.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.27.0">
+			<g class="shape">
+				<rect x="1354.000000"
+					  y="1490.000000"
+					  width="134.000000"
+					  height="66.000000"
+					  class=" stroke-B1 fill-N7"
+					  style="stroke-width:2;" />
+			</g><text x="1421.000000"
+				  y="1528.500000"
+				  class="text-bold fill-N1"
+				  style="text-anchor:middle;font-size:16px">0 Navigation</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 1)[0]">
+			<marker id="mk-3488378134"
+					markerWidth="10.000000"
+					markerHeight="12.000000"
+					refX="7.000000"
+					refY="6.000000"
+					viewBox="0.000000 0.000000 10.000000 12.000000"
+					orient="auto"
+					markerUnits="userSpaceOnUse">
+				<polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000"
+						 class="connection fill-B1"
+						 stroke-width="2" />
+			</marker>
+			<path d="M 824.500000 618.888000 L 852.500000 618.888000 S 862.500000 618.888000 862.500000 608.888000 L 862.500000 205.000000 S 862.500000 195.000000 872.500000 195.000000 L 1300.500000 195.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="862.500000"
+				  y="203.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="862.500000"
+					   dy="0.000000">clicks &#34;Login&#34; AND</tspan>
+				<tspan x="862.500000"
+					   dy="18.500000">(has no open session)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 2)[0]">
+			<path d="M 824.500000 654.443970 L 902.500000 654.443970 S 912.500000 654.443970 912.500000 644.443970 L 912.500000 391.000000 S 912.500000 381.000000 922.500000 381.000000 L 1300.500000 381.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="927.000000"
+				  y="387.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Contact&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 3)[0]">
+			<path d="M 824.500000 690.000000 L 952.500000 690.000000 S 962.500000 690.000000 962.500000 680.000000 L 962.500000 549.333008 S 962.500000 539.333008 972.500000 539.333008 L 1300.500000 539.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="988.500000"
+				  y="545.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Welcome Page&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 4)[0]">
+			<path d="M 824.500000 761.111023 L 1002.500000 761.111023 S 1012.500000 761.111023 1012.500000 771.111023 L 1012.500000 882.000000 S 1012.500000 892.000000 1022.500000 892.000000 L 1300.500000 892.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1012.500000"
+				  y="883.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Standings&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 5)[0]">
+			<path d="M 824.500000 796.666016 L 952.500000 796.666016 S 962.500000 796.666016 962.500000 806.666016 L 962.500000 1068.000000 S 962.500000 1078.000000 972.500000 1078.000000 L 1300.500000 1078.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="962.500000"
+				  y="1044.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Event Priorities&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 6)[0]">
+			<path d="M 824.500000 832.221985 L 902.500000 832.221985 S 912.500000 832.221985 912.500000 842.221985 L 912.500000 1327.000000 S 912.500000 1337.000000 922.500000 1337.000000 L 1300.500000 1337.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="913.000000"
+				  y="1241.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Past Registrations&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 27)[0]">
+			<path d="M 824.500000 867.776978 L 852.500000 867.776978 S 862.500000 867.776978 862.500000 877.776978 L 862.500000 1513.000000 S 862.500000 1523.000000 872.500000 1523.000000 L 1300.500000 1523.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="862.500000"
+				  y="1394.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="862.500000"
+					   dy="0.000000">clicks &#34;Edit Profile&#34; AND</tspan>
+				<tspan x="862.500000"
+					   dy="18.500000">(has an open session)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(0 -&gt; 3)[1]">
+			<path d="M 824.500000 725.554993 L 1002.500000 725.554993 S 1012.500000 725.554993 1012.500000 715.554993 L 1012.500000 597.500000 S 1012.500000 587.500000 1022.500000 587.500000 L 1300.500000 587.500000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1013.000000"
+				  y="603.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1013.000000"
+					   dy="0.000000">clicks &#34;Logout&#34; AND</tspan>
+				<tspan x="1013.000000"
+					   dy="18.500000">(has an open session)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(4 -&gt; 4)[0]">
+			<path d="M 1404.785034 807.000000 L 1404.785034 769.000000 S 1404.785034 759.000000 1414.785034 759.000000 L 1428.213989 759.000000 S 1438.213989 759.000000 1438.213989 769.000000 L 1438.213989 805.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1421.500000"
+				  y="765.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(4 -&gt; 4)[1]">
+			<path d="M 1371.357056 807.000000 L 1371.357056 736.000000 S 1371.357056 726.000000 1381.357056 726.000000 L 1461.641968 726.000000 S 1471.641968 726.000000 1471.641968 736.000000 L 1471.641968 805.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1421.500000"
+				  y="732.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">selects &#34;territorial level&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(4 -&gt; 4)[2]">
+			<path d="M 1337.927979 807.000000 L 1337.927979 703.000000 S 1337.927979 693.000000 1347.927979 693.000000 L 1495.071045 693.000000 S 1505.071045 693.000000 1505.071045 703.000000 L 1505.071045 805.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1421.500000"
+				  y="699.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">selects &#34;temporal level&#34;</text>
+		</g>
+		<g id="TOP-Racing.Navigation.(6 -&gt; 6)[0]">
+			<path d="M 1382.500000 1252.000000 L 1382.500000 1214.000000 S 1382.500000 1204.000000 1392.500000 1204.000000 L 1450.500000 1204.000000 S 1460.500000 1204.000000 1460.500000 1214.000000 L 1460.500000 1250.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1421.500000"
+				  y="1210.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Login.(1 -&gt; 3)[0]">
+			<path d="M 480.000000 1886.333008 L 508.000000 1886.333008 S 518.000000 1886.333008 518.000000 1876.333008 L 518.000000 1755.000000 S 518.000000 1745.000000 528.000000 1745.000000 L 1524.666992 1745.000000 C 1541.333008 1745.000000 1524.666992 1761.666016 1541.333008 1761.666016 L 1569.000000 1761.666016"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="963.500000"
+				  y="1743.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="963.500000"
+					   dy="0.000000">clicks &#34;Login&#34; AND</tspan>
+				<tspan x="963.500000"
+					   dy="18.500000">(e-mail/password correct)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Login.(1 -&gt; 31)[0]">
+			<path d="M 480.000000 1926.333008 L 608.000000 1926.333008 S 618.000000 1926.333008 618.000000 1916.333008 L 618.000000 1915.333008 S 618.000000 1905.333008 628.000000 1905.333008 L 985.000000 1905.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="723.000000"
+				  y="1903.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="723.000000"
+					   dy="0.000000">clicks &#34;Login&#34; AND</tspan>
+				<tspan x="723.000000"
+					   dy="18.500000">(e-mail or password incorrect)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Login.(1 -&gt; 27)[0]">
+			<path d="M 480.000000 1906.333008 L 558.000000 1906.333008 S 568.000000 1906.333008 568.000000 1896.333008 L 568.000000 1842.833008 S 568.000000 1832.833008 578.000000 1832.833008 L 1071.000000 1832.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="740.000000"
+				  y="1838.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Account&#34;</text>
+		</g>
+		<g id="TOP-Racing.Login.(27 -&gt; 32)[0]">
+			<path d="M 1222.000000 1857.333008 L 1523.000000 1857.333008 S 1533.000000 1857.333008 1533.000000 1867.333008 L 1533.000000 1951.166016 S 1533.000000 1961.166016 1543.000000 1961.166016 L 1569.000000 1961.166016"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1448.000000"
+				  y="1855.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1448.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1448.000000"
+					   dy="18.500000">(Creation fails)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Login.(27 -&gt; 3)[0]">
+			<path d="M 1222.000000 1808.333008 L 1523.000000 1808.333008 S 1533.000000 1808.333008 1533.000000 1798.333008 L 1533.000000 1798.333008 S 1533.000000 1788.333008 1543.000000 1788.333008 L 1569.000000 1788.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1407.000000"
+				  y="1806.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1407.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1407.000000"
+					   dy="18.500000">(Data is saved)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Login.(1 -&gt; 33)[0]">
+			<path d="M 480.000000 1966.333008 L 939.000000 1966.333008 S 949.000000 1966.333008 949.000000 1976.333008 L 949.000000 1990.833008 S 949.000000 2000.833008 959.000000 2000.833008 L 985.000000 2000.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="750.500000"
+				  y="1964.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="750.500000"
+					   dy="0.000000">clicks &#34;Request a password reset&#34; AND</tspan>
+				<tspan x="750.500000"
+					   dy="18.500000">(email given)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Login.(31 -&gt; 1)[0]">
+			<path d="M 987.000000 1936.833008 L 953.750000 1936.833008 C 944.250000 1936.833008 953.750000 1946.333008 944.250000 1946.333008 L 482.000000 1946.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="738.000000"
+				  y="1952.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;OK&#34;</text>
+		</g>
+		<g id="TOP-Racing.Login.(32 -&gt; 1)[0]">
+			<path d="M 1571.000000 1983.166016 L 1543.000000 1983.166016 S 1533.000000 1983.166016 1533.000000 1993.166016 L 1533.000000 2074.833008 S 1533.000000 2084.833008 1523.000000 2084.833008 L 528.000000 2084.833008 S 518.000000 2084.833008 518.000000 2074.833008 L 518.000000 2016.333008 S 518.000000 2006.333008 508.000000 2006.333008 L 482.000000 2006.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1037.000000"
+				  y="2090.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;OK&#34;</text>
+		</g>
+		<g id="TOP-Racing.Login.(33 -&gt; 1)[0]">
+			<path d="M 987.000000 2032.333008 L 578.000000 2032.333008 S 568.000000 2032.333008 568.000000 2022.333008 L 568.000000 1996.333008 S 568.000000 1986.333008 558.000000 1986.333008 L 482.000000 1986.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="711.000000"
+				  y="2038.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;OK&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(7 -&gt; 8)[0]">
+			<path d="M 447.500000 2359.166016 L 873.500000 2359.166016"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="662.000000"
+				  y="2357.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="662.000000"
+					   dy="0.000000">clicks &#34;View/Edit Event registrations&#34; AND</tspan>
+				<tspan x="662.000000"
+					   dy="18.500000">(is logged in)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(8 -&gt; 8)[0]">
+			<path d="M 966.500000 2303.833008 L 966.500000 2265.833008 S 966.500000 2255.833008 976.500000 2255.833008 L 1045.500000 2255.833008 S 1055.500000 2255.833008 1055.500000 2265.833008 L 1055.500000 2301.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1011.500000"
+				  y="2253.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1011.500000"
+					   dy="0.000000">selects &#34;Registration status&#34; AND</tspan>
+				<tspan x="1011.500000"
+					   dy="18.500000">(is Event creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(8 -&gt; 8)[1]">
+			<path d="M 1055.500000 2467.833008 L 1055.500000 2505.833008 S 1055.500000 2515.833008 1045.500000 2515.833008 L 976.500000 2515.833008 S 966.500000 2515.833008 966.500000 2505.833008 L 966.500000 2469.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1011.000000"
+				  y="2513.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1011.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1011.000000"
+					   dy="18.500000">(is Event creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(8 -&gt; 9)[0]">
+			<path d="M 1146.500000 2359.166016 L 1634.500000 2359.166016 S 1644.500000 2359.166016 1644.500000 2369.166016 L 1644.500000 2452.833008 S 1644.500000 2462.833008 1654.500000 2462.833008 L 1730.500000 2462.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1491.000000"
+				  y="2365.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Registration&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(8 -&gt; 7)[0]">
+			<path d="M 875.500000 2406.333008 L 495.500000 2406.333008 S 485.500000 2406.333008 485.500000 2396.333008 L 485.500000 2391.166016 S 485.500000 2381.166016 475.500000 2381.166016 L 449.500000 2381.166016"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="648.500000"
+				  y="2412.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(9 -&gt; 10)[0]">
+			<path d="M 1732.500000 2562.833008 L 1604.500000 2562.833008 S 1594.500000 2562.833008 1594.500000 2572.833008 L 1594.500000 2635.333008 S 1594.500000 2645.333008 1584.500000 2645.333008 L 1189.750000 2645.333008 C 1179.250000 2645.333008 1189.750000 2634.833008 1179.250000 2634.833008 L 1148.500000 2634.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1475.500000"
+				  y="2643.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1475.500000"
+					   dy="0.000000">clicks &#34;View Drivers&#34; AND</tspan>
+				<tspan x="1475.500000"
+					   dy="18.500000">(is Registration creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(9 -&gt; 11)[0]">
+			<path d="M 1732.500000 2612.833008 L 1704.500000 2612.833008 S 1694.500000 2612.833008 1694.500000 2622.833008 L 1694.500000 2736.833008 S 1694.500000 2746.833008 1684.500000 2746.833008 L 1148.500000 2746.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1506.500000"
+				  y="2744.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1506.500000"
+					   dy="0.000000">clicks &#34;View Vehicles&#34; AND</tspan>
+				<tspan x="1506.500000"
+					   dy="18.500000">(is Registration creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(9 -&gt; 9)[0]">
+			<path d="M 1806.500000 2435.833008 L 1806.500000 2397.833008 S 1806.500000 2387.833008 1816.500000 2387.833008 L 1868.500000 2387.833008 S 1878.500000 2387.833008 1878.500000 2397.833008 L 1878.500000 2433.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1843.000000"
+				  y="2385.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1843.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1843.000000"
+					   dy="18.500000">(is Registration cretaor)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(9 -&gt; 8)[0]">
+			<path d="M 1732.500000 2487.833008 L 1604.500000 2487.833008 S 1594.500000 2487.833008 1594.500000 2477.833008 L 1594.500000 2412.333008 S 1594.500000 2402.333008 1584.500000 2402.333008 L 1148.500000 2402.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1482.500000"
+				  y="2408.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(10 -&gt; 9)[0]">
+			<path d="M 1146.500000 2594.833008 L 1174.500000 2594.833008 S 1184.500000 2594.833008 1184.500000 2584.833008 L 1184.500000 2490.833008 S 1184.500000 2480.833008 1194.500000 2480.833008 L 1534.500000 2480.833008 S 1544.500000 2480.833008 1544.500000 2490.833008 L 1544.500000 2502.833008 S 1544.500000 2512.833008 1554.500000 2512.833008 L 1730.500000 2512.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1399.000000"
+				  y="2486.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">selects &#34;Driver&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(10 -&gt; 9)[1]">
+			<path d="M 1146.500000 2614.833008 L 1534.500000 2614.833008 S 1544.500000 2614.833008 1544.500000 2604.833008 L 1544.500000 2547.833008 S 1544.500000 2537.833008 1554.500000 2537.833008 L 1730.500000 2537.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1478.500000"
+				  y="2620.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(11 -&gt; 9)[0]">
+			<path d="M 1146.500000 2726.833008 L 1634.500000 2726.833008 S 1644.500000 2726.833008 1644.500000 2716.833008 L 1644.500000 2597.833008 S 1644.500000 2587.833008 1654.500000 2587.833008 L 1730.500000 2587.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1509.500000"
+				  y="2732.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">selects &#34;Vehicle&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(11 -&gt; 12)[0]">
+			<path d="M 1146.500000 2766.833008 L 1283.750000 2766.833008 C 1285.250000 2766.833008 1283.750000 2768.333008 1285.250000 2768.333008 L 1730.500000 2768.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1439.000000"
+				  y="2774.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Vehicle&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(11 -&gt; 12)[1]">
+			<path d="M 1146.500000 2786.833008 L 1227.250000 2786.833008 C 1241.750000 2786.833008 1227.250000 2801.333008 1241.750000 2801.333008 L 1730.500000 2801.333008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1432.500000"
+				  y="2807.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Vehicle&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(12 -&gt; 12)[0]">
+			<path d="M 1783.500000 2737.833008 L 1783.500000 2699.833008 S 1783.500000 2689.833008 1793.500000 2689.833008 L 1822.500000 2689.833008 S 1832.500000 2689.833008 1832.500000 2699.833008 L 1832.500000 2735.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1808.000000"
+				  y="2695.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Save Data&#34;</text>
+		</g>
+		<g id="TOP-Racing.Edit results.(12 -&gt; 11)[0]">
+			<path d="M 1732.500000 2834.333008 L 1194.500000 2834.333008 S 1184.500000 2834.333008 1184.500000 2824.333008 L 1184.500000 2816.833008 S 1184.500000 2806.833008 1174.500000 2806.833008 L 1148.500000 2806.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1425.500000"
+				  y="2840.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(5 -&gt; 5)[0]">
+			<path d="M 171.000000 3050.833008 L 171.000000 3012.833008 S 171.000000 3002.833008 181.000000 3002.833008 L 202.000000 3002.833008 S 212.000000 3002.833008 212.000000 3012.833008 L 212.000000 3048.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="191.500000"
+				  y="3008.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(5 -&gt; 5)[1]">
+			<path d="M 212.000000 3254.833008 L 212.000000 3292.833008 S 212.000000 3302.833008 202.000000 3302.833008 L 181.000000 3302.833008 S 171.000000 3302.833008 171.000000 3292.833008 L 171.000000 3256.833008"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="191.500000"
+				  y="3308.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">selects &#34;territorial level&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(5 -&gt; 5)[2]">
+			<path d="M 255.000000 3086.166016 L 293.000000 3086.166016 S 303.000000 3086.166016 303.000000 3096.166016 L 303.000000 3109.499023 S 303.000000 3119.499023 293.000000 3119.499023 L 257.000000 3119.499023"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="303.500000"
+				  y="3108.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">selects &#34;temporal level&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(5 -&gt; 7)[0]">
+			<path d="M 255.000000 3140.451904 L 1123.000000 3140.451904"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="690.000000"
+				  y="3146.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on an Event&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(5 -&gt; 7)[1]">
+			<path d="M 255.000000 3179.976074 L 1123.000000 3179.976074"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="690.000000"
+				  y="3185.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Event&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(7 -&gt; 7)[0]">
+			<path d="M 1183.333008 3086.547119 L 1183.333008 3048.547119 S 1183.333008 3038.547119 1193.333008 3038.547119 L 1229.666016 3038.547119 S 1239.666016 3038.547119 1239.666016 3048.547119 L 1239.666016 3084.547119"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1211.500000"
+				  y="3044.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Previous&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(7 -&gt; 7)[1]">
+			<path d="M 1239.666016 3410.547119 L 1239.666016 3448.547119 S 1239.666016 3458.547119 1229.666016 3458.547119 L 1193.333008 3458.547119 S 1183.333008 3458.547119 1183.333008 3448.547119 L 1183.333008 3412.547119"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1211.500000"
+				  y="3464.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Next&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(7 -&gt; 34)[0]">
+			<path d="M 1298.000000 3308.071045 L 1887.250000 3308.071045 C 1892.750000 3308.071045 1887.250000 3313.571045 1892.750000 3313.571045 L 1926.000000 3313.571045"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1616.000000"
+				  y="3314.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Next Status&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(34 -&gt; 7)[0]">
+			<path d="M 1928.000000 3341.071045 L 1300.000000 3341.071045"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1613.000000"
+				  y="3347.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;OK&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(7 -&gt; 1)[0]">
+			<path d="M 1298.000000 3238.571045 L 1926.000000 3238.571045"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1613.000000"
+				  y="3236.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1613.000000"
+					   dy="0.000000">clicks &#34;View/Edit Event registrations&#34; AND</tspan>
+				<tspan x="1613.000000"
+					   dy="18.500000">(is not logged in)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(7 -&gt; 13)[0]">
+			<path d="M 1125.000000 3362.833008 L 1047.000000 3362.833008 S 1037.000000 3362.833008 1037.000000 3372.833008 L 1037.000000 3500.738037 S 1037.000000 3510.738037 1027.000000 3510.738037 L 257.000000 3510.738037"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="763.500000"
+				  y="3516.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View Variants&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(7 -&gt; 7)[2]">
+			<path d="M 1298.000000 3141.879883 L 1336.000000 3141.879883 S 1346.000000 3141.879883 1346.000000 3151.879883 L 1346.000000 3185.214111 S 1346.000000 3195.214111 1336.000000 3195.214111 L 1300.000000 3195.214111"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1346.000000"
+				  y="3166.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1346.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1346.000000"
+					   dy="18.500000">(is the event creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(7 -&gt; 5)[0]">
+			<path d="M 1125.000000 3219.499023 L 257.000000 3219.499023"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="690.500000"
+				  y="3225.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(13 -&gt; 13)[0]">
+			<path d="M 171.000000 3423.022949 L 171.000000 3385.022949 S 171.000000 3375.022949 181.000000 3375.022949 L 202.000000 3375.022949 S 212.000000 3375.022949 212.000000 3385.022949 L 212.000000 3421.022949"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="191.500000"
+				  y="3381.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(13 -&gt; 14)[0]">
+			<path d="M 255.000000 3539.309082 L 1077.000000 3539.309082 S 1087.000000 3539.309082 1087.000000 3549.309082 L 1087.000000 3609.118896 S 1087.000000 3619.118896 1097.000000 3619.118896 L 1144.000000 3619.118896"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="740.000000"
+				  y="3545.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Variant&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(13 -&gt; 7)[0]">
+			<path d="M 255.000000 3453.594971 L 492.000000 3453.594971 S 502.000000 3453.594971 502.000000 3443.594971 L 502.000000 3287.594971 S 502.000000 3277.594971 512.000000 3277.594971 L 1123.000000 3277.594971"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="602.500000"
+				  y="3275.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="602.500000"
+					   dy="0.000000">clicks &#34;Select&#34; AND</tspan>
+				<tspan x="602.500000"
+					   dy="18.500000">(is Event creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(13 -&gt; 14)[1]">
+			<path d="M 255.000000 3567.879883 L 1027.000000 3567.879883 S 1037.000000 3567.879883 1037.000000 3577.879883 L 1037.000000 3637.689941 S 1037.000000 3647.689941 1047.000000 3647.689941 L 1144.000000 3647.689941"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="740.500000"
+				  y="3573.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Variant&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(13 -&gt; 7)[1]">
+			<path d="M 255.000000 3482.166016 L 977.000000 3482.166016 S 987.000000 3482.166016 987.000000 3472.166016 L 987.000000 3327.118896 S 987.000000 3317.118896 997.000000 3317.118896 L 1123.000000 3317.118896"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="772.500000"
+				  y="3488.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(14 -&gt; 15)[0]">
+			<path d="M 1146.000000 3761.976074 L 1097.000000 3761.976074 S 1087.000000 3761.976074 1087.000000 3771.976074 L 1087.000000 3791.309082 S 1087.000000 3801.309082 1077.000000 3801.309082 L 612.000000 3801.309082 S 602.000000 3801.309082 602.000000 3811.309082 L 602.000000 3881.738037 S 602.000000 3891.738037 592.000000 3891.738037 L 257.000000 3891.738037"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="675.000000"
+				  y="3807.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View Venues&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(14 -&gt; 14)[0]">
+			<path d="M 1210.333008 3588.547119 L 1210.333008 3550.547119 S 1210.333008 3540.547119 1220.333008 3540.547119 L 1262.666016 3540.547119 S 1272.666016 3540.547119 1272.666016 3550.547119 L 1272.666016 3586.547119"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1241.000000"
+				  y="3538.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1241.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1241.000000"
+					   dy="18.500000">(is the variant creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(14 -&gt; 13)[0]">
+			<path d="M 1146.000000 3676.260986 L 512.000000 3676.260986 S 502.000000 3676.260986 502.000000 3666.260986 L 502.000000 3606.451904 S 502.000000 3596.451904 492.000000 3596.451904 L 257.000000 3596.451904"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="660.500000"
+				  y="3682.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(15 -&gt; 15)[0]">
+			<path d="M 176.332993 3809.738037 L 176.332993 3771.738037 S 176.332993 3761.738037 186.332993 3761.738037 L 204.666000 3761.738037 S 214.666000 3761.738037 214.666000 3771.738037 L 214.666000 3807.738037"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="195.500000"
+				  y="3767.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(15 -&gt; 16)[0]">
+			<path d="M 255.000000 3918.404053 L 642.000000 3918.404053 S 652.000000 3918.404053 652.000000 3908.404053 L 652.000000 3880.833008 S 652.000000 3870.833008 662.000000 3870.833008 L 1077.000000 3870.833008 S 1087.000000 3870.833008 1087.000000 3880.833008 L 1087.000000 3918.118896 S 1087.000000 3928.118896 1097.000000 3928.118896 L 1144.000000 3928.118896"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="705.000000"
+				  y="3876.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Venue&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(15 -&gt; 14)[0]">
+			<path d="M 255.000000 3838.404053 L 492.000000 3838.404053 S 502.000000 3838.404053 502.000000 3828.404053 L 502.000000 3723.238037 S 502.000000 3713.238037 512.000000 3713.238037 L 1144.000000 3713.238037"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="637.500000"
+				  y="3711.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="637.500000"
+					   dy="0.000000">clicks &#34;Select&#34; AND</tspan>
+				<tspan x="637.500000"
+					   dy="18.500000">(is Variant creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(15 -&gt; 28)[0]">
+			<path d="M 255.000000 3998.404053 L 692.000000 3998.404053 S 702.000000 3998.404053 702.000000 4008.404053 L 702.000000 4222.046875 S 702.000000 4232.046875 712.000000 4232.046875 L 1144.000000 4232.046875"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="702.500000"
+				  y="4119.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View in Map&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(15 -&gt; 16)[1]">
+			<path d="M 255.000000 3945.071045 L 692.000000 3945.071045 S 702.000000 3945.071045 702.000000 3935.071045 L 702.000000 3913.833008 S 702.000000 3903.833008 712.000000 3903.833008 L 1027.000000 3903.833008 S 1037.000000 3903.833008 1037.000000 3913.833008 L 1037.000000 3946.689941 S 1037.000000 3956.689941 1047.000000 3956.689941 L 1144.000000 3956.689941"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="706.500000"
+				  y="3909.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Venue&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(15 -&gt; 14)[1]">
+			<path d="M 255.000000 3865.071045 L 542.000000 3865.071045 S 552.000000 3865.071045 552.000000 3855.071045 L 552.000000 3743.404053 S 552.000000 3733.404053 562.000000 3733.404053 L 1144.000000 3733.404053"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="634.500000"
+				  y="3739.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(28 -&gt; 28)[0]">
+			<path d="M 1179.666016 4206.546875 L 1179.666016 4168.546875 S 1179.666016 4158.546875 1189.666016 4158.546875 L 1201.333008 4158.546875 S 1211.333008 4158.546875 1211.333008 4168.546875 L 1211.333008 4204.546875"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1195.500000"
+				  y="4156.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1195.500000"
+					   dy="0.000000">clicks &#34;on Map&#34; AND</tspan>
+				<tspan x="1195.500000"
+					   dy="18.500000">(is the venue creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(28 -&gt; 15)[0]">
+			<path d="M 1146.000000 4265.046875 L 512.000000 4265.046875 S 502.000000 4265.046875 502.000000 4255.046875 L 502.000000 4035.071045 S 502.000000 4025.071045 492.000000 4025.071045 L 257.000000 4025.071045"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="580.500000"
+				  y="4271.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(16 -&gt; 17)[0]">
+			<path d="M 1146.000000 4070.976074 L 1097.000000 4070.976074 S 1087.000000 4070.976074 1087.000000 4080.976074 L 1087.000000 4295.976074 S 1087.000000 4305.976074 1077.000000 4305.976074 L 302.000000 4305.976074"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="840.500000"
+				  y="4311.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View Province Regions&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(16 -&gt; 16)[0]">
+			<path d="M 1207.666016 3897.547119 L 1207.666016 3859.547119 S 1207.666016 3849.547119 1217.666016 3849.547119 L 1257.333008 3849.547119 S 1267.333008 3849.547119 1267.333008 3859.547119 L 1267.333008 3895.547119"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1237.000000"
+				  y="3847.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1237.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1237.000000"
+					   dy="18.500000">(is the venue creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(16 -&gt; 15)[0]">
+			<path d="M 1146.000000 3985.260986 L 994.321045 3985.260986 C 979.678955 3985.260986 994.321045 3970.618896 979.678955 3970.618896 L 257.000000 3970.618896"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="707.500000"
+				  y="3976.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(17 -&gt; 17)[0]">
+			<path d="M 174.000000 4218.261230 L 174.000000 4180.261230 S 174.000000 4170.261230 184.000000 4170.261230 L 226.000000 4170.261230 S 236.000000 4170.261230 236.000000 4180.261230 L 236.000000 4216.261230"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="205.500000"
+				  y="4176.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(17 -&gt; 18)[0]">
+			<path d="M 300.000000 4334.546875 L 1077.000000 4334.546875 S 1087.000000 4334.546875 1087.000000 4344.546875 L 1087.000000 4416.119141 S 1087.000000 4426.119141 1097.000000 4426.119141 L 1144.000000 4426.119141"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="768.500000"
+				  y="4340.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Province Region&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(17 -&gt; 16)[0]">
+			<path d="M 300.000000 4248.833008 L 542.000000 4248.833008 S 552.000000 4248.833008 552.000000 4238.833008 L 552.000000 4032.238037 S 552.000000 4022.238037 562.000000 4022.238037 L 1144.000000 4022.238037"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="609.500000"
+				  y="4020.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="609.500000"
+					   dy="0.000000">clicks &#34;Select&#34; AND</tspan>
+				<tspan x="609.500000"
+					   dy="18.500000">(is Venue creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(17 -&gt; 18)[1]">
+			<path d="M 300.000000 4363.119141 L 1027.000000 4363.119141 S 1037.000000 4363.119141 1037.000000 4373.119141 L 1037.000000 4444.689941 S 1037.000000 4454.689941 1047.000000 4454.689941 L 1144.000000 4454.689941"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="769.000000"
+				  y="4369.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Province Region&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(17 -&gt; 16)[1]">
+			<path d="M 300.000000 4277.403809 L 592.000000 4277.403809 S 602.000000 4277.403809 602.000000 4267.403809 L 602.000000 4052.404053 S 602.000000 4042.404053 612.000000 4042.404053 L 1144.000000 4042.404053"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="605.500000"
+				  y="4048.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(18 -&gt; 19)[0]">
+			<path d="M 1146.000000 4568.976074 L 1097.000000 4568.976074 S 1087.000000 4568.976074 1087.000000 4578.976074 L 1087.000000 4652.928223 S 1087.000000 4662.928223 1077.000000 4662.928223 L 260.000000 4662.928223"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="749.000000"
+				  y="4668.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View Provinces&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(18 -&gt; 18)[0]">
+			<path d="M 1231.333008 4395.546875 L 1231.333008 4357.546875 S 1231.333008 4347.546875 1241.333008 4347.546875 L 1304.666016 4347.546875 S 1314.666016 4347.546875 1314.666016 4357.546875 L 1314.666016 4393.546875"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1272.500000"
+				  y="4345.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1272.500000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1272.500000"
+					   dy="18.500000">(is the Province Region creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(18 -&gt; 17)[0]">
+			<path d="M 1146.000000 4476.261230 L 512.000000 4476.261230 S 502.000000 4476.261230 502.000000 4466.261230 L 502.000000 4401.689941 S 502.000000 4391.689941 492.000000 4391.689941 L 302.000000 4391.689941"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="680.500000"
+				  y="4482.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(19 -&gt; 19)[0]">
+			<path d="M 167.166000 4575.213867 L 167.166000 4537.213867 S 167.166000 4527.213867 177.166000 4527.213867 L 201.832993 4527.213867 S 211.832993 4527.213867 211.832993 4537.213867 L 211.832993 4573.213867"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="189.500000"
+				  y="4533.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(19 -&gt; 20)[0]">
+			<path d="M 258.000000 4691.500000 L 1077.000000 4691.500000 S 1087.000000 4691.500000 1087.000000 4701.500000 L 1087.000000 4725.119141 S 1087.000000 4735.119141 1097.000000 4735.119141 L 1144.000000 4735.119141"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="724.000000"
+				  y="4697.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Province&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(19 -&gt; 18)[0]">
+			<path d="M 258.000000 4605.785156 L 492.000000 4605.785156 S 502.000000 4605.785156 502.000000 4595.785156 L 502.000000 4527.261230 S 502.000000 4517.261230 512.000000 4517.261230 L 1144.000000 4517.261230"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="657.500000"
+				  y="4515.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="657.500000"
+					   dy="0.000000">clicks &#34;Select&#34; AND</tspan>
+				<tspan x="657.500000"
+					   dy="18.500000">(is Province Region creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(19 -&gt; 20)[1]">
+			<path d="M 258.000000 4720.070801 L 1027.000000 4720.070801 S 1037.000000 4720.070801 1037.000000 4730.070801 L 1037.000000 4753.689941 S 1037.000000 4763.689941 1047.000000 4763.689941 L 1144.000000 4763.689941"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="723.500000"
+				  y="4726.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Province&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(19 -&gt; 18)[1]">
+			<path d="M 258.000000 4634.356934 L 1027.000000 4634.356934 S 1037.000000 4634.356934 1037.000000 4624.356934 L 1037.000000 4550.403809 S 1037.000000 4540.403809 1047.000000 4540.403809 L 1144.000000 4540.403809"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="748.500000"
+				  y="4640.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(20 -&gt; 21)[0]">
+			<path d="M 1146.000000 4877.976074 L 1097.000000 4877.976074 S 1087.000000 4877.976074 1087.000000 4887.976074 L 1087.000000 4961.928223 S 1087.000000 4971.928223 1077.000000 4971.928223 L 298.000000 4971.928223"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="768.000000"
+				  y="4977.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View Country Regions&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(20 -&gt; 20)[0]">
+			<path d="M 1214.333008 4704.546875 L 1214.333008 4666.546875 S 1214.333008 4656.546875 1224.333008 4656.546875 L 1270.666016 4656.546875 S 1280.666016 4656.546875 1280.666016 4666.546875 L 1280.666016 4702.546875"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1247.000000"
+				  y="4654.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1247.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1247.000000"
+					   dy="18.500000">(is the Province creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(20 -&gt; 19)[0]">
+			<path d="M 1146.000000 4785.261230 L 512.000000 4785.261230 S 502.000000 4785.261230 502.000000 4775.261230 L 502.000000 4758.642090 S 502.000000 4748.642090 492.000000 4748.642090 L 260.000000 4748.642090"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="683.500000"
+				  y="4791.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(21 -&gt; 21)[0]">
+			<path d="M 172.666000 4884.213867 L 172.666000 4846.213867 S 172.666000 4836.213867 182.666000 4836.213867 L 223.332993 4836.213867 S 233.332993 4836.213867 233.332993 4846.213867 L 233.332993 4882.213867"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="202.500000"
+				  y="4842.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(21 -&gt; 22)[0]">
+			<path d="M 296.000000 5000.500000 L 1077.000000 5000.500000 S 1087.000000 5000.500000 1087.000000 5010.500000 L 1087.000000 5034.119141 S 1087.000000 5044.119141 1097.000000 5044.119141 L 1144.000000 5044.119141"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="743.000000"
+				  y="5006.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Country Region&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(21 -&gt; 20)[0]">
+			<path d="M 296.000000 4914.785156 L 492.000000 4914.785156 S 502.000000 4914.785156 502.000000 4904.785156 L 502.000000 4836.261230 S 502.000000 4826.261230 512.000000 4826.261230 L 1144.000000 4826.261230"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="677.000000"
+				  y="4824.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="677.000000"
+					   dy="0.000000">clicks &#34;Select&#34; AND</tspan>
+				<tspan x="677.000000"
+					   dy="18.500000">(is Province creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(21 -&gt; 22)[1]">
+			<path d="M 296.000000 5029.070801 L 1027.000000 5029.070801 S 1037.000000 5029.070801 1037.000000 5039.070801 L 1037.000000 5062.689941 S 1037.000000 5072.689941 1047.000000 5072.689941 L 1144.000000 5072.689941"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="742.500000"
+				  y="5035.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Country Region&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(21 -&gt; 20)[1]">
+			<path d="M 296.000000 4943.356934 L 1027.000000 4943.356934 S 1037.000000 4943.356934 1037.000000 4933.356934 L 1037.000000 4859.403809 S 1037.000000 4849.403809 1047.000000 4849.403809 L 1144.000000 4849.403809"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="767.500000"
+				  y="4949.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(22 -&gt; 23)[0]">
+			<path d="M 1146.000000 5186.976074 L 1097.000000 5186.976074 S 1087.000000 5186.976074 1087.000000 5196.976074 L 1087.000000 5270.928223 S 1087.000000 5280.928223 1077.000000 5280.928223 L 260.000000 5280.928223"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="748.500000"
+				  y="5286.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View Countries&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(22 -&gt; 22)[0]">
+			<path d="M 1230.000000 5013.546875 L 1230.000000 4975.546875 S 1230.000000 4965.546875 1240.000000 4965.546875 L 1302.000000 4965.546875 S 1312.000000 4965.546875 1312.000000 4975.546875 L 1312.000000 5011.546875"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1271.000000"
+				  y="4963.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1271.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1271.000000"
+					   dy="18.500000">(is the Country Region creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(22 -&gt; 21)[0]">
+			<path d="M 1146.000000 5094.261230 L 512.000000 5094.261230 S 502.000000 5094.261230 502.000000 5084.261230 L 502.000000 5067.642090 S 502.000000 5057.642090 492.000000 5057.642090 L 298.000000 5057.642090"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="702.500000"
+				  y="5100.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(23 -&gt; 23)[0]">
+			<path d="M 167.166000 5193.213867 L 167.166000 5155.213867 S 167.166000 5145.213867 177.166000 5145.213867 L 201.832993 5145.213867 S 211.832993 5145.213867 211.832993 5155.213867 L 211.832993 5191.213867"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="189.500000"
+				  y="5151.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(23 -&gt; 24)[0]">
+			<path d="M 258.000000 5309.500000 L 1077.000000 5309.500000 S 1087.000000 5309.500000 1087.000000 5319.500000 L 1087.000000 5343.119141 S 1087.000000 5353.119141 1097.000000 5353.119141 L 1144.000000 5353.119141"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="723.500000"
+				  y="5315.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Country&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(23 -&gt; 22)[0]">
+			<path d="M 258.000000 5223.785156 L 492.000000 5223.785156 S 502.000000 5223.785156 502.000000 5213.785156 L 502.000000 5145.261230 S 502.000000 5135.261230 512.000000 5135.261230 L 1144.000000 5135.261230"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="658.000000"
+				  y="5133.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="658.000000"
+					   dy="0.000000">clicks &#34;Select&#34; AND</tspan>
+				<tspan x="658.000000"
+					   dy="18.500000">(is Country Region creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(23 -&gt; 24)[1]">
+			<path d="M 258.000000 5338.070801 L 1027.000000 5338.070801 S 1037.000000 5338.070801 1037.000000 5348.070801 L 1037.000000 5371.689941 S 1037.000000 5381.689941 1047.000000 5381.689941 L 1144.000000 5381.689941"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="724.000000"
+				  y="5344.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Country&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(23 -&gt; 22)[1]">
+			<path d="M 258.000000 5252.356934 L 1027.000000 5252.356934 S 1037.000000 5252.356934 1037.000000 5242.356934 L 1037.000000 5168.403809 S 1037.000000 5158.403809 1047.000000 5158.403809 L 1144.000000 5158.403809"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="748.500000"
+				  y="5258.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(24 -&gt; 25)[0]">
+			<path d="M 1146.000000 5495.976074 L 1097.000000 5495.976074 S 1087.000000 5495.976074 1087.000000 5505.976074 L 1087.000000 5596.713867 S 1087.000000 5606.713867 1077.000000 5606.713867 L 287.000000 5606.713867"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="770.500000"
+				  y="5612.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;View Planet Regions&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(24 -&gt; 24)[0]">
+			<path d="M 1213.000000 5322.546875 L 1213.000000 5284.546875 S 1213.000000 5274.546875 1223.000000 5274.546875 L 1268.000000 5274.546875 S 1278.000000 5274.546875 1278.000000 5284.546875 L 1278.000000 5320.546875"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1246.000000"
+				  y="5272.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1246.000000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1246.000000"
+					   dy="18.500000">(is Country creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(24 -&gt; 23)[0]">
+			<path d="M 1146.000000 5403.261230 L 512.000000 5403.261230 S 502.000000 5403.261230 502.000000 5393.261230 L 502.000000 5376.642090 S 502.000000 5366.642090 492.000000 5366.642090 L 260.000000 5366.642090"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="683.500000"
+				  y="5409.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(25 -&gt; 25)[0]">
+			<path d="M 169.000000 5519.000000 L 169.000000 5481.000000 S 169.000000 5471.000000 179.000000 5471.000000 L 216.000000 5471.000000 S 226.000000 5471.000000 226.000000 5481.000000 L 226.000000 5517.000000"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="197.500000"
+				  y="5477.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">types &#34;in a search field&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(25 -&gt; 26)[0]">
+			<path d="M 285.000000 5635.285156 L 592.000000 5635.285156 S 602.000000 5635.285156 602.000000 5645.285156 L 602.000000 5648.261230 S 602.000000 5658.261230 612.000000 5658.261230 L 1144.000000 5658.261230"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="704.500000"
+				  y="5664.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Create Planet Region&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(25 -&gt; 24)[0]">
+			<path d="M 285.000000 5549.570801 L 492.000000 5549.570801 S 502.000000 5549.570801 502.000000 5539.570801 L 502.000000 5454.261230 S 502.000000 5444.261230 512.000000 5444.261230 L 1144.000000 5444.261230"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="662.500000"
+				  y="5442.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="662.500000"
+					   dy="0.000000">clicks &#34;Select&#34; AND</tspan>
+				<tspan x="662.500000"
+					   dy="18.500000">(is Country creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(25 -&gt; 26)[1]">
+			<path d="M 285.000000 5663.856934 L 542.000000 5663.856934 S 552.000000 5663.856934 552.000000 5673.856934 L 552.000000 5682.761230 S 552.000000 5692.761230 562.000000 5692.761230 L 1144.000000 5692.761230"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="701.000000"
+				  y="5698.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;on a Planet Region&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(25 -&gt; 24)[1]">
+			<path d="M 285.000000 5578.142090 L 1027.000000 5578.142090 S 1037.000000 5578.142090 1037.000000 5568.142090 L 1037.000000 5477.403809 S 1037.000000 5467.403809 1047.000000 5467.403809 L 1144.000000 5467.403809"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="770.500000"
+				  y="5584.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(26 -&gt; 26)[0]">
+			<path d="M 1226.333008 5631.546875 L 1226.333008 5593.546875 S 1226.333008 5583.546875 1236.333008 5583.546875 L 1294.666016 5583.546875 S 1304.666016 5583.546875 1304.666016 5593.546875 L 1304.666016 5629.546875"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="1265.500000"
+				  y="5581.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">
+				<tspan x="1265.500000"
+					   dy="0.000000">clicks &#34;Save Data&#34; AND</tspan>
+				<tspan x="1265.500000"
+					   dy="18.500000">(is Planet Region creator)</tspan>
+			</text>
+		</g>
+		<g id="TOP-Racing.Priorities.(26 -&gt; 25)[0]">
+			<path d="M 1146.000000 5725.761230 L 512.000000 5725.761230 S 502.000000 5725.761230 502.000000 5715.761230 L 502.000000 5702.428223 S 502.000000 5692.428223 492.000000 5692.428223 L 287.000000 5692.428223"
+				  fill="none"
+				  class="connection stroke-B1"
+				  style="stroke-width:2;"
+				  marker-end="url(#mk-3488378134)"
+				  mask="url(#d2-2170071961)" /><text x="698.500000"
+				  y="5731.000000"
+				  class="text-italic fill-N2"
+				  style="text-anchor:middle;font-size:16px">clicks &#34;Return&#34;</text>
+		</g>
+		<mask id="d2-2170071961"
+			  maskUnits="userSpaceOnUse"
+			  x="-89"
+			  y="-89"
+			  width="2405"
+			  height="6044">
+			<rect x="-89"
+				  y="-89"
+				  width="2405"
+				  height="6044"
+				  fill="white"></rect>
+			<rect x="1044.500000"
+				  y="17.000000"
+				  width="138"
+				  height="36"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1060.000000"
+				  y="67.000000"
+				  width="106"
+				  height="31"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1087.000000"
+				  y="1681.000000"
+				  width="53"
+				  height="31"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1057.500000"
+				  y="2171.000000"
+				  width="111"
+				  height="31"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1069.000000"
+				  y="2934.000000"
+				  width="89"
+				  height="31"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="710.500000"
+				  y="732.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1391.500000"
+				  y="117.000000"
+				  width="59"
+				  height="26"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1380.500000"
+				  y="303.000000"
+				  width="81"
+				  height="26"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1375.000000"
+				  y="489.000000"
+				  width="92"
+				  height="26"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1372.000000"
+				  y="814.000000"
+				  width="98"
+				  height="26"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.000000"
+				  y="1000.000000"
+				  width="90"
+				  height="26"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1338.500000"
+				  y="1259.000000"
+				  width="165"
+				  height="26"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1362.500000"
+				  y="1445.000000"
+				  width="117"
+				  height="26"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="722.500000"
+				  y="945.500000"
+				  width="66"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="725.500000"
+				  y="1031.500000"
+				  width="59"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="405.500000"
+				  y="1935.500000"
+				  width="50"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1595.500000"
+				  y="1764.500000"
+				  width="76"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1097.500000"
+				  y="1821.500000"
+				  width="100"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1011.500000"
+				  y="1914.500000"
+				  width="144"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1595.500000"
+				  y="1961.500000"
+				  width="226"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1011.500000"
+				  y="2000.500000"
+				  width="229"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="298.500000"
+				  y="2359.500000"
+				  width="124"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="899.500000"
+				  y="2374.500000"
+				  width="222"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1756.500000"
+				  y="2526.500000"
+				  width="171"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1013.500000"
+				  y="2603.500000"
+				  width="108"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1006.500000"
+				  y="2755.500000"
+				  width="115"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1756.500000"
+				  y="2788.500000"
+				  width="102"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1952.500000"
+				  y="3227.500000"
+				  width="50"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="152.500000"
+				  y="3141.500000"
+				  width="78"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1149.500000"
+				  y="3237.500000"
+				  width="124"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1952.500000"
+				  y="3313.500000"
+				  width="140"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="152.500000"
+				  y="3514.500000"
+				  width="78"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="3679.500000"
+				  width="142"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="160.500000"
+				  y="3920.500000"
+				  width="70"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="3988.500000"
+				  width="134"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="4237.500000"
+				  width="50"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="134.500000"
+				  y="4309.500000"
+				  width="141"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="4486.500000"
+				  width="205"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="144.500000"
+				  y="4666.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="4795.500000"
+				  width="154"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="134.500000"
+				  y="4975.500000"
+				  width="137"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="5104.500000"
+				  width="201"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="144.500000"
+				  y="5284.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="5413.500000"
+				  width="150"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="134.500000"
+				  y="5610.500000"
+				  width="126"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1170.500000"
+				  y="5682.500000"
+				  width="190"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.500000"
+				  y="184.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.500000"
+				  y="370.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.500000"
+				  y="556.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.500000"
+				  y="881.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.500000"
+				  y="1067.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.500000"
+				  y="1326.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="1376.500000"
+				  y="1512.500000"
+				  width="89"
+				  height="21"
+				  fill="rgba(0,0,0,0.75)"></rect>
+			<rect x="793.000000"
+				  y="187.000000"
+				  width="139"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="875.000000"
+				  y="371.000000"
+				  width="104"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="914.000000"
+				  y="529.000000"
+				  width="149"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="953.000000"
+				  y="867.000000"
+				  width="119"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="887.000000"
+				  y="1028.000000"
+				  width="151"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="827.000000"
+				  y="1225.000000"
+				  width="172"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="785.000000"
+				  y="1378.000000"
+				  width="155"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="943.000000"
+				  y="587.000000"
+				  width="140"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="1344.000000"
+				  y="749.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1342.000000"
+				  y="716.000000"
+				  width="159"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1343.000000"
+				  y="683.000000"
+				  width="157"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1344.000000"
+				  y="1194.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="879.000000"
+				  y="1727.000000"
+				  width="169"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="625.000000"
+				  y="1887.000000"
+				  width="196"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="664.000000"
+				  y="1822.000000"
+				  width="152"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1373.000000"
+				  y="1839.000000"
+				  width="150"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="1332.000000"
+				  y="1790.000000"
+				  width="150"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="625.000000"
+				  y="1948.000000"
+				  width="251"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="702.000000"
+				  y="1936.000000"
+				  width="72"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1001.000000"
+				  y="2074.000000"
+				  width="72"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="675.000000"
+				  y="2022.000000"
+				  width="72"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="526.000000"
+				  y="2341.000000"
+				  width="272"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="903.000000"
+				  y="2237.000000"
+				  width="217"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="936.000000"
+				  y="2497.000000"
+				  width="150"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="1401.000000"
+				  y="2349.000000"
+				  width="180"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="600.000000"
+				  y="2396.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1394.000000"
+				  y="2627.000000"
+				  width="163"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="1421.000000"
+				  y="2728.000000"
+				  width="171"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="1766.000000"
+				  y="2369.000000"
+				  width="154"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="1434.000000"
+				  y="2392.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1348.000000"
+				  y="2470.000000"
+				  width="102"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1430.000000"
+				  y="2604.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1455.000000"
+				  y="2716.000000"
+				  width="109"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1366.000000"
+				  y="2758.000000"
+				  width="146"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1367.000000"
+				  y="2791.000000"
+				  width="131"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1748.000000"
+				  y="2679.000000"
+				  width="120"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1377.000000"
+				  y="2824.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="114.000000"
+				  y="2992.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="112.000000"
+				  y="3292.000000"
+				  width="159"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="225.000000"
+				  y="3092.000000"
+				  width="157"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="625.000000"
+				  y="3130.000000"
+				  width="130"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="622.000000"
+				  y="3169.000000"
+				  width="136"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1157.000000"
+				  y="3028.000000"
+				  width="109"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1170.000000"
+				  y="3448.000000"
+				  width="83"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1552.000000"
+				  y="3298.000000"
+				  width="128"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1577.000000"
+				  y="3331.000000"
+				  width="72"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1477.000000"
+				  y="3220.000000"
+				  width="272"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="693.000000"
+				  y="3500.000000"
+				  width="141"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1271.000000"
+				  y="3150.000000"
+				  width="150"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="642.000000"
+				  y="3209.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="114.000000"
+				  y="3365.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="666.000000"
+				  y="3529.000000"
+				  width="148"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="541.000000"
+				  y="3259.000000"
+				  width="123"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="674.000000"
+				  y="3557.000000"
+				  width="133"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="724.000000"
+				  y="3472.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="608.000000"
+				  y="3791.000000"
+				  width="134"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1166.000000"
+				  y="3522.000000"
+				  width="150"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="612.000000"
+				  y="3666.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="118.000000"
+				  y="3751.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="635.000000"
+				  y="3860.000000"
+				  width="140"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="576.000000"
+				  y="3695.000000"
+				  width="123"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="637.000000"
+				  y="4103.000000"
+				  width="131"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="644.000000"
+				  y="3893.000000"
+				  width="125"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="586.000000"
+				  y="3723.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1127.000000"
+				  y="4140.000000"
+				  width="137"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="532.000000"
+				  y="4255.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="741.000000"
+				  y="4295.000000"
+				  width="199"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1162.000000"
+				  y="3831.000000"
+				  width="150"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="659.000000"
+				  y="3960.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="128.000000"
+				  y="4160.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="666.000000"
+				  y="4324.000000"
+				  width="205"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="548.000000"
+				  y="4004.000000"
+				  width="123"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="674.000000"
+				  y="4353.000000"
+				  width="190"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="557.000000"
+				  y="4032.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="674.000000"
+				  y="4652.000000"
+				  width="150"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1171.000000"
+				  y="4329.000000"
+				  width="203"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="632.000000"
+				  y="4466.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="112.000000"
+				  y="4517.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="646.000000"
+				  y="4681.000000"
+				  width="156"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="568.000000"
+				  y="4499.000000"
+				  width="179"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="653.000000"
+				  y="4710.000000"
+				  width="141"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="700.000000"
+				  y="4624.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="671.000000"
+				  y="4961.000000"
+				  width="194"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1170.000000"
+				  y="4638.000000"
+				  width="154"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="635.000000"
+				  y="4775.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="125.000000"
+				  y="4826.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="643.000000"
+				  y="4990.000000"
+				  width="200"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="612.000000"
+				  y="4808.000000"
+				  width="130"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="650.000000"
+				  y="5019.000000"
+				  width="185"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="719.000000"
+				  y="4933.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="674.000000"
+				  y="5270.000000"
+				  width="149"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1172.000000"
+				  y="4947.000000"
+				  width="198"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="654.000000"
+				  y="5084.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="112.000000"
+				  y="5135.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="648.000000"
+				  y="5299.000000"
+				  width="151"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="571.000000"
+				  y="5117.000000"
+				  width="174"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="656.000000"
+				  y="5328.000000"
+				  width="136"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="700.000000"
+				  y="5242.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="678.000000"
+				  y="5596.000000"
+				  width="185"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1171.000000"
+				  y="5256.000000"
+				  width="150"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="635.000000"
+				  y="5393.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="120.000000"
+				  y="5461.000000"
+				  width="155"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="609.000000"
+				  y="5648.000000"
+				  width="191"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="600.000000"
+				  y="5426.000000"
+				  width="125"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="613.000000"
+				  y="5682.000000"
+				  width="176"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="722.000000"
+				  y="5568.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+			<rect x="1183.000000"
+				  y="5565.000000"
+				  width="165"
+				  height="37"
+				  fill="black"></rect>
+			<rect x="650.000000"
+				  y="5715.000000"
+				  width="97"
+				  height="21"
+				  fill="black"></rect>
+		</mask>
+	</svg></svg>

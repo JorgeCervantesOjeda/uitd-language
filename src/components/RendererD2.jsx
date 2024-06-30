@@ -21,7 +21,7 @@ const gatherAllTransitions = ( parsedData ) => {
                 uiTransitions[ toUI ] = new Set();
             }
 
-            const transitionStr = `${transition.from}->${transition.to}:${transition.action}:${transition.target}:${transition.condition}`;
+            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\\n(' + transition.condition + ')' : '' );
             uiTransitions[ fromUI ].add( transitionStr );
             uiTransitions[ toUI ].add( transitionStr );
         } );
@@ -45,7 +45,7 @@ const gatherFragmentTransitions = ( fragment ) => {
             fragmentTransitions[ toKey ] = new Set();
         }
 
-        const transitionStr = `${transition.from}->${transition.to}:${transition.action}:${transition.target}:${transition.condition}`;
+        const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\\n(' + transition.condition + ')' : '' );
         fragmentTransitions[ fromKey ].add( transitionStr );
         fragmentTransitions[ toKey ].add( transitionStr );
     } );
@@ -63,30 +63,29 @@ const getInnermostUI = ( transition ) => {
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 
-    let d2 = `direction: right\n"${parsedData.name}": {\n`;
+    let d2 = 'direction: right\n"' + parsedData.name + '": {\n';
 
     const allTransitions = gatherAllTransitions( parsedData );
 
     // Build UI hierarchy
-    parsedData.fragments.forEach( ( fragment, fragmentIndex ) => {
-        d2 += `  "Fragment ${fragment.name}": {\n`;
+    parsedData.fragments.forEach( ( fragment ) => {
+        d2 += '  "' + fragment.name + '": {\n';
 
         const fragmentTransitions = gatherFragmentTransitions( fragment );
 
-        fragment.draws.forEach( ( draw, drawIndex ) => {
-            draw.uiRefs.forEach( ( ref, refIndex ) => {
+        fragment.draws.forEach( ( draw ) => {
+            draw.uiRefs.forEach( ( ref ) => {
                 d2 += buildUIHierarchy( ref, 2, parsedData.uis, fragmentTransitions, allTransitions, '' );
             } );
         } );
 
         // Add transitions
-        fragment.transitions.forEach( ( transition, transitionIndex ) => {
-            d2 += `    ${formatTransition( transition.from )} -> ${formatTransition( transition.to )}: \``;
-            d2 += `${transition.action} "${transition.target}"`;
+        fragment.transitions.forEach( ( transition ) => {
+            d2 += '    ' + formatTransition( transition.from ) + ' -> ' + formatTransition( transition.to ) + ': ' + transition.action + ' "' + transition.target + '"';
             if( transition.condition ) {
-                d2 += ` AND\\n(${transition.condition})`;
+                d2 += ' AND\\n(' + transition.condition + ')';
             }
-            d2 += `\`\n`;
+            d2 += '\n';
         } );
 
         d2 += '  }\n';
@@ -101,23 +100,23 @@ const translateToD2 = ( parsedData ) => {
 const buildUIHierarchy = ( ref, indentLevel, uis, fragmentTransitions, allTransitions, parentKey ) => {
     const ui = uis.find( ui => ui.id === parseInt( ref.id ) );
     if( !ui ) {
-        console.error( `UI with id ${ref.id} not found in the parsed data.` );
+        console.error( 'UI with id ' + ref.id + ' not found in the parsed data.' );
         return '';
     }
 
     let hierarchy = '';
 
     // Construct parent key
-    const fullKey = parentKey ? `${parentKey}.${ref.id}` : ref.id.toString();
+    const fullKey = parentKey ? parentKey + '.' + ref.id : ref.id.toString();
 
     if( ref.nested.length > 0 ) {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${ui.name} {\n`;
-        ref.nested.forEach( ( nestedRef, nestedIndex ) => {
-            hierarchy += buildUIHierarchy( nestedRef, indentLevel + 1, uis, fragmentTransitions, allTransitions, `${parentKey}${parentKey ? '(' : ''}${ref.id}${parentKey ? ')' : ''}` );
+        hierarchy += '  '.repeat( indentLevel ) + ref.id + ': ' + ref.id + ' ' + ui.name + ' {\n';
+        ref.nested.forEach( ( nestedRef ) => {
+            hierarchy += buildUIHierarchy( nestedRef, indentLevel + 1, uis, fragmentTransitions, allTransitions, parentKey + ( parentKey ? '(' : '' ) + ref.id + ( parentKey ? ')' : '' ) );
         } );
-        hierarchy += `${'  '.repeat( indentLevel )}}\n`;
+        hierarchy += '  '.repeat( indentLevel ) + '}\n';
     } else {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${ui.name}\n`;
+        hierarchy += '  '.repeat( indentLevel ) + ref.id + ': ' + ref.id + ' ' + ui.name + '\n';
     }
 
     // Determine if this UI copy should have a double border
@@ -125,7 +124,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, fragmentTransitions, allTransi
     const fragmentTransitionsSet = fragmentTransitions[ fullKey ] || new Set();
 
     if( allTransitionsSet.size > 0 && allTransitionsSet.size === fragmentTransitionsSet.size ) {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}.style.double-border: true\n`;
+        hierarchy += '  '.repeat( indentLevel ) + ref.id + '.style.double-border: true\n';
     }
 
     return hierarchy;
@@ -148,9 +147,9 @@ const RendererD2 = ( { data } ) => {
             },
             body: JSON.stringify( { d2: d2Text } ),
         } )
-            .then( response => response.text() )
-            .then( svg => setSvgOutput( svg ) )
-            .catch( err => console.error( 'Error fetching SVG:', err ) );
+            .then( ( response ) => response.text() )
+            .then( ( svg ) => setSvgOutput( svg ) )
+            .catch( ( err ) => console.error( 'Error fetching SVG:', err ) );
     }, [ data ] );
 
     const copyToClipboard = () => {
@@ -160,27 +159,47 @@ const RendererD2 = ( { data } ) => {
             setTimeout( () => {
                 copyMessage.style.visibility = 'hidden';
             }, 2000 );
-        } ).catch( err => {
+        } ).catch( ( err ) => {
             console.error( 'Could not copy text: ', err );
         } );
     };
 
+    const openInPlayground = () => {
+        const playgroundUrl = 'https://play.d2lang.com';
+        window.open( playgroundUrl, '_blank' );
+    };
+
     return (
         <div style={ { padding: '16px', backgroundColor: '#1e1e1e', color: '#d4d4d4', borderRadius: '4px' } }>
-            <button
-                onClick={ copyToClipboard }
-                style={ {
-                    marginBottom: '10px',
-                    padding: '10px',
-                    backgroundColor: '#ffffff', // white background
-                    color: '#000000', // black text
-                    border: '1px solid #000000',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                } }
-            >
-                Copy to Clipboard
-            </button>
+            <div style={ { marginBottom: '10px' } }>
+                <button
+                    onClick={ copyToClipboard }
+                    style={ {
+                        marginRight: '10px',
+                        padding: '10px',
+                        backgroundColor: '#ffffff', // white background
+                        color: '#000000', // black text
+                        border: '1px solid #000000',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                    } }
+                >
+                    Copy to Clipboard
+                </button>
+                <button
+                    onClick={ openInPlayground }
+                    style={ {
+                        padding: '10px',
+                        backgroundColor: '#ffffff', // white background
+                        color: '#000000', // black text
+                        border: '1px solid #000000',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                    } }
+                >
+                    Open D2 Playground
+                </button>
+            </div>
             <span id="copyMessage" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
             <pre>{ d2Output }</pre>
             <div dangerouslySetInnerHTML={ { __html: svgOutput } } />
