@@ -10,14 +10,14 @@ import { generateWebAppFromUITDL } from './utils/webAppGenerator';
 
 const App = () => {
   const [ uitdlText, setUitdlText ] = useState(
-    `UITD "title" {
+    `UITD "System Title" {
     UI 1 "Login" actions {
       clicks "Login" 
     }
-    UI 2 "Admin" actions {
+    UI 2 "Admin Home" actions {
       deletes "user" 
     }
-    UI 3 "Normal" actions {
+    UI 3 "Home" actions {
       clicks "play" 
     }
     UI 4 "Standings" actions {
@@ -32,7 +32,7 @@ const App = () => {
       clicks "Events" 
       clicks "Logout" 
     }
-    FRAGMENT "name" {
+    FRAGMENT "Menu Navigation and Login" {
       DRAW 1, 0
       DRAW 2(3(0)), 4(0), 5(0)
       TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin"
@@ -170,9 +170,9 @@ const App = () => {
       </div>
       <div style={ { flex: 1, display: 'flex', flexDirection: 'column', width: '50vw' } }>
         <div style={ { display: 'flex', justifyContent: 'center', marginBottom: '10px' } }>
-          <button hidden onClick={ () => setSelectedTab( 'Renderer' ) }>Renderer</button>
-          <button hidden onClick={ () => setSelectedTab( 'RendererD2' ) }>RendererD2</button>
-          <button hidden onClick={ () => setSelectedTab( 'RendererParsed' ) }>RendererParsed</button>
+          <button onClick={ () => setSelectedTab( 'Renderer' ) }>Renderer</button>
+          <button onClick={ () => setSelectedTab( 'RendererD2' ) }>RendererD2</button>
+          <button onClick={ () => setSelectedTab( 'RendererParsed' ) }>RendererParsed</button>
         </div>
         { renderContent() }
       </div>

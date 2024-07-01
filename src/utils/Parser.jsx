@@ -18,10 +18,11 @@ export const parseUIRefList = ( text ) => {
         } else if( char === ')' ) {
             braceCount--;
             if( braceCount === 0 ) {
-                if( currentRef.trim() !== '' ) { // Ensure the currentRef is not empty
+                if( currentRef.trim() !== '' ) {
                     refs.push( {
                         id: currentRef.trim(),
-                        nested: parseUIRefList( nestedText )
+                        nested: parseUIRefList( nestedText ),
+                        full: false
                     } );
                 }
                 currentRef = '';
@@ -34,8 +35,8 @@ export const parseUIRefList = ( text ) => {
             nestedText += char;
         } else if( char === ',' ) {
             if( braceCount === 0 ) {
-                if( currentRef.trim() !== '' ) { // Ensure the currentRef is not empty
-                    refs.push( { id: currentRef.trim(), nested: [] } );
+                if( currentRef.trim() !== '' ) {
+                    refs.push( { id: currentRef.trim(), nested: [], full: false } );
                 }
                 currentRef = '';
             } else {
@@ -47,10 +48,61 @@ export const parseUIRefList = ( text ) => {
     }
 
     if( currentRef.trim() !== '' ) {
-        refs.push( { id: currentRef.trim(), nested: [] } );
+        refs.push( { id: currentRef.trim(), nested: [], full: false } );
     }
 
     return refs;
+};
+
+const getInnermostUI = ( uiRef ) => {
+    const parts = uiRef.split( /[\(\)]+/ );
+    return parts[ parts.length - 1 ] === '' ? parts[ parts.length - 2 ] : parts[ parts.length - 1 ];
+};
+
+const gatherAllTransitions = ( parsedData ) => {
+    const uiTransitions = {};
+
+    parsedData.fragments.forEach( fragment => {
+        fragment.transitions.forEach( transition => {
+            const fromUI = getInnermostUI( transition.from );
+            const toUI = getInnermostUI( transition.to );
+
+            if( !uiTransitions[ fromUI ] ) {
+                uiTransitions[ fromUI ] = new Set();
+            }
+            if( !uiTransitions[ toUI ] ) {
+                uiTransitions[ toUI ] = new Set();
+            }
+
+            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\n(' + transition.condition + ')' : '' );
+            uiTransitions[ fromUI ].add( transitionStr );
+            uiTransitions[ toUI ].add( transitionStr );
+        } );
+    } );
+
+    return uiTransitions;
+};
+
+const gatherFragmentTransitions = ( fragment ) => {
+    const fragmentTransitions = {};
+
+    fragment.transitions.forEach( transition => {
+        const fromKey = transition.from;//.replace( /\(/g, '.' ).replace( /\)/g, '' );
+        const toKey = transition.to;//.replace( /\(/g, '.' ).replace( /\)/g, '' );
+
+        if( !fragmentTransitions[ fromKey ] ) {
+            fragmentTransitions[ fromKey ] = new Set();
+        }
+        if( !fragmentTransitions[ toKey ] ) {
+            fragmentTransitions[ toKey ] = new Set();
+        }
+
+        const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\n(' + transition.condition + ')' : '' );
+        fragmentTransitions[ fromKey ].add( transitionStr );
+        fragmentTransitions[ toKey ].add( transitionStr );
+    } );
+
+    return fragmentTransitions;
 };
 
 export const parseUITDL = ( text ) => {
@@ -71,7 +123,7 @@ export const parseUITDL = ( text ) => {
 
         try {
             if( !trimmedLine ) {
-                // Do nothing
+                // Do nothing for empty lines
             } else if( trimmedLine === '}' ) {
                 let popped = braceStack.pop();
                 currentSection = braceStack[ braceStack.length - 1 ];
@@ -88,7 +140,6 @@ export const parseUITDL = ( text ) => {
                     result.name = match[ 1 ];
                     currentSection = 'uitd';
                     braceStack.push( 'uitd' );
-
                 } else {
                     throw new Error( `Invalid syntax at line ${lineNumber}. All content must be inside UITD "name" {` );
                 }
@@ -103,10 +154,11 @@ export const parseUITDL = ( text ) => {
                     currentSection = 'ui';
                     braceStack.push( 'ui' );
                 } else if( trimmedLine.startsWith( 'FRAGMENT' ) ) {
-                    if( !trimmedLine.match( /^FRAGMENT\s+"[^"]+"\s*{\s*$/ ) ) {
+                    const fragmentMatch = trimmedLine.match( /^FRAGMENT\s+"([^"]+)"\s*{\s*$/ );
+                    if( !fragmentMatch ) {
                         throw new Error( `Invalid FRAGMENT declaration` );
                     }
-                    result.fragments.push( { name: trimmedLine.match( /^FRAGMENT\s+"([^"]+)"/ )[ 1 ], draws: [], transitions: [], lineNumber: lineNumber } );
+                    result.fragments.push( { name: fragmentMatch[ 1 ], draws: [], transitions: [], lineNumber: lineNumber } );
                     currentSection = 'fragment';
                     braceStack.push( 'fragment' );
                 } else {
@@ -132,14 +184,14 @@ export const parseUITDL = ( text ) => {
                         throw new Error( `Invalid DRAW declaration at line ${lineNumber}` );
                     }
                 } else if( trimmedLine.startsWith( 'TRANSITION' ) ) {
-                    const match = trimmedLine.match( /^TRANSITION\s+from\s+(\d+(\(\d+\))*)\s+to\s+(\d+(\(\d+\))*)\s+if\s+user\s+(\w+)\s+"([^"]+)"\s*(AND\s+"([^"]+)")?/ );
-                    if( match ) {
+                    const transitionMatch = trimmedLine.match( /^TRANSITION\s+from\s+(\d+(\(\d+\))*)\s+to\s+(\d+(\(\d+\))*)\s+if\s+user\s+(\w+)\s+"([^"]+)"\s*(AND\s+"([^"]+)")?/ );
+                    if( transitionMatch ) {
                         result.fragments[ result.fragments.length - 1 ].transitions.push( {
-                            from: match[ 1 ],
-                            to: match[ 3 ],
-                            action: match[ 5 ],
-                            target: match[ 6 ],
-                            condition: match[ 8 ] || '',
+                            from: transitionMatch[ 1 ],
+                            to: transitionMatch[ 3 ],
+                            action: transitionMatch[ 5 ],
+                            target: transitionMatch[ 6 ],
+                            condition: transitionMatch[ 8 ] || '',
                             lineNumber: lineNumber
                         } );
                     } else {
@@ -163,6 +215,38 @@ export const parseUITDL = ( text ) => {
                 endColumn: 3
             } );
         }
+    } );
+
+    // Gather all transitions for each UI in the entire UITD
+    const allTransitions = gatherAllTransitions( result );
+
+    // Process each fragment
+    result.fragments.forEach( fragment => {
+        const fragmentTransitions = gatherFragmentTransitions( fragment );
+
+        const processRef = ( ref, parentId = null ) => {
+            const refId = parentId ? `${parentId}(${ref.id})` : ref.id;
+
+            // Determine if this UI copy should be marked as full
+            const innermostId = getInnermostUI( refId );
+            const allTransitionsSet = allTransitions[ innermostId ] || new Set();
+            const fragmentTransitionsSet = fragmentTransitions[ refId ] || new Set();
+
+            if( allTransitionsSet.size > 0 && allTransitionsSet.size === fragmentTransitionsSet.size ) {
+                ref.full = true;
+            } else {
+                ref.full = false;
+            }
+
+            ref.nested.forEach( nestedRef => processRef( nestedRef, ref.id ) );
+        };
+
+        // Process each draw list
+        fragment.draws.forEach( ( { uiRefs } ) => {
+            uiRefs.forEach( ref => {
+                processRef( ref, null );
+            } );
+        } );
     } );
 
     return result;
@@ -215,38 +299,25 @@ export const validateData = ( parsedData ) => {
         }
     } );
 
+    // Check if there are undrawn UIs referenced in transitions
     parsedData.fragments.forEach( fragment => {
         const drawnUIs = new Set();
-        const definedUIs = new Set( parsedData.uis.map( ui => ui.id.toString() ) );
-        const processRef = ( ref, parentId = null, drawLineNumber ) => {
-            if( parentId ) {
-                drawnUIs.add( `${parentId}(${ref.id})` );
-            } else {
-                drawnUIs.add( ref.id );
-            }
-            if( ref.id !== "" && !definedUIs.has( ref.id ) ) {
-                markers.push( {
-                    severity: 'Error',
-                    startLineNumber: drawLineNumber,
-                    startColumn: 1,
-                    endLineNumber: drawLineNumber,
-                    endColumn: 3,
-                    message: `UI ${ref.id} is drawn but not defined`,
-                } );
-            }
-            ref.nested.forEach( nestedRef => processRef( nestedRef, ref.id, drawLineNumber ) );
+
+        const collectDrawnUIs = ( ref ) => {
+            drawnUIs.add( ref.id );
+            ref.nested.forEach( nestedRef => collectDrawnUIs( nestedRef ) );
         };
 
-        // Process each draw list
-        fragment.draws.forEach( ( { uiRefs, lineNumber } ) => {
+        fragment.draws.forEach( ( { uiRefs } ) => {
             uiRefs.forEach( ref => {
-                processRef( ref, null, lineNumber );
+                collectDrawnUIs( ref );
             } );
         } );
 
         fragment.transitions.forEach( transition => {
             const checkUI = ( uiRef ) => {
-                if( !drawnUIs.has( uiRef ) ) {
+                const innermostId = getInnermostUI( uiRef );
+                if( !drawnUIs.has( innermostId ) ) {
                     markers.push( {
                         severity: 'Error',
                         startLineNumber: transition.lineNumber,
@@ -262,7 +333,7 @@ export const validateData = ( parsedData ) => {
             checkUI( transition.to );
 
             // Validate that transition actions are defined in the origin UI
-            const originUI = parsedData.uis.find( ui => ui.id.toString() === transition.from.split( '(' )[ 0 ] );
+            const originUI = parsedData.uis.find( ui => ui.id.toString() === getInnermostUI( transition.from ) );
             if( !originUI || !originUI.actions.some( action => action.verb === transition.action && action.target === transition.target ) ) {
                 markers.push( {
                     severity: 'Error',

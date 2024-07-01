@@ -25,9 +25,7 @@ const Renderer = ( { data } ) => {
             let maxHeight = 0; // Reset maxHeight for each row
 
             fragment.draws.forEach( draw => {
-                console.log( 'draw', draw );
                 draw.uiRefs.forEach( ref => {
-                    console.log( 'ref', ref );
                     const dimensions = drawUI( ref, xPosition, yPosition, initialWidth, initialHeight, svg );
                     xPosition += dimensions.width + horizontalPadding;
                     maxHeight = Math.max( maxHeight, dimensions.height );
@@ -36,10 +34,7 @@ const Renderer = ( { data } ) => {
                 yPosition += maxHeight + verticalSpacing; // Move yPosition down by maxHeight and verticalSpacing
             } );
 
-            console.log( 'uiPositions', uiPositions );
-
             fragment.transitions.forEach( transition => {
-                console.log( 'Transition', transition );
                 const arrow = calculateArrowPosition( transition, uiPositions );
                 if( arrow ) arrowData.push( arrow );
             } );
@@ -64,7 +59,6 @@ const Renderer = ( { data } ) => {
             }
 
             const uiData = data.uis.find( ui => ui.id.toString() === ref.id );
-            console.log( 'uiData', uiData );
             if( !uiData ) {
                 return { width: 0, height: 0 };
             }
@@ -89,7 +83,6 @@ const Renderer = ( { data } ) => {
                 ref.nested.forEach( nestedRef => {
                     const nestedInitialWidth = initialWidth;
                     const nestedDimensions = drawUI( nestedRef, x + 10, nestedY, nestedInitialWidth, initialHeight, svgElement, uiId );
-                    console.log( 'nestedDimensions', nestedDimensions );
                     nestedY += nestedDimensions.height + 10; // Increment Y position for the next nested UI
                     maxWidth = Math.max( maxWidth, nestedDimensions.width + 20 ); // Adjust width if nested UI is wider
                     totalHeight += nestedDimensions.height + 10; // Increment total height to fit all nested UIs
@@ -104,11 +97,15 @@ const Renderer = ( { data } ) => {
             rect.setAttribute( "fill", "none" );
             rect.setAttribute( "stroke", "black" );
 
+            if( ref.full ) {
+                rect.setAttribute( "stroke-width", "4" );
+                //rect.setAttribute( "stroke-dasharray", "5,5" );
+            }
+
             // Append the rect after adjusting dimensions
             svgElement.insertBefore( rect, text ); // Ensure text is on top of the rectangle
 
             uiPositions[ uiId ] = { x, y, width: maxWidth, height: totalHeight };
-            console.log( 'uiPositions[uiId]', uiPositions[ uiId ] );
 
             return { width: maxWidth, height: totalHeight };
         }
@@ -116,7 +113,7 @@ const Renderer = ( { data } ) => {
         function calculateArrowPosition( transition, positions ) {
             const fromPos = positions[ transition.from ];
             const toPos = positions[ transition.to ];
-            return fromPos && toPos ? { from: { x: fromPos.x + fromPos.width * Math.random(), y: fromPos.y + fromPos.height }, to: { x: toPos.x + toPos.width * Math.random(), y: toPos.y }, transition } : null;
+            return fromPos && toPos ? { from: { x: fromPos.x + fromPos.width / 2, y: fromPos.y + fromPos.height }, to: { x: toPos.x + toPos.width / 2, y: toPos.y }, transition } : null;
         }
 
         function adjustAndDrawArrows( arrows, svgElement ) {
@@ -134,7 +131,6 @@ const Renderer = ( { data } ) => {
             line.setAttribute( "stroke", "blue" );
             line.setAttribute( "marker-end", "url(#arrowhead)" );
             svgElement.appendChild( line );
-            console.log( 'Line', line );
         }
 
         const defs = document.createElementNS( "http://www.w3.org/2000/svg", "defs" );

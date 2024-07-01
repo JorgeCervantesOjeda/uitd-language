@@ -21,7 +21,7 @@ const gatherAllTransitions = ( parsedData ) => {
                 uiTransitions[ toUI ] = new Set();
             }
 
-            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\\n(' + transition.condition + ')' : '' );
+            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\n(' + transition.condition + ')' : '' );
             uiTransitions[ fromUI ].add( transitionStr );
             uiTransitions[ toUI ].add( transitionStr );
         } );
@@ -30,32 +30,9 @@ const gatherAllTransitions = ( parsedData ) => {
     return uiTransitions;
 };
 
-// Function to gather transitions for each UI copy in a fragment
-const gatherFragmentTransitions = ( fragment ) => {
-    const fragmentTransitions = {};
-
-    fragment.transitions.forEach( transition => {
-        const fromKey = transition.from.replace( /\(/g, '.' ).replace( /\)/g, '' );
-        const toKey = transition.to.replace( /\(/g, '.' ).replace( /\)/g, '' );
-
-        if( !fragmentTransitions[ fromKey ] ) {
-            fragmentTransitions[ fromKey ] = new Set();
-        }
-        if( !fragmentTransitions[ toKey ] ) {
-            fragmentTransitions[ toKey ] = new Set();
-        }
-
-        const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\\n(' + transition.condition + ')' : '' );
-        fragmentTransitions[ fromKey ].add( transitionStr );
-        fragmentTransitions[ toKey ].add( transitionStr );
-    } );
-
-    return fragmentTransitions;
-};
-
 // Helper function to extract the innermost referenced UI
-const getInnermostUI = ( transition ) => {
-    const parts = transition.split( /[\(\)]+/ );
+const getInnermostUI = ( uiRef ) => {
+    const parts = uiRef.split( /[\(\)]+/ );
     return parts[ parts.length - 1 ] === '' ? parts[ parts.length - 2 ] : parts[ parts.length - 1 ];
 };
 
@@ -65,17 +42,13 @@ const translateToD2 = ( parsedData ) => {
 
     let d2 = 'direction: right\n"' + parsedData.name + '": {\n';
 
-    const allTransitions = gatherAllTransitions( parsedData );
-
     // Build UI hierarchy
     parsedData.fragments.forEach( ( fragment ) => {
         d2 += '  "' + fragment.name + '": {\n';
 
-        const fragmentTransitions = gatherFragmentTransitions( fragment );
-
         fragment.draws.forEach( ( draw ) => {
             draw.uiRefs.forEach( ( ref ) => {
-                d2 += buildUIHierarchy( ref, 2, parsedData.uis, fragmentTransitions, allTransitions, '' );
+                d2 += buildUIHierarchy( ref, 2, parsedData.uis, '' );
             } );
         } );
 
@@ -83,7 +56,7 @@ const translateToD2 = ( parsedData ) => {
         fragment.transitions.forEach( ( transition ) => {
             d2 += '    ' + formatTransition( transition.from ) + ' -> ' + formatTransition( transition.to ) + ': ' + transition.action + ' "' + transition.target + '"';
             if( transition.condition ) {
-                d2 += ' AND\\n(' + transition.condition + ')';
+                d2 += ' AND\n(' + transition.condition + ')';
             }
             d2 += '\n';
         } );
@@ -97,7 +70,7 @@ const translateToD2 = ( parsedData ) => {
 };
 
 // Helper function to build the UI hierarchy
-const buildUIHierarchy = ( ref, indentLevel, uis, fragmentTransitions, allTransitions, parentKey ) => {
+const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
     const ui = uis.find( ui => ui.id === parseInt( ref.id ) );
     if( !ui ) {
         console.error( 'UI with id ' + ref.id + ' not found in the parsed data.' );
@@ -112,7 +85,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, fragmentTransitions, allTransi
     if( ref.nested.length > 0 ) {
         hierarchy += '  '.repeat( indentLevel ) + ref.id + ': ' + ref.id + ' ' + ui.name + ' {\n';
         ref.nested.forEach( ( nestedRef ) => {
-            hierarchy += buildUIHierarchy( nestedRef, indentLevel + 1, uis, fragmentTransitions, allTransitions, parentKey + ( parentKey ? '(' : '' ) + ref.id + ( parentKey ? ')' : '' ) );
+            hierarchy += buildUIHierarchy( nestedRef, indentLevel + 1, uis, parentKey + ( parentKey ? '(' : '' ) + ref.id + ( parentKey ? ')' : '' ) );
         } );
         hierarchy += '  '.repeat( indentLevel ) + '}\n';
     } else {
@@ -120,10 +93,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, fragmentTransitions, allTransi
     }
 
     // Determine if this UI copy should have a double border
-    const allTransitionsSet = allTransitions[ ref.id ] || new Set();
-    const fragmentTransitionsSet = fragmentTransitions[ fullKey ] || new Set();
-
-    if( allTransitionsSet.size > 0 && allTransitionsSet.size === fragmentTransitionsSet.size ) {
+    if( ref.full ) {
         hierarchy += '  '.repeat( indentLevel ) + ref.id + '.style.double-border: true\n';
     }
 
