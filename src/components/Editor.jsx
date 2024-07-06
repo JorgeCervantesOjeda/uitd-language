@@ -1,15 +1,73 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
 import { parseUITDL, validateData, validVerbs } from '../utils/Parser';
+import { saveAs } from 'file-saver';
 
-const Editor = ( { value, onChange } ) => {
+const Editor = ( { uitdlText, onChange } ) => {
     const editorRef = useRef( null );
+    const [ lastSaved, setLastSaved ] = useState( Date.now() );
+    const [ reminder, setReminder ] = useState( false );
+    const [ isModified, setIsModified ] = useState( false );
+    const fileInputRef = useRef( null );
 
     const handleEditorChange = ( value ) => {
         onChange( value );
+        setIsModified( true );
     };
 
+    const handleCopyToClipboard = () => {
+        navigator.clipboard.writeText( uitdlText ).then( () => {
+            const copyMessage = document.getElementById( 'copyMessageEditor' );
+            copyMessage.style.visibility = 'visible';
+            setTimeout( () => {
+                copyMessage.style.visibility = 'hidden';
+            }, 2000 );
+        } ).catch( ( err ) => {
+            console.error( 'Could not copy text: ', err );
+        } );
+    };
+
+    const handlePasteFromClipboard = () => {
+        navigator.clipboard.readText().then( ( text ) => {
+            handleEditorChange( text );
+        } ).catch( ( err ) => {
+            console.error( 'Failed to read clipboard contents: ', err );
+        } );
+    };
+
+    const handleSaveToFile = () => {
+        const blob = new Blob( [ uitdlText ], { type: 'text/plain;charset=utf-8' } );
+        saveAs( blob, 'uitdl_description.uitd' );
+        setLastSaved( Date.now() );
+        setReminder( false );
+        setIsModified( false );
+    };
+
+    const handleOpenFile = ( event ) => {
+        const file = event.target.files[ 0 ];
+        if( file && file.name.endsWith( '.uitd' ) ) {
+            const reader = new FileReader();
+            reader.onload = ( e ) => {
+                handleEditorChange( e.target.result );
+            };
+            reader.readAsText( file );
+        } else {
+            alert( 'Please select a .uitd file' );
+        }
+    };
+
+    useEffect( () => {
+        if( isModified ) {
+            const timer = setInterval( () => {
+                if( Date.now() - lastSaved > 5 * 60 * 1000 ) {
+                    setReminder( true );
+                }
+            }, 60 * 1000 );
+
+            return () => clearInterval( timer );
+        }
+    }, [ lastSaved, isModified ] );
 
     const handleEditorDidMount = ( editor, monaco ) => {
         // Set cursor position (line, column)
@@ -122,19 +180,41 @@ const Editor = ( { value, onChange } ) => {
     };
 
     return (
-        <MonacoEditor
-            width="100%"
-            height="100%"
-            defaultLanguage="uitdl"
-            value={ value }
-            onChange={ handleEditorChange }
-            onMount={ handleEditorDidMount }
-            theme="vs-dark"
-            options={ {
-                readOnly: false,
-                minimap: { enabled: true },
-            } }
-        />
+        <div>
+            <div>
+                <div>UITD Editor</div>
+                <button onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
+                <button onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
+                <button onClick={ handleSaveToFile }>Save to File</button>
+                <input
+                    type="file"
+                    ref={ fileInputRef }
+                    style={ { display: 'none' } }
+                    onChange={ handleOpenFile }
+                    accept=".uitd"
+                />
+                <button onClick={ () => fileInputRef.current.click() }>Open File</button>
+            </div>
+            { reminder && (
+                <div style={ { color: 'yellow', backgroundColor: 'darkred' } }>
+                    Remember to save your file!
+                </div>
+            ) }
+            <span id="copyMessageEditor" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
+            <MonacoEditor
+                width="100%"
+                height="80vh"
+                defaultLanguage="uitdl"
+                value={ uitdlText }
+                onChange={ handleEditorChange }
+                onMount={ handleEditorDidMount }
+                theme="vs-dark"
+                options={ {
+                    readOnly: false,
+                    minimap: { enabled: true },
+                } }
+            />
+        </div>
     );
 };
 

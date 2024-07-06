@@ -127,8 +127,9 @@ const RendererD2 = ( { data } ) => {
     };
 
     return (
-        <div style={ { padding: '10px', height: '100%', backgroundColor: 'grey', color: '#d4d4d4', borderRadius: '4px' } }>
+        <div style={ { height: '80vh', backgroundColor: 'grey', color: '#d4d4d4', borderRadius: '4px' } }>
             <div >
+                <div>D2 Translation</div>
                 <button
                     onClick={ copyToClipboard }
                     style={ {
@@ -143,11 +144,11 @@ const RendererD2 = ( { data } ) => {
                         cursor: 'pointer',
                     } }
                 >
-                    Open D2 Playground
+                    SVG Renderer
                 </button>
             </div>
             <span id="copyMessage" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
-            <CodeViewer code={ d2Output } language="javascript" />
+            <CodeViewer code={ d2Output } language="python" />
         </div>
     );
 };
