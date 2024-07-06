@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
-import * as monaco from 'monaco-editor';
 import { parseUITDL, validateData, validVerbs } from '../utils/Parser';
 
 const Editor = ( { value, onChange } ) => {
@@ -124,14 +123,17 @@ const Editor = ( { value, onChange } ) => {
 
     return (
         <MonacoEditor
-            height="100%"
             width="100%"
+            height="100%"
             defaultLanguage="uitdl"
             value={ value }
             onChange={ handleEditorChange }
             onMount={ handleEditorDidMount }
             theme="vs-dark"
-            options={ { automaticLayout: true } }
+            options={ {
+                readOnly: false,
+                minimap: { enabled: true },
+            } }
         />
     );
 };

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import CodeViewer from './CodeViewer';
 
 // Helper function to format nested transitions
 const formatTransition = ( transition ) => {
@@ -104,24 +103,10 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
 
 const RendererD2 = ( { data } ) => {
     const [ d2Output, setD2Output ] = useState( '' );
-    const [ svgOutput, setSvgOutput ] = useState( '' );
 
     useEffect( () => {
         const d2Text = translateToD2( data );
         setD2Output( d2Text );
-
-        // Fetch the rendered SVG from your API or rendering tool
-        // Replace this URL with your actual API endpoint
-        fetch( 'http://localhost:5000/render', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify( { d2: d2Text } ),
-        } )
-            .then( ( response ) => response.text() )
-            .then( ( svg ) => setSvgOutput( svg ) )
-            .catch( ( err ) => console.error( 'Error fetching SVG:', err ) );
     }, [ data ] );
 
     const copyToClipboard = () => {
@@ -142,14 +127,11 @@ const RendererD2 = ( { data } ) => {
     };
 
     return (
-        <div style={ { padding: '16px', backgroundColor: '#1e1e1e', color: '#d4d4d4', borderRadius: '4px' } }>
-            <div style={ { marginBottom: '10px' } }>
+        <div style={ { padding: '10px', height: '100%', backgroundColor: 'grey', color: '#d4d4d4', borderRadius: '4px' } }>
+            <div >
                 <button
                     onClick={ copyToClipboard }
                     style={ {
-                        marginRight: '10px',
-                        padding: '10px',
-                        borderRadius: '4px',
                         cursor: 'pointer',
                     } }
                 >
@@ -158,8 +140,6 @@ const RendererD2 = ( { data } ) => {
                 <button
                     onClick={ openInPlayground }
                     style={ {
-                        padding: '10px',
-                        borderRadius: '4px',
                         cursor: 'pointer',
                     } }
                 >
@@ -167,10 +147,7 @@ const RendererD2 = ( { data } ) => {
                 </button>
             </div>
             <span id="copyMessage" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
-            <SyntaxHighlighter language="d2" style={ docco }>
-                { d2Output }
-            </SyntaxHighlighter>
-            <div dangerouslySetInnerHTML={ { __html: svgOutput } } />
+            <CodeViewer code={ d2Output } language="javascript" />
         </div>
     );
 };

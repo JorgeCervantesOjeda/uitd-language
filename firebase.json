@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist", // This should match the Vite build output directory
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -12,14 +12,5 @@
         "destination": "/index.html"
       }
     ]
-  },
-  "emulators": {
-    "hosting": {
-      "port": 5000
-    },
-    "ui": {
-      "enabled": true
-    },
-    "singleProjectMode": true
   }
 }

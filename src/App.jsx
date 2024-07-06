@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import Editor from './components/Editor';
-import Renderer from './components/Renderer';
+//import Renderer from './components/Renderer';
 import RendererD2 from './components/RendererD2';
-import RendererParsed from './components/RendererParsed';
+//import RendererParsed from './components/RendererParsed';
 import { parseUITDL, validateData } from './utils/Parser';
-import { generateWebAppFromUITDL } from './utils/webAppGenerator';
+//import { generateWebAppFromUITDL } from './utils/webAppGenerator';
 import './App.css';
 
 const App = () => {
@@ -68,21 +68,21 @@ const App = () => {
     setIsModified( true );
   };
 
-  const handleGenerate = () => {
-    const files = generateWebAppFromUITDL( parsedData );
-    setGeneratedFiles( files );
-    downloadZip( files );
-  };
+  //  const handleGenerate = () => {
+  //    const files = generateWebAppFromUITDL( parsedData );
+  //    setGeneratedFiles( files );
+  //    downloadZip( files );
+  //  };
 
-  const downloadZip = ( files ) => {
-    const zip = new JSZip();
-    files.forEach( ( file ) => {
-      zip.file( file.name, file.content );
-    } );
-    zip.generateAsync( { type: 'blob' } ).then( ( content ) => {
-      saveAs( content, 'webapp.zip' );
-    } );
-  };
+  //  const downloadZip = ( files ) => {
+  //    const zip = new JSZip();
+  //    files.forEach( ( file ) => {
+  //      zip.file( file.name, file.content );
+  //    } );
+  //    zip.generateAsync( { type: 'blob' } ).then( ( content ) => {
+  //      saveAs( content, 'webapp.zip' );
+  //    } );
+  //  };
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText( uitdlText ).then( () => {
@@ -141,22 +141,21 @@ const App = () => {
 
   const renderContent = () => {
     switch( selectedTab ) {
-      case 'Renderer':
-        return <Renderer data={ parsedData } />
+      //      case 'Renderer':
+      //        return <Renderer data={ parsedData } />
       case 'RendererD2':
         return <RendererD2 data={ parsedData } />;
-      case 'RendererParsed':
-        return <RendererParsed data={ parsedData } />;
+      //case 'RendererParsed':
+      //  return <RendererParsed data={ parsedData } />;
       default:
         return null;
     }
   };
 
   return (
-    <div style={ { display: 'flex', height: '100vh' } }>
-      <div style={ { flex: 1, display: 'flex', flexDirection: 'column', width: '50vw' } }>
+    <div style={ { display: 'flex', height: '100%', backgroundColor: 'grey' } }>
+      <div style={ { flex: 1, padding: '10px', display: 'flex', flexDirection: 'column', width: '45vw' } }>
         <div>
-          <button onClick={ handleGenerate }>Generate Web App</button>
           <button onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
           <button onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
           <button onClick={ handleSaveToFile }>Save to File</button>
@@ -170,26 +169,15 @@ const App = () => {
           <button onClick={ () => fileInputRef.current.click() }>Open File</button>
         </div>
         { reminder && (
-          <div style={ { color: 'red' } }>
+          <div style={ { color: 'yellow', backgroundColor: 'darkred' } }>
             Remember to save your file!
           </div>
         ) }
         <span id="copyMessageEditor" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
         <Editor style="editor" value={ uitdlText } onChange={ handleEditorChange } />
-        <div>
-          { generatedFiles.map( ( file ) => (
-            <div key={ file.name }>
-              <a href={ file.url } download={ file.name }>{ file.name }</a>
-            </div>
-          ) ) }
-        </div>
       </div>
-      <div style={ { flex: 1, display: 'flex', flexDirection: 'column', width: '50vw' } }>
-        <div style={ { display: 'none', justifyContent: 'center', marginBottom: '10px' } }>
-          <button onClick={ () => setSelectedTab( 'RendererD2' ) }>RendererD2</button>
-          <button onClick={ () => setSelectedTab( 'RendererParsed' ) }>RendererD2</button>
-        </div>
-        { renderContent() }
+      <div style={ { flex: 1, display: 'flex', flexDirection: 'column', width: '45vw', height: '100vh' } }>
+        <RendererD2 style="editor" data={ parsedData } />
       </div>
     </div>
   );

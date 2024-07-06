@@ -13,15 +13,25 @@ export const parseUIRefList = ( text ) => {
             braceCount++;
             if( braceCount === 1 ) {
                 currentRef = currentRef.trim();
+                if( isNaN( currentRef ) || currentRef === '' ) {
+                    throw new Error( `Invalid DRAW statement: "${currentRef}" is not a valid UI reference` );
+                }
                 continue;
             }
         } else if( char === ')' ) {
             braceCount--;
+            if( braceCount < 0 ) {
+                throw new Error( "Syntax error: Unbalanced parentheses" );
+            }
             if( braceCount === 0 ) {
                 if( currentRef.trim() !== '' ) {
+                    const nestedRefs = parseUIRefList( nestedText );
+                    if( nestedRefs.length === 0 ) {
+                        throw new Error( "Invalid DRAW statement: Empty parentheses are not allowed" );
+                    }
                     refs.push( {
                         id: currentRef.trim(),
-                        nested: parseUIRefList( nestedText ),
+                        nested: nestedRefs,
                         full: false
                     } );
                 }
@@ -36,6 +46,9 @@ export const parseUIRefList = ( text ) => {
         } else if( char === ',' ) {
             if( braceCount === 0 ) {
                 if( currentRef.trim() !== '' ) {
+                    if( isNaN( currentRef ) ) {
+                        throw new Error( `Invalid DRAW statement: "${currentRef}" is not a valid UI reference` );
+                    }
                     refs.push( { id: currentRef.trim(), nested: [], full: false } );
                 }
                 currentRef = '';
@@ -47,7 +60,14 @@ export const parseUIRefList = ( text ) => {
         }
     }
 
+    if( braceCount !== 0 ) {
+        throw new Error( "Syntax error: Unbalanced parentheses" );
+    }
+
     if( currentRef.trim() !== '' ) {
+        if( isNaN( currentRef ) ) {
+            throw new Error( `Invalid DRAW statement: "${currentRef}" is not a valid UI reference` );
+        }
         refs.push( { id: currentRef.trim(), nested: [], full: false } );
     }
 
@@ -74,7 +94,7 @@ const gatherAllTransitions = ( parsedData ) => {
                 uiTransitions[ toUI ] = new Set();
             }
 
-            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\n(' + transition.condition + ')' : '' );
+            const transitionStr = `${transition.from}->${transition.to}:${transition.action} "${transition.target}" ${transition.condition ? 'AND\n(' + transition.condition + ')' : ''}`;
             uiTransitions[ fromUI ].add( transitionStr );
             uiTransitions[ toUI ].add( transitionStr );
         } );
@@ -87,8 +107,8 @@ const gatherFragmentTransitions = ( fragment ) => {
     const fragmentTransitions = {};
 
     fragment.transitions.forEach( transition => {
-        const fromKey = transition.from;//.replace( /\(/g, '.' ).replace( /\)/g, '' );
-        const toKey = transition.to;//.replace( /\(/g, '.' ).replace( /\)/g, '' );
+        const fromKey = transition.from;
+        const toKey = transition.to;
 
         if( !fragmentTransitions[ fromKey ] ) {
             fragmentTransitions[ fromKey ] = new Set();
@@ -97,7 +117,7 @@ const gatherFragmentTransitions = ( fragment ) => {
             fragmentTransitions[ toKey ] = new Set();
         }
 
-        const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\n(' + transition.condition + ')' : '' );
+        const transitionStr = `${transition.from}->${transition.to}:${transition.action} "${transition.target}" ${transition.condition ? 'AND\n(' + transition.condition + ')' : ''}`;
         fragmentTransitions[ fromKey ].add( transitionStr );
         fragmentTransitions[ toKey ].add( transitionStr );
     } );
@@ -125,6 +145,9 @@ export const parseUITDL = ( text ) => {
             if( !trimmedLine ) {
                 // Do nothing for empty lines
             } else if( trimmedLine === '}' ) {
+                if( braceStack.length === 0 ) {
+                    throw new Error( `Unexpected closing brace at line ${lineNumber}` );
+                }
                 let popped = braceStack.pop();
                 currentSection = braceStack[ braceStack.length - 1 ];
                 if( braceStack.length === 0 ) {
@@ -178,8 +201,12 @@ export const parseUITDL = ( text ) => {
                 if( trimmedLine.startsWith( 'DRAW' ) ) {
                     const drawMatch = trimmedLine.match( /^DRAW\s+(.+)/ );
                     if( drawMatch ) {
-                        const uiRefs = parseUIRefList( drawMatch[ 1 ] );
-                        result.fragments[ result.fragments.length - 1 ].draws.push( { uiRefs, lineNumber } );
+                        try {
+                            const uiRefs = parseUIRefList( drawMatch[ 1 ] );
+                            result.fragments[ result.fragments.length - 1 ].draws.push( { uiRefs, lineNumber } );
+                        } catch( error ) {
+                            throw new Error( `Invalid DRAW declaration at line ${lineNumber}: ${error.message}` );
+                        }
                     } else {
                         throw new Error( `Invalid DRAW declaration at line ${lineNumber}` );
                     }
@@ -212,10 +239,20 @@ export const parseUITDL = ( text ) => {
                 lineNumber: lineNumber,
                 message: e.message,
                 startColumn: 1,
-                endColumn: 3
+                endColumn: 100
             } );
         }
     } );
+
+    if( braceStack.length > 0 ) {
+        result.errors.push( {
+            startLineNumber: lines.length,
+            lineNumber: lines.length,
+            message: 'Syntax error: Unbalanced braces',
+            startColumn: 1,
+            endColumn: 100
+        } );
+    }
 
     // Gather all transitions for each UI in the entire UITD
     const allTransitions = gatherAllTransitions( result );
@@ -265,7 +302,7 @@ export const validateData = ( parsedData ) => {
                 startLineNumber: ui.lineNumber,
                 startColumn: 1,
                 endLineNumber: ui.lineNumber,
-                endColumn: 3,
+                endColumn: 100,
                 message: `UI ${ui.id} has no actions defined`,
             } );
         }
@@ -275,7 +312,7 @@ export const validateData = ( parsedData ) => {
                 startLineNumber: ui.lineNumber,
                 startColumn: 1,
                 endLineNumber: ui.lineNumber,
-                endColumn: 3,
+                endColumn: 100,
                 message: `Duplicate UI name: ${ui.name}`,
             } );
         } else {
@@ -291,7 +328,7 @@ export const validateData = ( parsedData ) => {
                 startLineNumber: fragment.lineNumber,
                 startColumn: 1,
                 endLineNumber: fragment.lineNumber,
-                endColumn: 3,
+                endColumn: 100,
                 message: `Duplicate fragment name: ${fragment.name}`,
             } );
         } else {
@@ -323,7 +360,7 @@ export const validateData = ( parsedData ) => {
                         startLineNumber: transition.lineNumber,
                         startColumn: 1,
                         endLineNumber: transition.lineNumber,
-                        endColumn: 3,
+                        endColumn: 100,
                         message: `Undrawn UI referenced in transition: ${uiRef}`,
                     } );
                 }
@@ -340,7 +377,7 @@ export const validateData = ( parsedData ) => {
                     startLineNumber: transition.lineNumber,
                     startColumn: 1,
                     endLineNumber: transition.lineNumber,
-                    endColumn: 3,
+                    endColumn: 100,
                     message: `Action "${transition.action} ${transition.target}" in transition is not defined in UI ${transition.from}`,
                 } );
             }
@@ -360,7 +397,7 @@ export const validateData = ( parsedData ) => {
                     startLineNumber: action.lineNumber,
                     startColumn: 1,
                     endLineNumber: action.lineNumber,
-                    endColumn: 3,
+                    endColumn: 100,
                     message: `Unused action: ${action.verb} "${action.target}" in UI ${ui.id}`,
                 } );
             }
