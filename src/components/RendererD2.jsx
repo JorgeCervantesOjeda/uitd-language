@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 // Helper function to format nested transitions
 const formatTransition = ( transition ) => {
@@ -21,7 +23,7 @@ const gatherAllTransitions = ( parsedData ) => {
                 uiTransitions[ toUI ] = new Set();
             }
 
-            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\n(' + transition.condition + ')' : '' );
+            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\\n(' + transition.condition + ')' : '' );
             uiTransitions[ fromUI ].add( transitionStr );
             uiTransitions[ toUI ].add( transitionStr );
         } );
@@ -56,7 +58,7 @@ const translateToD2 = ( parsedData ) => {
         fragment.transitions.forEach( ( transition ) => {
             d2 += '    ' + formatTransition( transition.from ) + ' -> ' + formatTransition( transition.to ) + ': ' + transition.action + ' "' + transition.target + '"';
             if( transition.condition ) {
-                d2 += ' AND\n(' + transition.condition + ')';
+                d2 += ' AND\\n(' + transition.condition + ')';
             }
             d2 += '\n';
         } );
@@ -147,9 +149,6 @@ const RendererD2 = ( { data } ) => {
                     style={ {
                         marginRight: '10px',
                         padding: '10px',
-                        backgroundColor: '#ffffff', // white background
-                        color: '#000000', // black text
-                        border: '1px solid #000000',
                         borderRadius: '4px',
                         cursor: 'pointer',
                     } }
@@ -160,9 +159,6 @@ const RendererD2 = ( { data } ) => {
                     onClick={ openInPlayground }
                     style={ {
                         padding: '10px',
-                        backgroundColor: '#ffffff', // white background
-                        color: '#000000', // black text
-                        border: '1px solid #000000',
                         borderRadius: '4px',
                         cursor: 'pointer',
                     } }
@@ -171,7 +167,9 @@ const RendererD2 = ( { data } ) => {
                 </button>
             </div>
             <span id="copyMessage" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
-            <pre>{ d2Output }</pre>
+            <SyntaxHighlighter language="d2" style={ docco }>
+                { d2Output }
+            </SyntaxHighlighter>
             <div dangerouslySetInnerHTML={ { __html: svgOutput } } />
         </div>
     );

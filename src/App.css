@@ -1,8 +1,18 @@
+button:hover {
+  box-shadow: 0 0 15px rgba(0, 0255, 255, 0.5) !important;
+  border-color: black !important;
+  /* Adjust the color and size as needed */
+}
+
+.view-line:hover {
+  box-shadow: 0 0 15px rgba(0, 0255, 255, 0.5) !important;
+  /* Adjust the color and size as needed */
+}
+
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  width: 100%;
 }
 
 .logo {
@@ -11,9 +21,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -22,6 +34,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

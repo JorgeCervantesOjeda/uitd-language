@@ -7,6 +7,7 @@ import RendererD2 from './components/RendererD2';
 import RendererParsed from './components/RendererParsed';
 import { parseUITDL, validateData } from './utils/Parser';
 import { generateWebAppFromUITDL } from './utils/webAppGenerator';
+import './App.css';
 
 const App = () => {
   const [ uitdlText, setUitdlText ] = useState(
@@ -44,7 +45,12 @@ const App = () => {
       TRANSITION from 1 to 2(3) if user clicks "Login" AND "is Normal"
       TRANSITION from 1 to 1 if user clicks "Login" AND "not OK"
     }
-}`  );
+    FRAGMENT "Standings" {
+      DRAW 4
+      TRANSITION from 4 to 4 if user selects "level" 
+    }
+}`
+  );
   const [ parsedData, setParsedData ] = useState( parseUITDL( uitdlText ) );
   const [ generatedFiles, setGeneratedFiles ] = useState( [] );
   const [ lastSaved, setLastSaved ] = useState( Date.now() );
@@ -90,6 +96,15 @@ const App = () => {
     } );
   };
 
+  const handlePasteFromClipboard = () => {
+    navigator.clipboard.readText().then( ( text ) => {
+      setUitdlText( text );
+      handleEditorChange( text );
+    } ).catch( ( err ) => {
+      console.error( 'Failed to read clipboard contents: ', err );
+    } );
+  };
+
   const handleSaveToFile = () => {
     const blob = new Blob( [ uitdlText ], { type: 'text/plain;charset=utf-8' } );
     saveAs( blob, 'uitdl_description.uitd' );
@@ -127,7 +142,7 @@ const App = () => {
   const renderContent = () => {
     switch( selectedTab ) {
       case 'Renderer':
-        return <Renderer data={ parsedData } />;
+        return <Renderer data={ parsedData } />
       case 'RendererD2':
         return <RendererD2 data={ parsedData } />;
       case 'RendererParsed':
@@ -143,6 +158,7 @@ const App = () => {
         <div>
           <button onClick={ handleGenerate }>Generate Web App</button>
           <button onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
+          <button onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
           <button onClick={ handleSaveToFile }>Save to File</button>
           <input
             type="file"
@@ -159,7 +175,7 @@ const App = () => {
           </div>
         ) }
         <span id="copyMessageEditor" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
-        <Editor value={ uitdlText } onChange={ handleEditorChange } />
+        <Editor style="editor" value={ uitdlText } onChange={ handleEditorChange } />
         <div>
           { generatedFiles.map( ( file ) => (
             <div key={ file.name }>
@@ -169,10 +185,9 @@ const App = () => {
         </div>
       </div>
       <div style={ { flex: 1, display: 'flex', flexDirection: 'column', width: '50vw' } }>
-        <div style={ { display: 'flex', justifyContent: 'center', marginBottom: '10px' } }>
-          <button onClick={ () => setSelectedTab( 'Renderer' ) }>Renderer</button>
+        <div style={ { display: 'none', justifyContent: 'center', marginBottom: '10px' } }>
           <button onClick={ () => setSelectedTab( 'RendererD2' ) }>RendererD2</button>
-          <button onClick={ () => setSelectedTab( 'RendererParsed' ) }>RendererParsed</button>
+          <button onClick={ () => setSelectedTab( 'RendererParsed' ) }>RendererD2</button>
         </div>
         { renderContent() }
       </div>

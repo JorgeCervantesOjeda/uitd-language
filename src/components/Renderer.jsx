@@ -113,7 +113,7 @@ const Renderer = ( { data } ) => {
         function calculateArrowPosition( transition, positions ) {
             const fromPos = positions[ transition.from ];
             const toPos = positions[ transition.to ];
-            return fromPos && toPos ? { from: { x: fromPos.x + fromPos.width / 2, y: fromPos.y + fromPos.height }, to: { x: toPos.x + toPos.width / 2, y: toPos.y }, transition } : null;
+            return fromPos && toPos ? { from: { x: fromPos.x + fromPos.width * Math.random(), y: fromPos.y + fromPos.height }, to: { x: toPos.x + toPos.width * Math.random(), y: toPos.y }, transition } : null;
         }
 
         function adjustAndDrawArrows( arrows, svgElement ) {

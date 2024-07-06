@@ -351,7 +351,7 @@ export const validateData = ( parsedData ) => {
         ui.actions.forEach( action => {
             const used = parsedData.fragments.some( fragment =>
                 fragment.transitions.some( transition =>
-                    transition.action === action.verb && transition.target === action.target
+                    transition.from === ui.id.toString() && transition.action === action.verb && transition.target === action.target
                 )
             );
             if( !used ) {
@@ -361,7 +361,7 @@ export const validateData = ( parsedData ) => {
                     startColumn: 1,
                     endLineNumber: action.lineNumber,
                     endColumn: 3,
-                    message: `Unused action: ${action.verb} "${action.target}"`,
+                    message: `Unused action: ${action.verb} "${action.target}" in UI ${ui.id}`,
                 } );
             }
         } );
