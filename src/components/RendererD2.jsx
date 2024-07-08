@@ -17,7 +17,6 @@ const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 
     const markers = parsedData.errors;
-    console.log( 'Markers: ', markers );
 
     let d2 = `direction: right\n"${parsedData.name}": {\n`;
 
@@ -34,7 +33,6 @@ const translateToD2 = ( parsedData ) => {
         // Add transitions, excluding those with any markers on their line
         fragment.transitions.forEach( ( transition ) => {
             const hasMarkerOnLine = markers.some( marker => marker.startLineNumber === transition.line );
-            console.log( 'Transition: ', transition, hasMarkerOnLine );
 
             if( !hasMarkerOnLine ) {
                 const transitionString = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}: ${transition.action} "${transition.target}"`;

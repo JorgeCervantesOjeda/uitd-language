@@ -1,3 +1,5 @@
+import { getInnermostUI } from './utils';
+
 export const validVerbs = [ 'clicks', 'submits', 'selects', 'types', 'toggles', 'uploads', 'downloads', 'saves', 'deletes', 'waits for' ];
 
 export const parseUIRefList = ( text ) => {
@@ -72,11 +74,6 @@ export const parseUIRefList = ( text ) => {
     }
 
     return refs;
-};
-
-const getInnermostUI = ( uiRef ) => {
-    const parts = uiRef.split( /[\(\)]+/ );
-    return parts[ parts.length - 1 ] === '' ? parts[ parts.length - 2 ] : parts[ parts.length - 1 ];
 };
 
 const gatherAllTransitions = ( parsedData ) => {

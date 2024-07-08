@@ -1,9 +1,10 @@
-import { getInnermostUI, formatUIRef } from './utils';
+import { getInnermostUIRef, formatUIRef } from './utils';
 
 export const validateData = ( parsedData ) => {
     const markers = [];
     const uiNames = new Set();
     const fragmentNames = new Set();
+    const uiIds = new Set( parsedData.uis.map( ui => ui.id.toString() ) );
 
     // Check for UIs with no actions and duplicate UI names
     parsedData.uis.forEach( ui => {
@@ -64,7 +65,7 @@ export const validateData = ( parsedData ) => {
 
         fragment.transitions.forEach( transition => {
             const checkUI = ( uiRef ) => {
-                const innermostId = getInnermostUI( uiRef );
+                const innermostId = getInnermostUIRef( uiRef );
                 if( !drawnUIs.has( innermostId ) ) {
                     const uiRefString = formatUIRef( uiRef );
                     markers.push( {
@@ -78,11 +79,39 @@ export const validateData = ( parsedData ) => {
                 }
             };
 
+            // Check if the 'from' and 'to' UIs exist
+            const fromUIExists = uiIds.has( getInnermostUIRef( transition.from ) );
+            const toUIExists = uiIds.has( getInnermostUIRef( transition.to ) );
+
+            if( !fromUIExists ) {
+                const uiRefString = formatUIRef( transition.from );
+                markers.push( {
+                    severity: 'Error',
+                    startLineNumber: transition.line,
+                    startColumn: transition.column,
+                    endLineNumber: transition.line,
+                    endColumn: transition.column + 16 + uiRefString.length,
+                    message: `Referenced 'from' UI does not exist: ${uiRefString}`,
+                } );
+            }
+
+            if( !toUIExists ) {
+                const uiRefString = formatUIRef( transition.to );
+                markers.push( {
+                    severity: 'Error',
+                    startLineNumber: transition.line,
+                    startColumn: transition.column,
+                    endLineNumber: transition.line,
+                    endColumn: transition.column + 16 + uiRefString.length,
+                    message: `Referenced 'to' UI does not exist: ${uiRefString}`,
+                } );
+            }
+
             checkUI( transition.from );
             checkUI( transition.to );
 
             // Validate that transition actions are defined in the origin UI
-            const originUI = parsedData.uis.find( ui => ui.id.toString() === getInnermostUI( transition.from ) );
+            const originUI = parsedData.uis.find( ui => ui.id.toString() === getInnermostUIRef( transition.from ) );
             if( !originUI || !originUI.actions.some( action => action.verb === transition.action && action.target === transition.target ) ) {
                 const uiRefString = formatUIRef( transition.from );
                 markers.push( {
@@ -95,6 +124,29 @@ export const validateData = ( parsedData ) => {
                 } );
             }
         } );
+
+        // Check if the referenced UIs in DRAW statements exist
+        fragment.draws.forEach( draw => {
+            draw.uiRefs.forEach( uiRef => {
+                const checkUIExists = ( ref ) => {
+                    const innermostId = getInnermostUIRef( ref );
+                    if( !uiIds.has( innermostId ) ) {
+                        const uiRefString = formatUIRef( ref );
+                        markers.push( {
+                            severity: 'Error',
+                            startLineNumber: draw.line,
+                            startColumn: draw.column,
+                            endLineNumber: draw.line,
+                            endColumn: draw.column + 4,
+                            message: `Referenced UI in DRAW does not exist: ${uiRefString}`,
+                        } );
+                    }
+                    ref.nested.forEach( nestedRef => checkUIExists( nestedRef ) );
+                };
+
+                checkUIExists( uiRef );
+            } );
+        } );
     } );
 
     // Check for unused actions in UIs
@@ -102,7 +154,7 @@ export const validateData = ( parsedData ) => {
         ui.actions.forEach( action => {
             const used = parsedData.fragments.some( fragment =>
                 fragment.transitions.some( transition =>
-                    getInnermostUI( transition.from ) === ui.id.toString() && transition.action === action.verb && transition.target === action.target
+                    getInnermostUIRef( transition.from ) === ui.id.toString() && transition.action === action.verb && transition.target === action.target
                 )
             );
             if( !used ) {

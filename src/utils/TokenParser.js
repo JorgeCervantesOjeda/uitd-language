@@ -1,8 +1,11 @@
 import { tokenize } from './lexer';
 import { TokenType } from './tokens';
-import { getInnermostUI } from './utils';
+import { getInnermostUIStr, getInnermostUIRef, formatUIRef } from './utils';
 
-export const validVerbs = [ 'clicks', 'submits', 'selects', 'types', 'toggles', 'uploads', 'downloads', 'saves', 'deletes', 'waits for' ];
+export const validVerbs = [
+    'clicks', 'submits', 'selects', 'types', 'toggles',
+    'uploads', 'downloads', 'saves', 'deletes', 'waits for'
+];
 
 class TokenParser {
     constructor( tokens ) {
@@ -46,10 +49,10 @@ class TokenParser {
             token = this.getNextToken();
             while( token.type !== TokenType.PUNCTUATION || token.value !== '}' ) {
                 if( token.type === TokenType.KEYWORD && token.value === 'UI' ) {
-                    this.undoGetNextToken(); // Undo to correctly expect UI token in parseUI
+                    this.undoGetNextToken();
                     this.parseUI( result );
                 } else if( token.type === TokenType.KEYWORD && token.value === 'FRAGMENT' ) {
-                    this.undoGetNextToken(); // Undo to correctly expect FRAGMENT token in parseFragment
+                    this.undoGetNextToken();
                     this.parseFragment( result );
                 } else {
                     throw new Error( `Unexpected token ${token.value} at line ${token.line}, column ${token.column}` );
@@ -66,6 +69,9 @@ class TokenParser {
                 message: e.message
             } );
         }
+
+        // Process transitions to set the `full` field
+        this.processFullField( result );
 
         return result;
     }
@@ -113,13 +119,13 @@ class TokenParser {
         let token = this.getNextToken();
         while( token.type !== TokenType.PUNCTUATION || token.value !== '}' ) {
             if( token.type === TokenType.KEYWORD && token.value === 'DRAW' ) {
-                this.undoGetNextToken(); // Undo to correctly expect DRAW token in parseDraw
+                this.undoGetNextToken();
                 this.parseDraw( draws );
             } else if( token.type === TokenType.KEYWORD && token.value === 'TRANSITION' ) {
-                this.undoGetNextToken(); // Undo to correctly expect TRANSITION token in parseTransition
+                this.undoGetNextToken();
                 this.parseTransition( transitions );
             } else {
-                throw new Error( `Unexpected token ${token.value} in FRAGMENT at line ${token.line, token.column}` );
+                throw new Error( `Unexpected token ${token.value} in FRAGMENT at line ${token.line}, token.column}` );
             }
             token = this.getNextToken();
         }
@@ -160,7 +166,7 @@ class TokenParser {
 
     parseUIRef() {
         const idToken = this.expectToken( TokenType.NUMBER );
-        let uiRef = { id: idToken.value, nested: [] };
+        let uiRef = { id: idToken.value, nested: [], full: false };
         const nextToken = this.getNextToken();
         if( nextToken.type === TokenType.PUNCTUATION && nextToken.value === '(' ) {
             uiRef.nested = this.parseUIRefList();
@@ -205,11 +211,86 @@ class TokenParser {
             column: startToken.column
         } );
     }
+
+    processFullField( parsedData ) {
+        const allTransitions = this.gatherAllTransitions( parsedData );
+
+        parsedData.fragments.forEach( fragment => {
+            const fragmentTransitions = this.gatherFragmentTransitions( fragment );
+
+            const processRef = ( ref, parentId = null ) => {
+                const refIdStr = parentId ? `${parentId}(${ref.id})` : ref.id;
+
+                const innermostId = getInnermostUIStr( refIdStr );
+                const allTransitionsSet = allTransitions[ innermostId ] || new Set();
+                const fragmentTransitionsSet = fragmentTransitions[ refIdStr ] || new Set();
+
+                if( allTransitionsSet.size > 0 && allTransitionsSet.size === fragmentTransitionsSet.size ) {
+                    ref.full = true;
+                } else {
+                    ref.full = false;
+                }
+
+                ref.nested.forEach( nestedRef => processRef( nestedRef, ref.id ) );
+            };
+
+            fragment.draws.forEach( ( { uiRefs } ) => {
+                uiRefs.forEach( ref => {
+                    processRef( ref, null );
+                } );
+            } );
+        } );
+    }
+
+    gatherAllTransitions( parsedData ) {
+        const uiTransitions = {};
+
+        parsedData.fragments.forEach( fragment => {
+            fragment.transitions.forEach( transition => {
+                const fromUI = getInnermostUIRef( transition.from );
+                const toUI = getInnermostUIRef( transition.to );
+
+                if( !uiTransitions[ fromUI ] ) {
+                    uiTransitions[ fromUI ] = new Set();
+                }
+                if( !uiTransitions[ toUI ] ) {
+                    uiTransitions[ toUI ] = new Set();
+                }
+
+                const transitionStr = `${transition.from}->${transition.to}:${transition.action} "${transition.target}" ${transition.condition ? 'AND\n(' + transition.condition + ')' : ''}`;
+                uiTransitions[ fromUI ].add( transitionStr );
+                uiTransitions[ toUI ].add( transitionStr );
+            } );
+        } );
+
+        return uiTransitions;
+    }
+
+    gatherFragmentTransitions( fragment ) {
+        const fragmentTransitions = {};
+
+        fragment.transitions.forEach( transition => {
+            const fromKey = formatUIRef( transition.from );
+            const toKey = formatUIRef(transition.to);
+
+            if( !fragmentTransitions[ fromKey ] ) {
+                fragmentTransitions[ fromKey ] = new Set();
+            }
+            if( !fragmentTransitions[ toKey ] ) {
+                fragmentTransitions[ toKey ] = new Set();
+            }
+
+            const transitionStr = `${fromKey}->${toKey}:${transition.action} "${transition.target}" ${transition.condition ? 'AND\n(' + transition.condition + ')' : ''}`;
+            fragmentTransitions[ fromKey ].add( transitionStr );
+            fragmentTransitions[ toKey ].add( transitionStr );
+        } );
+
+        return fragmentTransitions;
+    }
 }
 
 export function parseUITDL( text ) {
     const tokens = tokenize( text );
-    console.log( 'Tokenized input:', tokens );
     const parser = new TokenParser( tokens );
     return parser.parse();
 }
