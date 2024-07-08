@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Editor from './components/Editor';
 import RendererD2 from './components/RendererD2';
-import { parseUITDL, validateData } from './utils/Parser';
+import { parseUITDL } from './utils/TokenParser';
+import { validateData } from './utils/validation';
 import './App.css';
 
 const App = () => {
@@ -29,20 +30,22 @@ const App = () => {
       clicks "Logout" 
     }
     FRAGMENT "Menu Navigation and Login" {
-      DRAW 1, 0
-      DRAW 2(3(0)), 4(0), 5(0)
-      TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin"
-      TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal"
-      TRANSITION from 0 to 4 if user clicks "Standings"
-      TRANSITION from 0 to 5 if user clicks "Events"
-      TRANSITION from 0 to 1 if user clicks "Logout"  
-      TRANSITION from 1 to 2 if user clicks "Login" AND "is Admin"
-      TRANSITION from 1 to 2(3) if user clicks "Login" AND "is Normal"
-      TRANSITION from 1 to 1 if user clicks "Login" AND "not OK"
+      DRAW { 1, 0 }
+      DRAW { 2(3(0)), 4(0), 5(0) }
+      TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin";
+      TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal";
+      TRANSITION from 0 to 4 if user clicks "Standings";
+      TRANSITION from 0 to 5 if user clicks "Events";
+      TRANSITION from 0 to 1 if user clicks "Logout";  
+      TRANSITION from 1 to 2 if user clicks "Login" AND "is Admin";
+      TRANSITION from 1 to 2(3) if user clicks "Login" AND "is Normal";
+      TRANSITION from 1 to 1 if user clicks "Login" AND "not OK";
     }
     FRAGMENT "Standings" {
-      DRAW 4
-      TRANSITION from 4 to 4 if user selects "level" 
+      DRAW { 4 }
+      TRANSITION from 4 to 4 if user selects "level"; 
+      TRANSITION from 2 to 4 if user deletes "user";
+      TRANSITION from 4 to 4 if user clicks "OK";
     }
 }`
   );
@@ -51,10 +54,10 @@ const App = () => {
   const handleEditorChange = ( text ) => {
     setUitdlText( text );
     const parsed = parseUITDL( text );
+    console.log( 'Parsed Data', parsed );
     const validationErrors = validateData( parsed );
     parsed.errors = validationErrors;
     setParsedData( parsed );
-    setIsModified( true );
   };
 
   return (

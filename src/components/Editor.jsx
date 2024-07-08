@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
-import { parseUITDL, validateData, validVerbs } from '../utils/Parser';
+import { parseUITDL, validVerbs } from '../utils/TokenParser';
+import { validateData } from '../utils/validation';
 import { saveAs } from 'file-saver';
 
 const Editor = ( { uitdlText, onChange } ) => {
@@ -112,14 +113,14 @@ const Editor = ( { uitdlText, onChange } ) => {
                     {
                         label: 'FRAGMENT',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW ${2:id}\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb}\n}',
+                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW {${2:id}}\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb}\n}',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define a fragment with draw and transitions',
                     },
                     {
                         label: 'DRAW',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'DRAW ${1:id}',
+                        insertText: 'DRAW {${1:id}}',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define draw statements with UI IDs',
                     },

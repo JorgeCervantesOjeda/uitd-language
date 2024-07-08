@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import CodeViewer from './CodeViewer';
 
-// Helper function to format nested transitions
-const formatTransition = ( transition ) => {
-    return transition.replace( /\(/g, '.' ).replace( /\)/g, '' );
+// Helper function to format nested UIRefs in transitions
+const formatTransitionUIRef = ( uiRef ) => {
+    if( !uiRef.nested || uiRef.nested.length === 0 ) {
+        return uiRef.id;
+    }
+
+    const nestedRefs = uiRef.nested.map( nestedRef => formatTransitionUIRef( nestedRef ) ).join( '.' );
+    return `${uiRef.id}.${nestedRefs}`;
 };
 
 // Function to gather unique transitions for each UI in the entire UITD
@@ -55,7 +60,7 @@ const translateToD2 = ( parsedData ) => {
 
         // Add transitions
         fragment.transitions.forEach( ( transition ) => {
-            d2 += '    ' + formatTransition( transition.from ) + ' -> ' + formatTransition( transition.to ) + ': ' + transition.action + ' "' + transition.target + '"';
+            d2 += '    ' + formatTransitionUIRef( transition.from ) + ' -> ' + formatTransitionUIRef( transition.to ) + ': ' + transition.action + ' "' + transition.target + '"';
             if( transition.condition ) {
                 d2 += ' AND\\n(' + transition.condition + ')';
             }
@@ -148,7 +153,7 @@ const RendererD2 = ( { data } ) => {
                 </button>
             </div>
             <span id="copyMessage" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
-            <CodeViewer code={ d2Output } language="python" />
+            <CodeViewer code={ d2Output } language="java" />
         </div>
     );
 };
