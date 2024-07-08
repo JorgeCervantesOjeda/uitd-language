@@ -18,6 +18,29 @@ button {
   /* Adjust the color and size as needed */
 }
 
+/* styles.css */
+.renderer-container {
+  height: 80vh;
+  background-color: grey;
+  color: #d4d4d4;
+  border-radius: 4px;
+}
+
+.renderer-header {
+  display: flex;
+  align-items: center;
+}
+
+.renderer-button {
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.copy-message {
+  margin-left: 10px;
+  visibility: hidden;
+}
+
 #root {
   width: 100%;
   margin-top: 0px;

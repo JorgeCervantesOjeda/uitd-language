@@ -6,8 +6,7 @@ import { validateData } from './utils/validation';
 import './App.css';
 
 const App = () => {
-  const [ uitdlText, setUitdlText ] = useState(
-    `UITD "System Title" {
+  const initialText = `UITD "System Title" {
     UI 1 "Login" actions {
       clicks "Login" 
     }
@@ -47,14 +46,18 @@ const App = () => {
       TRANSITION from 2 to 4 if user deletes "user";
       TRANSITION from 4 to 4 if user clicks "OK";
     }
-}`
-  );
-  const [ parsedData, setParsedData ] = useState( parseUITDL( uitdlText ) );
+}`;
+  const [ uitdlText, setUitdlText ] = useState( initialText );
+
+  // Parse and validate the initial text
+  const initialParsedData = parseUITDL( initialText );
+  initialParsedData.errors = validateData( initialParsedData );
+
+  const [ parsedData, setParsedData ] = useState( initialParsedData );
 
   const handleEditorChange = ( text ) => {
     setUitdlText( text );
     const parsed = parseUITDL( text );
-    console.log( 'Parsed Data', parsed );
     const validationErrors = validateData( parsed );
     parsed.errors = validationErrors;
     setParsedData( parsed );

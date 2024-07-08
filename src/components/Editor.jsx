@@ -181,12 +181,12 @@ const Editor = ( { uitdlText, onChange } ) => {
     };
 
     return (
-        <div>
-            <div>
+        <div className='renderer-container'>
+            <div className='renderer-header'>
                 <div>UITD Editor</div>
-                <button onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
-                <button onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
-                <button onClick={ handleSaveToFile }>Save to File</button>
+                <button className='renderer-button' onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
+                <button className='renderer-button' onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
+                <button className='renderer-button' onClick={ handleSaveToFile }>Save to File</button>
                 <input
                     type="file"
                     ref={ fileInputRef }
@@ -194,7 +194,7 @@ const Editor = ( { uitdlText, onChange } ) => {
                     onChange={ handleOpenFile }
                     accept=".uitd"
                 />
-                <button onClick={ () => fileInputRef.current.click() }>Open File</button>
+                <button className='renderer-button' onClick={ () => fileInputRef.current.click() }>Open File</button>
             </div>
             { reminder && (
                 <div style={ { color: 'yellow', backgroundColor: 'darkred' } }>

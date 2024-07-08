@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CodeViewer from './CodeViewer';
+import '../App.css';  // Ensure this import is present
 
 // Helper function to format nested UIRefs in transitions
 const formatTransitionUIRef = ( uiRef ) => {
@@ -11,46 +12,18 @@ const formatTransitionUIRef = ( uiRef ) => {
     return `${uiRef.id}.${nestedRefs}`;
 };
 
-// Function to gather unique transitions for each UI in the entire UITD
-const gatherAllTransitions = ( parsedData ) => {
-    const uiTransitions = {};
-
-    parsedData.fragments.forEach( fragment => {
-        fragment.transitions.forEach( transition => {
-            const fromUI = getInnermostUI( transition.from );
-            const toUI = getInnermostUI( transition.to );
-
-            if( !uiTransitions[ fromUI ] ) {
-                uiTransitions[ fromUI ] = new Set();
-            }
-            if( !uiTransitions[ toUI ] ) {
-                uiTransitions[ toUI ] = new Set();
-            }
-
-            const transitionStr = transition.from + '->' + transition.to + ':' + transition.action + ' "' + transition.target + '" ' + ( transition.condition ? 'AND\\n(' + transition.condition + ')' : '' );
-            uiTransitions[ fromUI ].add( transitionStr );
-            uiTransitions[ toUI ].add( transitionStr );
-        } );
-    } );
-
-    return uiTransitions;
-};
-
-// Helper function to extract the innermost referenced UI
-const getInnermostUI = ( uiRef ) => {
-    const parts = uiRef.split( /[\(\)]+/ );
-    return parts[ parts.length - 1 ] === '' ? parts[ parts.length - 2 ] : parts[ parts.length - 1 ];
-};
-
 // Function to translate parsed UITD to D2 language
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 
-    let d2 = 'direction: right\n"' + parsedData.name + '": {\n';
+    const markers = parsedData.errors;
+    console.log( 'Markers: ', markers );
+
+    let d2 = `direction: right\n"${parsedData.name}": {\n`;
 
     // Build UI hierarchy
     parsedData.fragments.forEach( ( fragment ) => {
-        d2 += '  "' + fragment.name + '": {\n';
+        d2 += `  "${fragment.name}": {\n`;
 
         fragment.draws.forEach( ( draw ) => {
             draw.uiRefs.forEach( ( ref ) => {
@@ -58,13 +31,19 @@ const translateToD2 = ( parsedData ) => {
             } );
         } );
 
-        // Add transitions
+        // Add transitions, excluding those with any markers on their line
         fragment.transitions.forEach( ( transition ) => {
-            d2 += '    ' + formatTransitionUIRef( transition.from ) + ' -> ' + formatTransitionUIRef( transition.to ) + ': ' + transition.action + ' "' + transition.target + '"';
-            if( transition.condition ) {
-                d2 += ' AND\\n(' + transition.condition + ')';
+            const hasMarkerOnLine = markers.some( marker => marker.startLineNumber === transition.line );
+            console.log( 'Transition: ', transition, hasMarkerOnLine );
+
+            if( !hasMarkerOnLine ) {
+                const transitionString = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}: ${transition.action} "${transition.target}"`;
+                d2 += `    ${transitionString}`;
+                if( transition.condition ) {
+                    d2 += ` AND\\n(${transition.condition})`;
+                }
+                d2 += '\n';
             }
-            d2 += '\n';
         } );
 
         d2 += '  }\n';
@@ -79,28 +58,25 @@ const translateToD2 = ( parsedData ) => {
 const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
     const ui = uis.find( ui => ui.id === parseInt( ref.id ) );
     if( !ui ) {
-        console.error( 'UI with id ' + ref.id + ' not found in the parsed data.' );
+        console.error( `UI with id ${ref.id} not found in the parsed data.` );
         return '';
     }
 
     let hierarchy = '';
-
-    // Construct parent key
-    const fullKey = parentKey ? parentKey + '.' + ref.id : ref.id.toString();
+    const fullKey = parentKey ? `${parentKey}.${ref.id}` : ref.id.toString();
 
     if( ref.nested.length > 0 ) {
-        hierarchy += '  '.repeat( indentLevel ) + ref.id + ': ' + ref.id + ' ' + ui.name + ' {\n';
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${ui.name} {\n`;
         ref.nested.forEach( ( nestedRef ) => {
-            hierarchy += buildUIHierarchy( nestedRef, indentLevel + 1, uis, parentKey + ( parentKey ? '(' : '' ) + ref.id + ( parentKey ? ')' : '' ) );
+            hierarchy += buildUIHierarchy( nestedRef, indentLevel + 1, uis, `${parentKey}${parentKey ? '(' : ''}${ref.id}${parentKey ? ')' : ''}` );
         } );
-        hierarchy += '  '.repeat( indentLevel ) + '}\n';
+        hierarchy += `${'  '.repeat( indentLevel )}}\n`;
     } else {
-        hierarchy += '  '.repeat( indentLevel ) + ref.id + ': ' + ref.id + ' ' + ui.name + '\n';
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${ui.name}\n`;
     }
 
-    // Determine if this UI copy should have a double border
     if( ref.full ) {
-        hierarchy += '  '.repeat( indentLevel ) + ref.id + '.style.double-border: true\n';
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}.style.double-border: true\n`;
     }
 
     return hierarchy;
@@ -132,27 +108,17 @@ const RendererD2 = ( { data } ) => {
     };
 
     return (
-        <div style={ { height: '80vh', backgroundColor: 'grey', color: '#d4d4d4', borderRadius: '4px' } }>
-            <div >
+        <div className="renderer-container">
+            <div className="renderer-header">
                 <div>D2 Translation</div>
-                <button
-                    onClick={ copyToClipboard }
-                    style={ {
-                        cursor: 'pointer',
-                    } }
-                >
+                <button onClick={ copyToClipboard } className="renderer-button">
                     Copy to Clipboard
                 </button>
-                <button
-                    onClick={ openInPlayground }
-                    style={ {
-                        cursor: 'pointer',
-                    } }
-                >
+                <button onClick={ openInPlayground } className="renderer-button">
                     SVG Renderer
                 </button>
             </div>
-            <span id="copyMessage" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
+            <span id="copyMessage" className="copy-message">Copied to clipboard!</span>
             <CodeViewer code={ d2Output } language="java" />
         </div>
     );
