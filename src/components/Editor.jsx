@@ -183,7 +183,7 @@ const Editor = ( { uitdlText, onChange } ) => {
     return (
         <div className='renderer-container'>
             <div className='renderer-header'>
-                <div>UITD Editor</div>
+                <div style={ { color: 'yellow' } }>UITD Editor</div>
                 <button className='renderer-button' onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
                 <button className='renderer-button' onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
                 <button className='renderer-button' onClick={ handleSaveToFile }>Save to File</button>
@@ -201,10 +201,10 @@ const Editor = ( { uitdlText, onChange } ) => {
                     Remember to save your file!
                 </div>
             ) }
-            <span id="copyMessageEditor" style={ { marginLeft: '10px', visibility: 'hidden' } }>Copied to clipboard!</span>
+            <span id="copyMessageEditor" className='copy-message'>Copied to clipboard!</span>
             <MonacoEditor
                 width="100%"
-                height="80vh"
+                height="90vh"
                 defaultLanguage="uitdl"
                 value={ uitdlText }
                 onChange={ handleEditorChange }

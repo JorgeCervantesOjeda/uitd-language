@@ -74,7 +74,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
     }
 
     if( ref.full ) {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}.style.double-border: true\n`;
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}.style.stroke-width: 6\n`;
     }
 
     return hierarchy;
@@ -108,7 +108,7 @@ const RendererD2 = ( { data } ) => {
     return (
         <div className="renderer-container">
             <div className="renderer-header">
-                <div>D2 Translation</div>
+                <div style={ { color: 'lightgreen' } }>D2 Translation</div>
                 <button onClick={ copyToClipboard } className="renderer-button">
                     Copy to Clipboard
                 </button>

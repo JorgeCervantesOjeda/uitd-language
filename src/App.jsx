@@ -64,14 +64,14 @@ const App = () => {
   };
 
   return (
-    <div style={ { display: 'flex', width: '100vw', height: '90vh', backgroundColor: 'grey' } }>
-      <div style={ { flex: 1, padding: '10px', display: 'flex', flexDirection: 'column', width: '40vw', height: '90vh' } }>
+    <div style={ { display: 'flex', width: '100vw', height: '100vh' } }>
+      <div style={ { flex: 1, padding: '0px', marginRight: '10px', display: 'flex', flexDirection: 'column', height: '100vh' } }>
         <Editor style="editor" uitdlText={ uitdlText } onChange={ handleEditorChange } />
       </div>
-      <div style={ { flex: 1, padding: '10px', display: 'flex', flexDirection: 'column', width: '40vw', height: '90vh' } }>
+      <div style={ { flex: 1, padding: '0px', display: 'flex', flexDirection: 'column', height: '100vh' } }>
         <RendererD2 style="editor" data={ parsedData } />
       </div>
-    </div>
+    </div >
   );
 };
 

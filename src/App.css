@@ -13,6 +13,11 @@ button {
   padding: 5px 10px !important;
 }
 
+*:active {
+  background-color: rgb(69, 0, 0) !important;
+  color: white;
+}
+
 .view-line:hover {
   box-shadow: 0 0 15px rgba(0, 0255, 255, 0.5) !important;
   /* Adjust the color and size as needed */
@@ -20,8 +25,8 @@ button {
 
 /* styles.css */
 .renderer-container {
-  height: 80vh;
-  background-color: grey;
+  height: 100vh;
+  background-color: black;
   color: #d4d4d4;
   border-radius: 4px;
 }
@@ -29,6 +34,8 @@ button {
 .renderer-header {
   display: flex;
   align-items: center;
+  margin-top: 10px;
+  margin-left: 10px;
 }
 
 .renderer-button {
