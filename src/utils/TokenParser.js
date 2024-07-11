@@ -1,6 +1,8 @@
+// TokenParser.js
 import { tokenize } from './lexer';
 import { TokenType } from './tokens';
 import { getInnermostUIStr, getInnermostUIRef, formatUIRef } from './utils';
+import { validateData } from './validation';
 
 export const validVerbs = [
     'clicks', 'submits', 'selects', 'types', 'toggles',
@@ -40,9 +42,17 @@ class TokenParser {
             throw new Error( `Expected ${value || type}, but got ${token.value} at line ${token.line}, column ${token.column}` );
         }
 
-        if( type === TokenType.STRING && token.value.includes( '  ' ) ) {
+        while( type === TokenType.STRING && token.value.includes( '  ' ) ) {
             // Correct the token to eliminate consecutive spaces
             token.value = token.value.replace( / {2,}/g, ' ' );
+            this.result.errors.push( {
+                severity: 4,
+                startLineNumber: token ? token.line : 0,
+                lineNumber: token ? token.line : 0,
+                startColumn: token ? token.column : 0,
+                endColumn: token ? token.column + ( token.value ? token.value.length : 0 ) : 0,
+                message: 'Double space'
+            } );
         }
 
         return token;
@@ -52,6 +62,7 @@ class TokenParser {
         console.error( 'Error:', e );
         const token = this.currentToken;
         this.result.errors.push( {
+            severity: 8,
             startLineNumber: token ? token.line : 0,
             lineNumber: token ? token.line : 0,
             startColumn: token ? token.column : 0,
@@ -95,6 +106,10 @@ class TokenParser {
 
         // Process transitions to set the `full` field
         this.processFullField();
+
+        // Incorporate validation errors
+        const validationErrors = validateData( this.result );
+        this.result.errors = [ ...this.result.errors, ...validationErrors ];
 
         return this.result;
     }
@@ -336,5 +351,6 @@ class TokenParser {
 export function parseUITDL( text ) {
     const tokens = tokenize( text );
     const parser = new TokenParser( tokens );
-    return parser.parse();
+    const parsed = parser.parse();
+    return parsed;
 }

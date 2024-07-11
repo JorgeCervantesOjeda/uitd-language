@@ -32,7 +32,7 @@ const translateToD2 = ( parsedData ) => {
 
         // Add transitions, excluding those with any markers on their line
         fragment.transitions.forEach( ( transition ) => {
-            const hasMarkerOnLine = markers.some( marker => marker.startLineNumber === transition.line );
+            const hasMarkerOnLine = markers.some( marker => marker.startLineNumber === transition.line && marker.severity == 8 );
 
             if( !hasMarkerOnLine ) {
                 const transitionString = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}: ${transition.action} "${transition.target}"`;

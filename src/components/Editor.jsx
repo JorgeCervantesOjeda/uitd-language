@@ -1,11 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
-import { parseUITDL, validVerbs } from '../utils/TokenParser';
-import { validateData } from '../utils/validation';
+import { validVerbs } from '../utils/TokenParser';
 import { saveAs } from 'file-saver';
 
-const Editor = ( { uitdlText, onChange } ) => {
+const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
     const editorRef = useRef( null );
     const [ lastSaved, setLastSaved ] = useState( Date.now() );
     const [ reminder, setReminder ] = useState( false );
@@ -71,8 +70,7 @@ const Editor = ( { uitdlText, onChange } ) => {
     }, [ lastSaved, isModified ] );
 
     const handleEditorDidMount = ( editor, monaco ) => {
-        // Set cursor position (line, column)
-        const initialCursorPosition = new monaco.Position( 2, 5 ); // Example: line 2, column 5
+        const initialCursorPosition = new monaco.Position( 2, 5 );
         editor.setPosition( initialCursorPosition );
         editor.focus();
 
@@ -158,27 +156,19 @@ const Editor = ( { uitdlText, onChange } ) => {
             ],
         } );
 
-        const validateAndSetMarkers = () => {
-            const model = editor.getModel();
-            const text = model.getValue();
-            const parsed = parseUITDL( text );
-            const markers = [
-                ...parsed.errors.map( error => ( {
-                    severity: monaco.MarkerSeverity.Error,
-                    startLineNumber: error.lineNumber,
-                    startColumn: error.startColumn,
-                    endLineNumber: error.lineNumber,
-                    endColumn: error.endColumn,
-                    message: error.message,
-                } ) ),
-                ...validateData( parsed ),
-            ];
-            monaco.editor.setModelMarkers( model, 'uitdl', markers );
-        };
-
-        validateAndSetMarkers();
-        editor.getModel().onDidChangeContent( validateAndSetMarkers );
+        onMount( editor, monaco );
     };
+
+    useEffect( () => {
+        if( editorRef.current ) {
+            const setMarkers = () => {
+                const model = editorRef.current.getModel();
+                monaco.editor.setModelMarkers( model, 'uitdl', markers );
+            };
+
+            setMarkers();
+        }
+    }, [ markers ] );
 
     return (
         <div className='renderer-container'>

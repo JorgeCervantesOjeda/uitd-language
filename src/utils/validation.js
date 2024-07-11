@@ -10,7 +10,7 @@ export const validateData = ( parsedData ) => {
     parsedData.uis.forEach( ui => {
         if( ui.actions.length === 0 ) {
             markers.push( {
-                severity: 'Error',
+                severity: 4,
                 startLineNumber: ui.line,
                 startColumn: ui.column,
                 endLineNumber: ui.line,
@@ -20,7 +20,7 @@ export const validateData = ( parsedData ) => {
         }
         if( uiNames.has( ui.name ) ) {
             markers.push( {
-                severity: 'Error',
+                severity: 8,
                 startLineNumber: ui.line,
                 startColumn: ui.column,
                 endLineNumber: ui.line,
@@ -36,7 +36,7 @@ export const validateData = ( parsedData ) => {
     parsedData.fragments.forEach( fragment => {
         if( fragmentNames.has( fragment.name ) ) {
             markers.push( {
-                severity: 'Error',
+                severity: 8,
                 startLineNumber: fragment.line,
                 startColumn: fragment.column,
                 endLineNumber: fragment.line,
@@ -69,7 +69,7 @@ export const validateData = ( parsedData ) => {
                 if( !drawnUIs.has( innermostId ) ) {
                     const uiRefString = formatUIRef( uiRef );
                     markers.push( {
-                        severity: 'Error',
+                        severity: 8,
                         startLineNumber: transition.line,
                         startColumn: transition.column + 16,
                         endLineNumber: transition.line,
@@ -86,7 +86,7 @@ export const validateData = ( parsedData ) => {
             if( !fromUIExists ) {
                 const uiRefString = formatUIRef( transition.from );
                 markers.push( {
-                    severity: 'Error',
+                    severity: 8,
                     startLineNumber: transition.line,
                     startColumn: transition.column,
                     endLineNumber: transition.line,
@@ -98,7 +98,7 @@ export const validateData = ( parsedData ) => {
             if( !toUIExists ) {
                 const uiRefString = formatUIRef( transition.to );
                 markers.push( {
-                    severity: 'Error',
+                    severity: 8,
                     startLineNumber: transition.line,
                     startColumn: transition.column,
                     endLineNumber: transition.line,
@@ -115,7 +115,7 @@ export const validateData = ( parsedData ) => {
             if( !originUI || !originUI.actions.some( action => action.verb === transition.action && action.target === transition.target ) ) {
                 const uiRefString = formatUIRef( transition.from );
                 markers.push( {
-                    severity: 'Error',
+                    severity: 8,
                     startLineNumber: transition.line,
                     startColumn: transition.column + 16,
                     endLineNumber: transition.line,
@@ -133,7 +133,7 @@ export const validateData = ( parsedData ) => {
                     if( !uiIds.has( innermostId ) ) {
                         const uiRefString = formatUIRef( ref );
                         markers.push( {
-                            severity: 'Error',
+                            severity: 8,
                             startLineNumber: draw.line,
                             startColumn: draw.column,
                             endLineNumber: draw.line,
@@ -159,7 +159,7 @@ export const validateData = ( parsedData ) => {
             );
             if( !used ) {
                 markers.push( {
-                    severity: 'Warning',
+                    severity: 4,
                     startLineNumber: action.line,
                     startColumn: action.column,
                     endLineNumber: action.line,
@@ -188,7 +188,7 @@ export const validateData = ( parsedData ) => {
 
         if( !isDrawn ) {
             markers.push( {
-                severity: 'Error',
+                severity: 4,
                 startLineNumber: ui.line,
                 startColumn: ui.column,
                 endLineNumber: ui.line,
@@ -209,7 +209,7 @@ export const validateData = ( parsedData ) => {
 
         if( !isUsedAsFrom ) {
             markers.push( {
-                severity: 'Error',
+                severity: 4,
                 startLineNumber: ui.line,
                 startColumn: ui.column,
                 endLineNumber: ui.line,
