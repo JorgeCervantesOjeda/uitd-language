@@ -7,7 +7,7 @@ const tokenSpec = [
     [ TokenType.PUNCTUATION, /[{}(),;]/ ],
     [ TokenType.COMMENT, /#.*/ ],
     [ TokenType.WHITESPACE, /\s+/ ],
-    [ TokenType.UNKNOWN, /./ ]
+    [ TokenType.UNKNOWN, /[^\s{}(),;"#]+/ ] // Pattern to match unknown words
 ];
 
 export function tokenize( code ) {

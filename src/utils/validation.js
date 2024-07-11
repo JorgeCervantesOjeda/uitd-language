@@ -53,7 +53,7 @@ export const validateData = ( parsedData ) => {
         const drawnUIs = new Set();
 
         const collectDrawnUIs = ( ref ) => {
-            drawnUIs.add( ref.id );
+            drawnUIs.add( ref.id.toString() );
             ref.nested.forEach( nestedRef => collectDrawnUIs( nestedRef ) );
         };
 
@@ -168,6 +168,55 @@ export const validateData = ( parsedData ) => {
                 } );
             }
         } );
+    } );
+
+    // Check if each UI is drawn at least once in at least one fragment
+    parsedData.uis.forEach( ui => {
+        const isDrawn = parsedData.fragments.some( fragment =>
+            fragment.draws.some( draw =>
+                draw.uiRefs.some( ref => {
+                    const checkNestedUIRefs = ( uiRef ) => {
+                        if( uiRef.id.toString() === ui.id.toString() ) {
+                            return true;
+                        }
+                        return uiRef.nested.some( nestedRef => checkNestedUIRefs( nestedRef ) );
+                    };
+                    return checkNestedUIRefs( ref );
+                } )
+            )
+        );
+
+        if( !isDrawn ) {
+            markers.push( {
+                severity: 'Error',
+                startLineNumber: ui.line,
+                startColumn: ui.column,
+                endLineNumber: ui.line,
+                endColumn: ui.column + ui.name.length,
+                message: `UI ${ui.id} is not drawn in any fragment`,
+            } );
+        }
+    } );
+
+    // Check if each UI is used as 'from' UI in at least one transition in at least one fragment
+    parsedData.uis.forEach( ui => {
+        const isUsedAsFrom = parsedData.fragments.some( fragment =>
+            fragment.transitions.some( transition => {
+                const innermostFromUI = getInnermostUIRef( transition.from );
+                return innermostFromUI === ui.id.toString();
+            } )
+        );
+
+        if( !isUsedAsFrom ) {
+            markers.push( {
+                severity: 'Error',
+                startLineNumber: ui.line,
+                startColumn: ui.column,
+                endLineNumber: ui.line,
+                endColumn: ui.column + ui.name.length,
+                message: `UI ${ui.id} is not used as 'from' UI in any transition`,
+            } );
+        }
     } );
 
     return markers;

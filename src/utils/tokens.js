@@ -40,5 +40,6 @@ export class Tokens {
         if( this.currentTokenIndex > 0 ) {
             this.currentTokenIndex--;
         }
+        return this.tokens[ this.currentTokenIndex ];
     }
 }

@@ -7,6 +7,12 @@ import './App.css';
 
 const App = () => {
   const initialText = `UITD "System Title" {
+    UI 0 "Menu" actions {
+      clicks "Home" 
+      clicks "Standings" 
+      clicks "Events" 
+      clicks "Logout" 
+    }
     UI 1 "Login" actions {
       clicks "Login" 
     }
@@ -22,11 +28,8 @@ const App = () => {
     UI 5 "Events" actions {
       selects "level" 
     }
-    UI 0 "Menu" actions {
-      clicks "Home" 
-      clicks "Standings" 
-      clicks "Events" 
-      clicks "Logout" 
+    UI 6 "name" actions {
+
     }
     FRAGMENT "Menu Navigation and Login" {
       DRAW { 1, 0 }
@@ -40,7 +43,7 @@ const App = () => {
       TRANSITION from 1 to 2(3) if user clicks "Login" AND "is Normal";
       TRANSITION from 1 to 1 if user clicks "Login" AND "not OK";
     }
-    FRAGMENT "Standings" {
+    FRAGMENT "Managing Standings" {
       DRAW { 4 }
       TRANSITION from 4 to 4 if user selects "level"; 
       TRANSITION from 2 to 4 if user deletes "user";
