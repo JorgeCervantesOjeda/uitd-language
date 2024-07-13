@@ -5,13 +5,13 @@ import { validVerbs } from '../utils/TokenParser';
 import { saveAs } from 'file-saver';
 import '../App.css'; // Assuming you have a CSS file for the problem-message class
 
-const Tooltip = ( { messages, x, y, severity } ) => {
+const Tooltip = ( { message, x, y, severity } ) => {
     const borderColor = severity === 'warning' ? 'yellow' : 'red';
     return (
         <div style={ {
             position: 'absolute',
-            bottom: window.innerHeight - y + 10,
-            left: x + 10,
+            top: y,
+            left: x,
             backgroundColor: 'black',
             color: 'white',
             padding: '5px',
@@ -21,11 +21,7 @@ const Tooltip = ( { messages, x, y, severity } ) => {
             whiteSpace: 'pre-wrap',
             border: `1px solid ${borderColor}`
         } }>
-            { messages.map( ( msg, index ) => (
-                <div key={ index }>
-                    <div>{ msg }</div>
-                </div>
-            ) ) }
+            <div>{ message }</div>
         </div>
     );
 };
@@ -35,7 +31,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ lastSaved, setLastSaved ] = useState( Date.now() );
     const [ isModified, setIsModified ] = useState( false );
     const [ message, setMessage ] = useState( '' );
-    const [ tooltip, setTooltip ] = useState( null );
+    const [ allMarkers, setAllMarkers ] = useState( [] );
     const fileInputRef = useRef( null );
 
     const formatCode = ( code ) => {
@@ -158,6 +154,27 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     useEffect( () => {
         if( editorRef.current ) {
             setMarkers( editorRef.current, markers );
+            const model = editorRef.current.getModel();
+            const layoutInfo = editorRef.current.getLayoutInfo();
+
+            const updatedMarkers = markers.map( marker => {
+                const { startLineNumber, startColumn } = marker;
+                const domNode = editorRef.current.getDomNode();
+                const editorContent = domNode.querySelector( '.monaco-editor' );
+                const lineNumberTop = editorRef.current.getTopForLineNumber( startLineNumber );
+                const lineHeight = editorRef.current.getOption( 37 ).lineHeight; // 37 = EditorOption.lineHeight
+                const charWidth = editorRef.current.getOption( 34 ).fontInfo.typicalHalfwidthCharacterWidth; // 34 = EditorOption.fontInfo
+                const top = lineNumberTop + layoutInfo.contentTop - editorContent.scrollTop;
+                const left = startColumn * charWidth + layoutInfo.contentLeft - editorContent.scrollLeft;
+
+                return {
+                    message: marker.message,
+                    severity: marker.severity === 8 ? 'error' : 'warning',
+                    top,
+                    left
+                };
+            } );
+            setAllMarkers( updatedMarkers );
         }
     }, [ markers ] );
 
@@ -245,39 +262,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         } );
 
         setMarkers( editor, markers );
-
-        // Handle hover manually using onMouseMove event
-        editor.onMouseMove( ( e ) => {
-            const model = editor.getModel();
-            const position = e.target.position;
-
-            if( !position ) {
-                setTooltip( null );
-                return;
-            }
-
-            const markers = monaco.editor.getModelMarkers( { resource: model.uri } );
-            const hoverMarkers = markers.filter( marker =>
-                marker.startLineNumber <= position.lineNumber &&
-                marker.endLineNumber >= position.lineNumber &&
-                marker.startColumn <= position.column &&
-                marker.endColumn >= position.column
-            );
-
-            if( hoverMarkers.length > 0 ) {
-                const { clientX, clientY } = e.event.browserEvent;
-                const severity = hoverMarkers.some( marker => marker.severity === monaco.MarkerSeverity.Error )
-                    ? 'error'
-                    : 'warning';
-                setTooltip( { messages: hoverMarkers.map( marker => marker.message ), x: clientX, y: clientY, severity } );
-            } else {
-                setTooltip( null );
-            }
-        } );
-
-        editor.onMouseLeave( () => {
-            setTooltip( null );
-        } );
     };
 
     const setMarkers = ( editor, markers ) => {
@@ -321,7 +305,15 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     hover: { enabled: false } // Disable default hover
                 } }
             />
-            { tooltip && <Tooltip messages={ tooltip.messages } x={ tooltip.x } y={ tooltip.y } severity={ tooltip.severity } /> }
+            { allMarkers.map( ( marker, index ) => (
+                <Tooltip
+                    key={ index }
+                    message={ marker.message }
+                    x={ marker.left }
+                    y={ marker.top }
+                    severity={ marker.severity }
+                />
+            ) ) }
         </div>
     );
 };
