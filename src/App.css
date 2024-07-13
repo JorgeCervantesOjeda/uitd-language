@@ -23,18 +23,32 @@ button {
   /* Adjust the color and size as needed */
 }
 
+.space-screen {
+  flex: 1;
+  padding: 0px;
+  margin-right: 0px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 45vw;
+  background: url('/Correcaminos-removebg-preview.png') fixed;
+  background-size: contain;
+  min-width: 400px;
+}
+
 /* styles.css */
 .renderer-container {
   height: 100vh;
   background-color: black;
   color: #d4d4d4;
   border-radius: 4px;
+  opacity: 0.98;
 }
 
 .renderer-header {
   position: sticky;
   top: 0;
-  display: flex;
+  display: block;
   align-items: center;
   margin-top: 10px;
   margin-left: 10px;

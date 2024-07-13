@@ -82,6 +82,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
 
 const RendererD2 = ( { data } ) => {
     const [ d2Output, setD2Output ] = useState( '' );
+    const [ message, setMessage ] = useState( '' );
 
     useEffect( () => {
         const d2Text = translateToD2( data );
@@ -90,10 +91,9 @@ const RendererD2 = ( { data } ) => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText( d2Output ).then( () => {
-            const copyMessage = document.getElementById( 'copyMessage' );
-            copyMessage.style.visibility = 'visible';
+            setMessage( 'Copied to clipboard!' );
             setTimeout( () => {
-                copyMessage.style.visibility = 'hidden';
+                setMessage( '' );
             }, 2000 );
         } ).catch( ( err ) => {
             console.error( 'Could not copy text: ', err );
@@ -116,8 +116,10 @@ const RendererD2 = ( { data } ) => {
                     SVG Renderer
                 </button>
             </div>
-            <span id="copyMessage" className="copy-message">Copied to clipboard!</span>
-            <CodeViewer code={ d2Output } language="java" />
+            <div style={ { minHeight: '20px', color: 'yellow', backgroundColor: message ? 'darkred' : 'transparent' } }>
+                { message || '\u00A0' }
+            </div>
+            <CodeViewer code={ d2Output } language="uitdl" />
         </div>
     );
 };

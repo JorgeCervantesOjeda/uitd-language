@@ -34,22 +34,23 @@ const App = () => {
 
   const setMarkers = ( editor, markers ) => {
     const model = editor.getModel();
-    monaco.editor.setModelMarkers( model, 'uitdl', markers );
+    if( model ) {
+      monaco.editor.setModelMarkers( model, 'uitdl', markers );
+    }
   };
 
   return (
     <div style={ { display: 'flex', width: '100vw', height: '100vh' } }>
-      <div style={ { flex: 1, padding: '0px', marginRight: '10px', display: 'flex', flexDirection: 'column', height: '100vh' } }>
+      <div className='space-screen'>
         <Editor
-          style="editor"
           uitdlText={ uitdlText }
           onChange={ handleEditorChange }
           markers={ parsedData.errors }
           onMount={ handleEditorDidMount }
         />
       </div>
-      <div style={ { flex: 1, padding: '0px', display: 'flex', flexDirection: 'column', height: '100vh' } }>
-        <RendererD2 style="editor" data={ parsedData } />
+      <div className='space-screen'>
+        <RendererD2 data={ parsedData } />
       </div>
     </div>
   );

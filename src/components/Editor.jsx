@@ -7,21 +7,78 @@ import { saveAs } from 'file-saver';
 const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
     const editorRef = useRef( null );
     const [ lastSaved, setLastSaved ] = useState( Date.now() );
-    const [ reminder, setReminder ] = useState( false );
     const [ isModified, setIsModified ] = useState( false );
+    const [ message, setMessage ] = useState( '' );
     const fileInputRef = useRef( null );
+
+    const formatCode = ( code ) => {
+        // Replace multiple consecutive spaces with a single space (excluding newlines)
+        code = code.replace( / {2,}/g, ' ' );
+
+        // Remove spaces before and after {
+        code = code.replace( /\s*{\s*/g, '{' );
+        // Remove spaces before and after }
+        code = code.replace( /\s*}\s*/g, '}' );
+
+        // Ensure { is followed by a newline and preceded by a space
+        code = code.replace( /{([^\n])/g, '{\n$1' );
+        code = code.replace( /([^\s{])\{/g, '$1 {' );
+
+        // Ensure } is followed by a newline and preceded by a newline
+        code = code.replace( /}([^\n])/g, '}\n$1' );
+        code = code.replace( /([^\n])}/g, '$1\n}' );
+
+        // Remove spaces before and after ( excluding newlines
+        code = code.replace( /[^\S\n]*\([^\S\n]*/g, '(' );
+        // Remove spaces before and after ) excluding newlines
+        code = code.replace( /[^\S\n]*\)[^\S\n]*/g, ')' );
+
+        // Split into lines and apply indentation correction
+        const lines = code.split( '\n' );
+        let indentLevel = 0;
+        const indentSize = 2;
+        const formattedLines = lines.map( line => {
+            if( line.trim() === '' ) return line; // Keep empty lines as they are
+
+            if( line.trim().startsWith( '}' ) ) indentLevel -= 1;
+            const formattedLine = ' '.repeat( indentLevel * indentSize ) + line.trim();
+            if( line.trim().endsWith( '{' ) ) indentLevel += 1;
+
+            return formattedLine;
+        } );
+
+        return formattedLines.join( '\n' ).trim();
+    };
 
     const handleEditorChange = ( value ) => {
         onChange( value );
         setIsModified( true );
     };
 
+    const handleFormatCode = () => {
+        const editor = editorRef.current;
+        const model = editor.getModel();
+        const position = editor.getPosition();
+
+        const currentValue = model.getValue();
+        const formattedValue = formatCode( currentValue );
+
+        editor.executeEdits( '', [
+            {
+                range: model.getFullModelRange(),
+                text: formattedValue,
+                forceMoveMarkers: true,
+            },
+        ] );
+        editor.setPosition( position );
+        onChange( formattedValue );
+    };
+
     const handleCopyToClipboard = () => {
         navigator.clipboard.writeText( uitdlText ).then( () => {
-            const copyMessage = document.getElementById( 'copyMessageEditor' );
-            copyMessage.style.visibility = 'visible';
+            setMessage( 'Copied to clipboard!' );
             setTimeout( () => {
-                copyMessage.style.visibility = 'hidden';
+                setMessage( '' );
             }, 2000 );
         } ).catch( ( err ) => {
             console.error( 'Could not copy text: ', err );
@@ -40,7 +97,6 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
         const blob = new Blob( [ uitdlText ], { type: 'text/plain;charset=utf-8' } );
         saveAs( blob, 'uitdl_description.uitd' );
         setLastSaved( Date.now() );
-        setReminder( false );
         setIsModified( false );
     };
 
@@ -61,7 +117,7 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
         if( isModified ) {
             const timer = setInterval( () => {
                 if( Date.now() - lastSaved > 5 * 60 * 1000 ) {
-                    setReminder( true );
+                    setMessage( 'Remember to save your file!' );
                 }
             }, 60 * 1000 );
 
@@ -70,10 +126,6 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
     }, [ lastSaved, isModified ] );
 
     const handleEditorDidMount = ( editor, monaco ) => {
-        const initialCursorPosition = new monaco.Position( 2, 5 );
-        editor.setPosition( initialCursorPosition );
-        editor.focus();
-
         editorRef.current = editor;
 
         monaco.languages.register( { id: 'uitdl' } );
@@ -177,6 +229,7 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
                 <button className='renderer-button' onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
                 <button className='renderer-button' onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
                 <button className='renderer-button' onClick={ handleSaveToFile }>Save to File</button>
+                <button className='renderer-button' onClick={ handleFormatCode }>Format Code</button>
                 <input
                     type="file"
                     ref={ fileInputRef }
@@ -186,12 +239,9 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
                 />
                 <button className='renderer-button' onClick={ () => fileInputRef.current.click() }>Open File</button>
             </div>
-            { reminder && (
-                <div style={ { color: 'yellow', backgroundColor: 'darkred' } }>
-                    Remember to save your file!
-                </div>
-            ) }
-            <span id="copyMessageEditor" className='copy-message'>Copied to clipboard!</span>
+            <div style={ { minHeight: '20px', color: 'yellow', backgroundColor: message ? 'darkred' : 'transparent' } }>
+                { message || '\u00A0' }
+            </div>
             <MonacoEditor
                 width="100%"
                 height="90vh"

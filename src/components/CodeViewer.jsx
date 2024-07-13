@@ -11,7 +11,7 @@ const CodeViewer = ( { code, language } ) => {
             value={ code }
             theme="vs-dark"
             options={ {
-                readOnly: false,
+                readOnly: true,
                 minimap: { enabled: true },
             } }
         />

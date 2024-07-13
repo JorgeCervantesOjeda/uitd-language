@@ -213,7 +213,7 @@ export const validateData = ( parsedData ) => {
                 startLineNumber: ui.line,
                 startColumn: ui.column,
                 endLineNumber: ui.line,
-                endColumn: ui.column + ui.name.length,
+                endColumn: ui.column + 3 + ui.id.toString().length,
                 message: `UI ${ui.id} is not used as 'from' UI in any transition`,
             } );
         }
