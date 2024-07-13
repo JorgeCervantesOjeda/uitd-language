@@ -22,12 +22,6 @@ export const formatUIRef = ( uiRef ) => {
     return uiRef.id;
 };
 
-// Handle text changes in the editor by parsing the text
-export const handleEditorTextChange = ( editorText ) => {
-    const parsedData = parseUITDL( editorText );
-    return parsedData;
-};
-
 // Debounce function to limit the rate at which a function can fire
 export const debounce = ( func, delay ) => {
     let timeoutId;

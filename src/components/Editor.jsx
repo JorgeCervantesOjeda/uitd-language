@@ -3,12 +3,39 @@ import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
 import { validVerbs } from '../utils/TokenParser';
 import { saveAs } from 'file-saver';
+import '../App.css'; // Assuming you have a CSS file for the problem-message class
 
-const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
+const Tooltip = ( { messages, x, y, severity } ) => {
+    const borderColor = severity === 'warning' ? 'yellow' : 'red';
+    return (
+        <div style={ {
+            position: 'absolute',
+            bottom: window.innerHeight - y + 10,
+            left: x + 10,
+            backgroundColor: 'black',
+            color: 'white',
+            padding: '5px',
+            borderRadius: '5px',
+            zIndex: 1000,
+            maxWidth: '300px',
+            whiteSpace: 'pre-wrap',
+            border: `1px solid ${borderColor}`
+        } }>
+            { messages.map( ( msg, index ) => (
+                <div key={ index }>
+                    <div>{ msg }</div>
+                </div>
+            ) ) }
+        </div>
+    );
+};
+
+const Editor = ( { uitdlText, onChange, markers } ) => {
     const editorRef = useRef( null );
     const [ lastSaved, setLastSaved ] = useState( Date.now() );
     const [ isModified, setIsModified ] = useState( false );
     const [ message, setMessage ] = useState( '' );
+    const [ tooltip, setTooltip ] = useState( null );
     const fileInputRef = useRef( null );
 
     const formatCode = ( code ) => {
@@ -128,6 +155,12 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
         }
     }, [ lastSaved, isModified ] );
 
+    useEffect( () => {
+        if( editorRef.current ) {
+            setMarkers( editorRef.current, markers );
+        }
+    }, [ markers ] );
+
     const handleEditorDidMount = ( editor, monaco ) => {
         editorRef.current = editor;
 
@@ -211,22 +244,51 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
             ],
         } );
 
-        onMount( editor, monaco );
+        setMarkers( editor, markers );
+
+        // Handle hover manually using onMouseMove event
+        editor.onMouseMove( ( e ) => {
+            const model = editor.getModel();
+            const position = e.target.position;
+
+            if( !position ) {
+                setTooltip( null );
+                return;
+            }
+
+            const markers = monaco.editor.getModelMarkers( { resource: model.uri } );
+            const hoverMarkers = markers.filter( marker =>
+                marker.startLineNumber <= position.lineNumber &&
+                marker.endLineNumber >= position.lineNumber &&
+                marker.startColumn <= position.column &&
+                marker.endColumn >= position.column
+            );
+
+            if( hoverMarkers.length > 0 ) {
+                const { clientX, clientY } = e.event.browserEvent;
+                const severity = hoverMarkers.some( marker => marker.severity === monaco.MarkerSeverity.Error )
+                    ? 'error'
+                    : 'warning';
+                setTooltip( { messages: hoverMarkers.map( marker => marker.message ), x: clientX, y: clientY, severity } );
+            } else {
+                setTooltip( null );
+            }
+        } );
+
+        editor.onMouseLeave( () => {
+            setTooltip( null );
+        } );
     };
 
-    useEffect( () => {
-        if( editorRef.current ) {
-            const setMarkers = () => {
-                const model = editorRef.current.getModel();
-                monaco.editor.setModelMarkers( model, 'uitdl', markers );
-            };
-
-            setMarkers();
+    const setMarkers = ( editor, markers ) => {
+        const model = editor.getModel();
+        if( model ) {
+            monaco.editor.setModelMarkers( model, 'uitdl', markers );
         }
-    }, [ markers ] );
+    };
 
     return (
-        <div className='renderer-container'>
+        <div className='renderer-container' style={ { position: 'relative' } }>
             <div className='renderer-header'>
                 <div style={ { color: 'yellow' } }>UITD Editor</div>
                 <button className='renderer-button' onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
@@ -256,8 +318,10 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
                 options={ {
                     readOnly: false,
                     minimap: { enabled: true },
+                    hover: { enabled: false } // Disable default hover
                 } }
             />
+            { tooltip && <Tooltip messages={ tooltip.messages } x={ tooltip.x } y={ tooltip.y } severity={ tooltip.severity } /> }
         </div>
     );
 };
