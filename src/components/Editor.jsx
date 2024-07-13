@@ -12,6 +12,9 @@ const Editor = ( { uitdlText, onChange, markers, onMount } ) => {
     const fileInputRef = useRef( null );
 
     const formatCode = ( code ) => {
+        // Add space after comma
+        code = code.replace( /,\s*/g, ', ' );
+
         // Replace multiple consecutive spaces with a single space (excluding newlines)
         code = code.replace( / {2,}/g, ' ' );
 
