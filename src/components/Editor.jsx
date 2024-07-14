@@ -3,7 +3,7 @@ import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
 import { validVerbs } from '../utils/TokenParser';
 import { saveAs } from 'file-saver';
-import '../App.css'; // Assuming you have a CSS file for the problem-message class
+import '../App.css'; // Ensure this CSS file is correctly imported
 
 const Tooltip = ( { messages, x, y, severity } ) => {
     const borderColor = severity === 'warning' ? 'yellow' : 'red';
@@ -37,6 +37,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ message, setMessage ] = useState( '' );
     const [ tooltip, setTooltip ] = useState( null );
     const fileInputRef = useRef( null );
+    const [ decorationIds, setDecorationIds ] = useState( [] );
 
     const formatCode = ( code ) => {
         // Add space after comma
@@ -128,6 +129,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         saveAs( blob, 'uitdl_description.uitd' );
         setLastSaved( Date.now() );
         setIsModified( false );
+        setMessage( '' );
     };
 
     const handleOpenFile = ( event ) => {
@@ -136,6 +138,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             const reader = new FileReader();
             reader.onload = ( e ) => {
                 handleEditorChange( e.target.result );
+                setMessage( '' );
             };
             reader.readAsText( file );
         } else {
@@ -146,10 +149,10 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     useEffect( () => {
         if( isModified ) {
             const timer = setInterval( () => {
-                if( Date.now() - lastSaved > 5 * 60 * 1000 ) {
+                if( Date.now() - lastSaved > 3 * 60 * 1000 ) {
                     setMessage( 'Remember to save your file!' );
                 }
-            }, 60 * 1000 );
+            }, 10 * 1000 );
 
             return () => clearInterval( timer );
         }
@@ -199,7 +202,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     {
                         label: 'FRAGMENT',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW {${2:id}}\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb}\n}',
+                        insertText: 'FRAGMENT "${1:name}" {\n\tDRAW {${2:id}}\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb} ;\n}',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define a fragment with draw and transitions',
                     },
@@ -213,7 +216,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     {
                         label: 'TRANSITION',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'TRANSITION from ${1:id} to ${2:id} if user ',
+                        insertText: 'TRANSITION from ${1:id} to ${2:id} if user ;',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define a transition between UIs with conditions',
                     },
@@ -227,7 +230,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     ...validVerbs.map( verb => ( {
                         label: verb,
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: verb + ' "${1:target}" ',
+                        insertText: verb + ' "${1:target}"',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: `Define a ${verb} action`,
                     } ) ),
@@ -284,6 +287,17 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         const model = editor.getModel();
         if( model ) {
             monaco.editor.setModelMarkers( model, 'uitdl', markers );
+
+            // Remove old decorations and apply new ones
+            const newDecorations = markers.map( marker => ( {
+                range: new monaco.Range( marker.startLineNumber, 1, marker.startLineNumber, 1 ),
+                options: {
+                    isWholeLine: true,
+                    className: marker.severity === monaco.MarkerSeverity.Warning ? 'line-warning' : 'line-error',
+                },
+            } ) );
+            const newDecorationIds = editor.deltaDecorations( decorationIds, newDecorations );
+            setDecorationIds( newDecorationIds );
         }
     };
 

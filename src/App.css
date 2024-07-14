@@ -1,3 +1,19 @@
+.monaco-editor .line-warning::before {
+  content: '';
+  display: inline-block;
+  border-left: 4px solid yellow;
+  margin-right: -4px;
+  height: 100%;
+}
+
+.monaco-editor .line-error::before {
+  content: '';
+  display: inline-block;
+  border-left: 4px solid red;
+  margin-right: -4px;
+  height: 100%;
+}
+
 button:hover {
   box-shadow: 0 0 15px rgba(0, 0255, 255, 0.5) !important;
   border-color: black !important;
@@ -14,8 +30,7 @@ button {
 }
 
 *:active {
-  background-color: rgb(69, 0, 0) !important;
-  color: white;
+  border-color: rgb(69, 0, 0) !important;
 }
 
 .view-line:hover {
