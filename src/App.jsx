@@ -7,9 +7,8 @@ import './App.css';
 
 const App = () => {
   const [ uitdlText, setUitdlText ] = useState( initialText );
-  const initialParsedData = parseUITDL( initialText );
+  const initialParsedData = parseUITDL( uitdlText );
   const [ parsedData, setParsedData ] = useState( initialParsedData );
-  const editorRef = useRef( null );
 
   useEffect( () => {
     // Handle text changes in the editor by parsing the text

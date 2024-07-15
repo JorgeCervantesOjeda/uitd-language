@@ -10,15 +10,16 @@ const Tooltip = ( { messages, x, y, severity } ) => {
     return (
         <div style={ {
             position: 'absolute',
-            bottom: window.innerHeight - y + 10,
+            top: y + 75,
             left: x + 10,
             backgroundColor: 'black',
             color: 'white',
-            padding: '5px',
+            padding: '1px',
             borderRadius: '5px',
             zIndex: 1000,
-            maxWidth: '300px',
+            maxWidth: '900px',
             whiteSpace: 'pre-wrap',
+            height: '17px',
             border: `1px solid ${borderColor}`
         } }>
             { messages.map( ( msg, index ) => (
@@ -32,10 +33,11 @@ const Tooltip = ( { messages, x, y, severity } ) => {
 
 const Editor = ( { uitdlText, onChange, markers } ) => {
     const editorRef = useRef( null );
+    const markersRef = useRef( markers );  // Ref to keep track of the latest markers
     const [ lastSaved, setLastSaved ] = useState( Date.now() );
     const [ isModified, setIsModified ] = useState( false );
     const [ message, setMessage ] = useState( '' );
-    const [ tooltip, setTooltip ] = useState( null );
+    const [ tooltips, setTooltips ] = useState( [] );
     const fileInputRef = useRef( null );
     const [ decorationIds, setDecorationIds ] = useState( [] );
 
@@ -160,7 +162,8 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
 
     useEffect( () => {
         if( editorRef.current ) {
-            setMarkers( editorRef.current, markers );
+            markersRef.current = markers;  // Update the markers ref whenever markers change
+            setMarkers( editorRef.current, markersRef.current );
         }
     }, [ markers ] );
 
@@ -247,58 +250,43 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             ],
         } );
 
-        setMarkers( editor, markers );
+        setMarkers( editor, markersRef.current );
 
-        // Handle hover manually using onMouseMove event
-        editor.onMouseMove( ( e ) => {
-            const model = editor.getModel();
-            const position = e.target.position;
-
-            if( !position ) {
-                setTooltip( null );
-                return;
-            }
-
-            const markers = monaco.editor.getModelMarkers( { resource: model.uri } );
-            const hoverMarkers = markers.filter( marker =>
-                marker.startLineNumber <= position.lineNumber &&
-                marker.endLineNumber >= position.lineNumber &&
-                marker.startColumn <= position.column &&
-                marker.endColumn >= position.column
-            );
-
-            if( hoverMarkers.length > 0 ) {
-                const { clientX, clientY } = e.event.browserEvent;
-                const severity = hoverMarkers.some( marker => marker.severity === monaco.MarkerSeverity.Error )
-                    ? 'error'
-                    : 'warning';
-                setTooltip( { messages: hoverMarkers.map( marker => marker.message ), x: clientX, y: clientY, severity } );
-            } else {
-                setTooltip( null );
-            }
-        } );
-
-        editor.onMouseLeave( () => {
-            setTooltip( null );
+        // Add scroll event listener
+        editor.onDidScrollChange( () => {
+            setMarkers( editor, markersRef.current );  // Use the latest markers from the ref
         } );
     };
 
     const setMarkers = ( editor, markers ) => {
         const model = editor.getModel();
         if( model ) {
-            monaco.editor.setModelMarkers( model, 'uitdl', markers );
+            // Clear existing markers
+            monaco.editor.setModelMarkers( model, 'uitdl', [] );
 
-            // Remove old decorations and apply new ones
-            const newDecorations = markers.map( marker => ( {
-                range: new monaco.Range( marker.startLineNumber, 1, marker.startLineNumber, 1 ),
-                options: {
-                    isWholeLine: true,
-                    className: marker.severity === monaco.MarkerSeverity.Warning ? 'line-warning' : 'line-error',
-                },
-            } ) );
-            const newDecorationIds = editor.deltaDecorations( decorationIds, newDecorations );
-            setDecorationIds( newDecorationIds );
+            // Set new markers
+            monaco.editor.setModelMarkers( model, 'uitdl', markers );
         }
+
+        const newTooltips = markers.map( marker => {
+            const positionCoords = editor.getScrolledVisiblePosition( {
+                lineNumber: marker.startLineNumber,
+                column: 200,
+            } );
+
+            if( positionCoords ) {
+                const { top, left } = positionCoords;
+                return {
+                    messages: [ marker.message ],
+                    x: left,
+                    y: top,
+                    severity: marker.severity === monaco.MarkerSeverity.Error ? 'error' : 'warning',
+                };
+            }
+            return null;
+        } ).filter( tooltip => tooltip !== null );
+
+        setTooltips( newTooltips );
     };
 
     return (
@@ -335,7 +323,9 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     hover: { enabled: false } // Disable default hover
                 } }
             />
-            { tooltip && <Tooltip messages={ tooltip.messages } x={ tooltip.x } y={ tooltip.y } severity={ tooltip.severity } /> }
+            { tooltips.map( ( tooltip, index ) => (
+                <Tooltip key={ index } messages={ tooltip.messages } x={ tooltip.x } y={ tooltip.y } severity={ tooltip.severity } />
+            ) ) }
         </div>
     );
 };
