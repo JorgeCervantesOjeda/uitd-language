@@ -9,9 +9,10 @@ const Tooltip = ( { messages, x, y, severity } ) => {
     const borderColor = severity === 'warning' ? 'yellow' : 'red';
     return (
         <div style={ {
-            position: 'absolute',
-            top: y + 75,
-            left: x + 10,
+            position: 'relative',
+            top: '0px',
+            left: '50px',
+            marginBottom: '3px',
             backgroundColor: 'black',
             color: 'white',
             padding: '1px',
@@ -19,12 +20,11 @@ const Tooltip = ( { messages, x, y, severity } ) => {
             zIndex: 1000,
             maxWidth: '900px',
             whiteSpace: 'pre-wrap',
-            height: '17px',
             border: `1px solid ${borderColor}`
         } }>
             { messages.map( ( msg, index ) => (
                 <div key={ index }>
-                    <div>{ msg }</div>
+                    <div>{ msg } </div>
                 </div>
             ) ) }
         </div>
@@ -219,7 +219,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     {
                         label: 'TRANSITION',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'TRANSITION from ${1:id} to ${2:id} if user ;',
+                        insertText: 'TRANSITION from ${1:id} to ${2:id} if user ${3:verb};',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define a transition between UIs with conditions',
                     },
@@ -268,6 +268,9 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             monaco.editor.setModelMarkers( model, 'uitdl', markers );
         }
 
+        const editorDomNode = editor.getDomNode();
+        const editorTop = editorDomNode ? editorDomNode.getBoundingClientRect().top : 0;
+
         const newTooltips = markers.map( marker => {
             const positionCoords = editor.getScrolledVisiblePosition( {
                 lineNumber: marker.startLineNumber,
@@ -277,14 +280,17 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             if( positionCoords ) {
                 const { top, left } = positionCoords;
                 return {
-                    messages: [ marker.message ],
+                    messages: [ '\tLine:' + marker.startLineNumber + '\t' + marker.message ],
                     x: left,
-                    y: top,
+                    y: top + editorTop,
                     severity: marker.severity === monaco.MarkerSeverity.Error ? 'error' : 'warning',
                 };
             }
             return null;
         } ).filter( tooltip => tooltip !== null );
+
+        // Sort tooltips by line number
+        newTooltips.sort( ( a, b ) => a.y - b.y );
 
         setTooltips( newTooltips );
     };
@@ -309,6 +315,9 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             <div style={ { minHeight: '20px', color: 'yellow', backgroundColor: message ? 'darkred' : 'transparent' } }>
                 { message || '\u00A0' }
             </div>
+            { tooltips.map( ( tooltip, index ) => (
+                <Tooltip key={ index } messages={ tooltip.messages } x={ tooltip.x } y={ tooltip.y } severity={ tooltip.severity } />
+            ) ) }
             <MonacoEditor
                 width="100%"
                 height="90vh"
@@ -323,9 +332,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     hover: { enabled: false } // Disable default hover
                 } }
             />
-            { tooltips.map( ( tooltip, index ) => (
-                <Tooltip key={ index } messages={ tooltip.messages } x={ tooltip.x } y={ tooltip.y } severity={ tooltip.severity } />
-            ) ) }
         </div>
     );
 };
