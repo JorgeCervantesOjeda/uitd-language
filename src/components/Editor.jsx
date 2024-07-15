@@ -11,20 +11,24 @@ const Tooltip = ( { messages, x, y, severity } ) => {
         <div style={ {
             position: 'relative',
             top: '0px',
-            left: '50px',
-            marginBottom: '3px',
+            left: '0px',
             backgroundColor: 'black',
             color: 'white',
-            padding: '1px',
-            borderRadius: '5px',
             zIndex: 1000,
-            maxWidth: '900px',
             whiteSpace: 'pre-wrap',
-            border: `1px solid ${borderColor}`
         } }>
             { messages.map( ( msg, index ) => (
-                <div key={ index }>
-                    <div>{ msg } </div>
+                <div key={ index } style={ { marginBottom: '1px' } }>
+                    <div style={ {
+                        display: 'inline-block',
+                        width: `auto`,
+                        border: `1px solid ${borderColor}`,
+                        padding: '2px 8px',
+                        borderRadius: '300px',
+                        whiteSpace: 'pre-wrap'
+                    } }>
+                        { msg }
+                    </div>
                 </div>
             ) ) }
         </div>
@@ -274,13 +278,13 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         const newTooltips = markers.map( marker => {
             const positionCoords = editor.getScrolledVisiblePosition( {
                 lineNumber: marker.startLineNumber,
-                column: 200,
+                column: 1,
             } );
 
             if( positionCoords ) {
                 const { top, left } = positionCoords;
                 return {
-                    messages: [ '\tLine:' + marker.startLineNumber + '\t' + marker.message ],
+                    messages: [ 'Line:' + marker.startLineNumber + ' ' + marker.message ],
                     x: left,
                     y: top + editorTop,
                     severity: marker.severity === monaco.MarkerSeverity.Error ? 'error' : 'warning',
