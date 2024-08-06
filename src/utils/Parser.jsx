@@ -186,7 +186,7 @@ export const parseUITDL = ( text ) => {
                 }
             } else if( currentSection == 'ui' ) {
                 if( validVerbs.some( verb => trimmedLine.startsWith( verb ) ) ) {
-                    const actionMatch = trimmedLine.match( new RegExp( `^(${validVerbs.join( '|' )})\\s+"([^"]+)"` ) );
+                    const actionMatch = trimmedLine.match( new RegExp( `^(${validVerbs.join( '|' )})\\s+"([^"]+)";` ) );
                     if( !actionMatch ) {
                         throw new Error( `Invalid action declaration` );
                     }
@@ -196,7 +196,7 @@ export const parseUITDL = ( text ) => {
                 }
             } else if( currentSection == 'fragment' ) {
                 if( trimmedLine.startsWith( 'DRAW' ) ) {
-                    const drawMatch = trimmedLine.match( /^DRAW\s+(.+)/ );
+                    const drawMatch = trimmedLine.match( /^DRAW\s+(.+);/ );
                     if( drawMatch ) {
                         try {
                             const uiRefs = parseUIRefList( drawMatch[ 1 ] );
@@ -208,7 +208,7 @@ export const parseUITDL = ( text ) => {
                         throw new Error( `Invalid DRAW declaration at line ${lineNumber}` );
                     }
                 } else if( trimmedLine.startsWith( 'TRANSITION' ) ) {
-                    const transitionMatch = trimmedLine.match( /^TRANSITION\s+from\s+(\d+(\(\d+\))*)\s+to\s+(\d+(\(\d+\))*)\s+if\s+user\s+(\w+)\s+"([^"]+)"\s*(AND\s+"([^"]+)")?/ );
+                    const transitionMatch = trimmedLine.match( /^TRANSITION\s+from\s+(\d+(\(\d+\))*)\s+to\s+(\d+(\(\d+\))*)\s+if\s+user\s+(\w+)\s+"([^"]+)"\s*(AND\s+"([^"]+)")?;/ );
                     if( transitionMatch ) {
                         result.fragments[ result.fragments.length - 1 ].transitions.push( {
                             from: transitionMatch[ 1 ],

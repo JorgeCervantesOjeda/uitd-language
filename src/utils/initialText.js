@@ -1,31 +1,31 @@
 export const initialText = `UITD "System Title" {
     UI 0 "Menu" actions {
-      clicks "Home" 
-      clicks "Standings" 
-      clicks "Events" 
-      clicks "Logout" 
+      clicks "Home"; 
+      clicks "Standings"; 
+      clicks "Events";
+      clicks "Logout";
     }
     UI 1 "Login" actions {
-      clicks "Login" 
+      clicks "Login";
     }
     UI 2 "Admin Home" actions {
-      deletes "user" 
+      deletes "user";
     }
     UI 3 "Home" actions {
-      clicks "play" 
+      clicks "play";
     }
     UI 4 "Standings" actions {
-      selects "level" 
+      selects "level";
     }
     UI 5 "Events" actions {
-      selects "level" 
+      selects "level";
     }
     UI 6 "name" actions {
 
     }
     FRAGMENT "Menu Navigation and Login" {
-      DRAW { 1, 0 }
-      DRAW { 2(3(0)), 4(0), 5(0) }
+      DRAW { 1, 0 };
+      DRAW { 2(3(0)), 4(0), 5(0) };
       TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin";
       TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal";
       TRANSITION from 0 to 4 if user clicks "Standings";

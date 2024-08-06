@@ -57,6 +57,7 @@ button {
 .renderer-button {
   cursor: pointer;
   margin-left: 10px;
+  border-width: 4px;
 }
 
 .copy-message {

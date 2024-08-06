@@ -44,6 +44,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ tooltips, setTooltips ] = useState( [] );
     const fileInputRef = useRef( null );
     const [ decorationIds, setDecorationIds ] = useState( [] );
+    const [ showErrors, setShowErrors ] = useState( false ); // State to control error visibility
 
     const formatCode = ( code ) => {
         // Add space after comma
@@ -216,7 +217,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     {
                         label: 'DRAW',
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        insertText: 'DRAW {${1:id}}',
+                        insertText: 'DRAW {${1:id}};',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: 'Define draw statements with UI IDs',
                     },
@@ -237,7 +238,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     ...validVerbs.map( verb => ( {
                         label: verb,
                         kind: monaco.languages.CompletionItemKind.Keyword,
-                        insertText: verb + ' "${1:target}"',
+                        insertText: verb + ' "${1:target}";',
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         documentation: `Define a ${verb} action`,
                     } ) ),
@@ -303,10 +304,10 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         <div className='renderer-container' style={ { position: 'relative' } }>
             <div className='renderer-header'>
                 <div style={ { color: 'yellow' } }>UITD Editor</div>
-                <button className='renderer-button' onClick={ handleCopyToClipboard }>Copy to Clipboard</button>
-                <button className='renderer-button' onClick={ handlePasteFromClipboard }>Paste from Clipboard</button>
-                <button className='renderer-button' onClick={ handleSaveToFile }>Save to File</button>
-                <button className='renderer-button' onClick={ handleFormatCode }>Format Code</button>
+                <button className='renderer-button' onClick={ handleCopyToClipboard }>Copy All</button>
+                <button className='renderer-button' onClick={ handlePasteFromClipboard }>Paste</button>
+                <button className='renderer-button' onClick={ handleSaveToFile }>Save as...</button>
+                <button className='renderer-button' onClick={ handleFormatCode }>Format</button>
                 <input
                     type="file"
                     ref={ fileInputRef }
@@ -314,12 +315,15 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     onChange={ handleOpenFile }
                     accept=".uitd"
                 />
-                <button className='renderer-button' onClick={ () => fileInputRef.current.click() }>Open File</button>
+                <button className='renderer-button' onClick={ () => fileInputRef.current.click() }>Open...</button>
+                <button className='renderer-button' style={ { borderColor: 'red' } } onClick={ () => setShowErrors( !showErrors ) }>
+                    { showErrors ? 'Hide' : 'Show' } Errors
+                </button>
             </div>
             <div style={ { minHeight: '20px', color: 'yellow', backgroundColor: message ? 'darkred' : 'transparent' } }>
                 { message || '\u00A0' }
             </div>
-            { tooltips.map( ( tooltip, index ) => (
+            { showErrors && tooltips.map( ( tooltip, index ) => (
                 <Tooltip key={ index } messages={ tooltip.messages } x={ tooltip.x } y={ tooltip.y } severity={ tooltip.severity } />
             ) ) }
             <MonacoEditor

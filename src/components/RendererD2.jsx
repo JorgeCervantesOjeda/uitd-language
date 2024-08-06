@@ -12,6 +12,33 @@ const formatTransitionUIRef = ( uiRef ) => {
     return `${uiRef.id}.${nestedRefs}`;
 };
 
+const formatString = ( name, maxLength = 20 ) => {
+    if( !name ) return '';
+    const words = name.split( ' ' );
+    let formattedName = '';
+    let line = '';
+
+    words.forEach( ( word ) => {
+        if( ( line + word ).length > maxLength ) {
+            if( line ) {
+                formattedName += line + '\\n';
+                line = '';
+            }
+        }
+        if( line ) {
+            line += ' ' + word;
+        } else {
+            line = word;
+        }
+    } );
+
+    if( line ) {
+        formattedName += line;
+    }
+
+    return formattedName;
+};
+
 // Function to translate parsed UITD to D2 language
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
@@ -22,7 +49,8 @@ const translateToD2 = ( parsedData ) => {
 
     // Build UI hierarchy
     parsedData.fragments.forEach( ( fragment ) => {
-        d2 += `  "${fragment.name}": {\n`;
+        const formattedName = formatString( fragment.name );
+        d2 += `  "${formattedName}": {\n`;
 
         fragment.draws.forEach( ( draw ) => {
             draw.uiRefs.forEach( ( ref ) => {
@@ -35,10 +63,10 @@ const translateToD2 = ( parsedData ) => {
             const hasMarkerOnLine = markers.some( marker => marker.startLineNumber === transition.line && marker.severity == 8 );
 
             if( !hasMarkerOnLine ) {
-                const transitionString = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}: ${transition.action} "${transition.target}"`;
+                const transitionString = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}:${transition.action}\\n"${transition.target}"`;
                 d2 += `    ${transitionString}`;
                 if( transition.condition ) {
-                    d2 += ` AND\\n(${transition.condition})`;
+                    d2 += ` AND\\n(${formatString( transition.condition )})`;
                 }
                 d2 += '\n';
             }
@@ -61,10 +89,10 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
     }
 
     let hierarchy = '';
-    const fullKey = parentKey ? `${parentKey}.${ref.id}` : ref.id.toString();
+    const formattedName = formatString( ui.name );
 
     if( ref.nested.length > 0 ) {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${ui.name} {\n`;
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${formattedName} {\n`;
         ref.nested.forEach( ( nestedRef ) => {
             hierarchy += buildUIHierarchy( nestedRef, indentLevel + 1, uis, `${parentKey}${parentKey ? '(' : ''}${ref.id}${parentKey ? ')' : ''}` );
         } );

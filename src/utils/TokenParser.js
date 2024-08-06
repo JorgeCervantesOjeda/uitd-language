@@ -132,6 +132,7 @@ class TokenParser {
                     const targetToken = this.expectToken( TokenType.STRING );
                     const target = targetToken.value.slice( 1, -1 );
                     actions.push( { verb, target, line: token.line, column: token.column } );
+                    this.expectToken( TokenType.PUNCTUATION, ';' );
                 } else {
                     throw new Error( `Unexpected token ${token.value} in UI actions at line ${token.line}, column ${token.column}` );
                 }
@@ -196,6 +197,7 @@ class TokenParser {
             this.expectToken( TokenType.PUNCTUATION, '{' );
             const uiRefs = this.parseUIRefList();
             this.expectToken( TokenType.PUNCTUATION, '}' );
+            this.expectToken( TokenType.PUNCTUATION, ';' );
             draws.push( { uiRefs, line: drawToken.line, column: drawToken.column } );
         } catch( e ) {
             this.handleParsingError( e );
