@@ -3,7 +3,9 @@ import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
 import { validVerbs } from '../utils/TokenParser';
 import { saveAs } from 'file-saver';
+import { initialText } from '../utils/initialText';
 import '../App.css'; // Ensure this CSS file is correctly imported
+import DropdownMenu from './DropdownMenu'; // Import the DropdownMenu component
 
 const Tooltip = ( { messages, x, y, severity } ) => {
     const borderColor = severity === 'warning' ? 'yellow' : 'red';
@@ -91,6 +93,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const handleEditorChange = ( value ) => {
         onChange( value );
         setIsModified( true );
+        localStorage.setItem( 'uitdlContent', value );
     };
 
     const handleFormatCode = () => {
@@ -110,6 +113,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         ] );
         editor.setPosition( position );
         onChange( formattedValue );
+        localStorage.setItem( 'uitdlContent', formattedValue );
     };
 
     const handleCopyToClipboard = () => {
@@ -153,6 +157,10 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         }
     };
 
+    const handleResetToInitial = () => {
+        handleEditorChange( initialText );
+    };
+
     useEffect( () => {
         if( isModified ) {
             const timer = setInterval( () => {
@@ -171,6 +179,13 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             setMarkers( editorRef.current, markersRef.current );
         }
     }, [ markers ] );
+
+    useEffect( () => {
+        const savedContent = localStorage.getItem( 'uitdlContent' );
+        if( savedContent ) {
+            onChange( savedContent );
+        }
+    }, [] );
 
     const handleEditorDidMount = ( editor, monaco ) => {
         editorRef.current = editor;
@@ -300,22 +315,24 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         setTooltips( newTooltips );
     };
 
+    const fileMenuItems = [
+        { label: 'Save as...', onClick: handleSaveToFile },
+        { label: 'Open...', onClick: () => fileInputRef.current.click() },
+    ];
+
+    const editMenuItems = [
+        { label: 'Copy All', onClick: handleCopyToClipboard },
+        { label: 'Paste', onClick: handlePasteFromClipboard },
+        { label: 'Format', onClick: handleFormatCode },
+        { label: 'Load Example', onClick: handleResetToInitial },
+    ];
+
     return (
         <div className='renderer-container' style={ { position: 'relative' } }>
-            <div className='renderer-header'>
-                <div style={ { color: 'yellow' } }>UITD Editor</div>
-                <button className='renderer-button' onClick={ handleCopyToClipboard }>Copy All</button>
-                <button className='renderer-button' onClick={ handlePasteFromClipboard }>Paste</button>
-                <button className='renderer-button' onClick={ handleSaveToFile }>Save as...</button>
-                <button className='renderer-button' onClick={ handleFormatCode }>Format</button>
-                <input
-                    type="file"
-                    ref={ fileInputRef }
-                    style={ { display: 'none' } }
-                    onChange={ handleOpenFile }
-                    accept=".uitd"
-                />
-                <button className='renderer-button' onClick={ () => fileInputRef.current.click() }>Open...</button>
+            <div className='renderer-header' style={ { zIndex: 1000 } }>
+                <div style={ { color: 'yellow' } }>UITD Language</div>
+                <DropdownMenu label="File" items={ fileMenuItems } />
+                <DropdownMenu label="Edit" items={ editMenuItems } />
                 <button className='renderer-button' style={ { borderColor: 'red' } } onClick={ () => setShowErrors( !showErrors ) }>
                     { showErrors ? 'Hide' : 'Show' } Errors
                 </button>
@@ -337,8 +354,15 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 options={ {
                     readOnly: false,
                     minimap: { enabled: true },
-                    hover: { enabled: false } // Disable default hover
+                    hover: { enabled: false }
                 } }
+            />
+            <input
+                type="file"
+                ref={ fileInputRef }
+                style={ { display: 'none' } }
+                onChange={ handleOpenFile }
+                accept=".uitd"
             />
         </div>
     );
