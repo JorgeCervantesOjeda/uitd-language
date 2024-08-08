@@ -3,7 +3,7 @@ import MonacoEditor from '@monaco-editor/react';
 import 'react-resizable/css/styles.css';
 import { validVerbs } from '../utils/TokenParser';
 import { saveAs } from 'file-saver';
-import { initialText } from '../utils/initialText';
+import { ExampleUITD } from './Editor/utils/ExampleUITD';
 import '../App.css'; // Ensure this CSS file is correctly imported
 import DropdownMenu from './DropdownMenu'; // Import the DropdownMenu component
 
@@ -49,6 +49,9 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ showErrors, setShowErrors ] = useState( false ); // State to control error visibility
 
     const formatCode = ( code ) => {
+        // remove all '\n'
+        code = code.replace( /\n/g, '' );
+
         // Add space after comma
         code = code.replace( /,\s*/g, ', ' );
 
@@ -65,7 +68,8 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         code = code.replace( /([^\s{])\{/g, '$1 {' );
 
         // Ensure } is followed by a newline and preceded by a newline
-        code = code.replace( /}([^\n])/g, '}\n$1' );
+        code = code.replace( /;([^\n])/g, ';\n$1' );
+        code = code.replace( /}(?!;)/g, '}\n' );
         code = code.replace( /([^\n])}/g, '$1\n}' );
 
         // Remove spaces before and after ( excluding newlines
@@ -158,7 +162,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     };
 
     const handleResetToInitial = () => {
-        handleEditorChange( initialText );
+        handleEditorChange( ExampleUITD );
     };
 
     useEffect( () => {
@@ -272,10 +276,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
 
         setMarkers( editor, markersRef.current );
 
-        // Add scroll event listener
-        editor.onDidScrollChange( () => {
-            setMarkers( editor, markersRef.current );  // Use the latest markers from the ref
-        } );
     };
 
     const setMarkers = ( editor, markers ) => {

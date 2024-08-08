@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Editor from './components/Editor';
+import Editor from './components/Editor/Editor';
 import RendererD2 from './components/RendererD2';
-import { initialText } from './utils/initialText';
+import { ExampleUITD } from './components/Editor/utils/ExampleUITD';
 import { parseUITDL } from './utils/TokenParser';
 import './App.css';
 
 const App = () => {
-  const [ uitdlText, setUitdlText ] = useState( initialText );
+  const [ uitdlText, setUitdlText ] = useState( ExampleUITD );
   const initialParsedData = parseUITDL( uitdlText );
   const [ parsedData, setParsedData ] = useState( initialParsedData );
 

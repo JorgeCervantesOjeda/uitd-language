@@ -1,4 +1,4 @@
-export const initialText = `UITD "System Title" {
+export const ExampleUITD = `UITD "System Title" {
     UI 0 "Menu" actions {
       clicks "Home"; 
       clicks "Standings"; 

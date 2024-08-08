@@ -1,0 +1,42 @@
+import React, { useState } from 'react';
+
+const DropdownMenu = ( { label, items } ) => {
+    const [ open, setOpen ] = useState( false );
+
+    const toggleMenu = () => {
+        setOpen( !open );
+    };
+
+    const handleItemClick = ( onClick ) => {
+        onClick();
+        setOpen( false );
+    };
+
+    return (
+        <div
+            className={ `dropdown ${open ? 'open' : ''}` }
+            onMouseLeave={ () => setOpen( false ) }
+        >
+            <button
+                className="dropdown-button"
+                onMouseEnter={ () => setOpen( true ) }
+                onClick={ toggleMenu }
+            >
+                { label }
+            </button>
+            <div className="dropdown-menu">
+                { items.map( ( item, index ) => (
+                    <button
+                        key={ index }
+                        className="dropdown-item"
+                        onClick={ () => handleItemClick( item.onClick ) }
+                    >
+                        { item.label }
+                    </button>
+                ) ) }
+            </div>
+        </div>
+    );
+};
+
+export default DropdownMenu;
