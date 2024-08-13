@@ -1,4 +1,4 @@
-const setErrors = ( editor, markers, setErrors ) => {
+const setErrors = ( editor, markers, setErrorState ) => {
     const model = editor.getModel();
     if( model ) {
         // Clear existing markers
@@ -17,7 +17,7 @@ const setErrors = ( editor, markers, setErrors ) => {
     // Sort errors by start line number
     newErrors.sort( ( a, b ) => a.startLineNumber - b.startLineNumber );
 
-    setErrors( newErrors );
+    setErrorState( newErrors );
 };
 
 export default setErrors;

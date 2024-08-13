@@ -44,8 +44,8 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     }, [ lastSaved, isModified ] );
 
     useEffect( () => {
+        markersRef.current = markers;
         if( editorRef.current ) {
-            markersRef.current = markers;
             setErrors( editorRef.current, markersRef.current, setErrorsState );
         }
     }, [ markers ] );

@@ -38,21 +38,40 @@ class TokenParser {
         const token = this.getNextToken();
         this.currentToken = token;
 
-        if( token.type !== type || ( value && token.value !== value ) ) {
-            throw new Error( `Expected ${value || type}, but got ${token.value} at line ${token.line}, column ${token.column}` );
+        if( type === TokenType.STRING ) {
+            // Handle string tokens with preceding and following quote tokens
+            if( token.type !== TokenType.QUOTE || ( value && token.value !== '"' ) ) {
+                throw new Error( `Expected opening quote, but got ${token.value} at line ${token.line}, column ${token.column}` );
+            }
+
+            const stringToken = this.getNextToken();
+            if( stringToken.type !== TokenType.STRING ) {
+                throw new Error( `Expected string, but got ${stringToken.value} at line ${stringToken.line}, column ${stringToken.column}` );
+            }
+
+            const closingQuoteToken = this.getNextToken();
+            if( closingQuoteToken.type !== TokenType.QUOTE || ( value && closingQuoteToken.value !== '"' ) ) {
+                throw new Error( `Expected closing quote, but got ${closingQuoteToken.value} at line ${closingQuoteToken.line}, column ${closingQuoteToken.column}` );
+            }
+
+            // Correct the string token if it has double spaces
+            if( stringToken.value.includes( '  ' ) ) {
+                stringToken.value = stringToken.value.replace( / {2,}/g, ' ' );
+                this.result.errors.push( {
+                    severity: 4,
+                    startLineNumber: stringToken.line,
+                    lineNumber: stringToken.line,
+                    startColumn: stringToken.column,
+                    endColumn: stringToken.column + stringToken.value.length,
+                    message: 'Double space',
+                } );
+            }
+
+            return stringToken;
         }
 
-        while( type === TokenType.STRING && token.value.includes( '  ' ) ) {
-            // Correct the token to eliminate consecutive spaces
-            token.value = token.value.replace( / {2,}/g, ' ' );
-            this.result.errors.push( {
-                severity: 4,
-                startLineNumber: token ? token.line : 0,
-                lineNumber: token ? token.line : 0,
-                startColumn: token ? token.column : 0,
-                endColumn: token ? token.column + ( token.value ? token.value.length : 0 ) : 0,
-                message: 'Double space'
-            } );
+        if( token.type !== type || ( value && token.value !== value ) ) {
+            throw new Error( `Expected ${value || type}, but got ${token.value} at line ${token.line}, column ${token.column}` );
         }
 
         return token;
@@ -78,7 +97,7 @@ class TokenParser {
             // Expect UITD Declaration
             this.expectToken( TokenType.KEYWORD, 'UITD' );
             const titleToken = this.expectToken( TokenType.STRING );
-            this.result.name = titleToken.value.slice( 1, -1 );
+            this.result.name = titleToken.value;
             this.expectToken( TokenType.PUNCTUATION, '{' );
 
             // Enter UITD Section Loop
@@ -120,7 +139,7 @@ class TokenParser {
             const idToken = this.expectToken( TokenType.NUMBER );
             const uiId = parseInt( idToken.value, 10 );
             const nameToken = this.expectToken( TokenType.STRING );
-            const uiName = nameToken.value.slice( 1, -1 );
+            const uiName = nameToken.value;
             this.expectToken( TokenType.KEYWORD, 'actions' );
             this.expectToken( TokenType.PUNCTUATION, '{' );
 
@@ -130,7 +149,7 @@ class TokenParser {
                 if( validVerbs.includes( token.value ) ) {
                     const verb = token.value;
                     const targetToken = this.expectToken( TokenType.STRING );
-                    const target = targetToken.value.slice( 1, -1 );
+                    const target = targetToken.value;
                     actions.push( { verb, target, line: token.line, column: token.column } );
                     this.expectToken( TokenType.PUNCTUATION, ';' );
                 } else {
@@ -155,7 +174,7 @@ class TokenParser {
         try {
             const fragmentStartToken = this.expectToken( TokenType.KEYWORD, 'FRAGMENT' );
             const nameToken = this.expectToken( TokenType.STRING );
-            const fragmentName = nameToken.value.slice( 1, -1 );
+            const fragmentName = nameToken.value;
             this.expectToken( TokenType.PUNCTUATION, '{' );
 
             const draws = [];
@@ -246,13 +265,13 @@ class TokenParser {
             const actionToken = this.expectToken( TokenType.KEYWORD );
             const action = actionToken.value;
             const targetToken = this.expectToken( TokenType.STRING );
-            const target = targetToken.value.slice( 1, -1 );
+            const target = targetToken.value;
 
             let condition = '';
             const nextToken = this.getNextToken();
             if( nextToken.type === TokenType.KEYWORD && nextToken.value === 'AND' ) {
                 const conditionToken = this.expectToken( TokenType.STRING );
-                condition = conditionToken.value.slice( 1, -1 );
+                condition = conditionToken.value;
             } else {
                 this.undoGetNextToken();
             }

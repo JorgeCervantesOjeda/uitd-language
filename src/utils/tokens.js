@@ -1,7 +1,9 @@
+// tokens.js
 export const TokenType = {
     KEYWORD: 'KEYWORD',
     NUMBER: 'NUMBER',
     STRING: 'STRING',
+    QUOTE: 'QUOTE', // Added for handling quotes separately
     PUNCTUATION: 'PUNCTUATION',
     COMMENT: 'COMMENT',
     WHITESPACE: 'WHITESPACE',
