@@ -1,15 +1,10 @@
-import React from 'react';
-import DropdownMenu from './DropdownMenu';
+import React, { useRef } from 'react';
 import { saveAs } from 'file-saver';
+import DropdownMenu from './DropdownMenu.jsx';
 
-const FileMenu = ( {
-    fileInputRef,
-    setLastSaved,
-    setIsModified,
-    setMessage,
-    uitdlText,
-    onChange
-} ) => {
+const FileMenu = ( { setLastSaved, setIsModified, setMessage, uitdlText, onChange } ) => {
+    const fileInputRef = useRef( null );
+
     const handleOpenFile = ( event ) => {
         const file = event.target.files[ 0 ];
         if( file && file.name.endsWith( '.uitd' ) ) {
@@ -18,8 +13,10 @@ const FileMenu = ( {
                 onChange( e.target.result );
             };
             reader.readAsText( file );
+            setIsModified( true );
+            setMessage( '' );
         } else {
-            alert( 'Please select a .uitd file' );
+            setMessage( 'Please select a valid .uitd file.' );
         }
     };
 

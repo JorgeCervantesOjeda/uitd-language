@@ -8,33 +8,35 @@ const DropdownMenu = ( { label, items } ) => {
     };
 
     const handleItemClick = ( onClick ) => {
-        onClick();
-        setOpen( false );
+        onClick();  // Ensure the click event is fully handled
+        setOpen( false );  // Close the menu after the click event
     };
 
     return (
         <div
             className={ `dropdown ${open ? 'open' : ''}` }
-            onMouseLeave={ () => setOpen( false ) }
+            onMouseLeave={ () => setOpen( false ) }  // Close menu when mouse leaves
         >
             <button
                 className="dropdown-button"
-                onMouseEnter={ () => setOpen( true ) }
-                onClick={ toggleMenu }
+                onMouseEnter={ () => setOpen( true ) }  // Open menu on hover
+                onClick={ toggleMenu }  // Toggle menu on click
             >
                 { label }
             </button>
-            <div className="dropdown-menu">
-                { items.map( ( item, index ) => (
-                    <button
-                        key={ index }
-                        className="dropdown-item"
-                        onClick={ () => handleItemClick( item.onClick ) }
-                    >
-                        { item.label }
-                    </button>
-                ) ) }
-            </div>
+            { open && (
+                <div className="dropdown-menu">
+                    { items.map( ( item, index ) => (
+                        <button
+                            key={ index }
+                            className="dropdown-item"
+                            onClick={ () => handleItemClick( item.onClick ) }
+                        >
+                            { item.label }
+                        </button>
+                    ) ) }
+                </div>
+            ) }
         </div>
     );
 };

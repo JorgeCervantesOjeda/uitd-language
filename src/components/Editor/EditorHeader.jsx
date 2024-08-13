@@ -6,7 +6,6 @@ const EditorHeader = ( {
     showErrors,
     setShowErrors,
     handleFormatCode,
-    fileInputRef,
     setLastSaved,
     setIsModified,
     setMessage,
@@ -14,11 +13,10 @@ const EditorHeader = ( {
     onChange
 } ) => {
     return (
-        <div className="editor-header">
-            <div style={ { color: 'lightgreen', width: '100px' } }>UITD Language</div>
+        <div className="renderer-header">
+            <div className="language-label">UITD Language</div>
             <div className="menu-container">
                 <FileMenu
-                    fileInputRef={ fileInputRef }
                     setLastSaved={ setLastSaved }
                     setIsModified={ setIsModified }
                     setMessage={ setMessage }
@@ -31,7 +29,10 @@ const EditorHeader = ( {
                     uitdlText={ uitdlText }
                     onChange={ onChange }
                 />
-                <button className="renderer-button" style={ { borderColor: 'red' } } onClick={ () => setShowErrors( !showErrors ) }>
+                <button
+                    className="renderer-button"
+                    onClick={ () => setShowErrors( !showErrors ) }
+                >
                     { showErrors ? 'Hide' : 'Show' } Errors
                 </button>
             </div>

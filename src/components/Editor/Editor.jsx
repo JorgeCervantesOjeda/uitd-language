@@ -20,7 +20,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ isModified, setIsModified ] = useState( false );
     const [ message, setMessage ] = useState( '' );
     const [ errors, setErrorsState ] = useState( [] );
-    const fileInputRef = useRef( null );
     const [ showErrors, setShowErrors ] = useState( false );
 
     const handleEditorChangeWrapper = ( value ) => {
@@ -55,7 +54,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         if( savedContent ) {
             onChange( savedContent );
         }
-    }, [] );
+    }, [ onChange ] );
 
     const handleEditorDidMount = ( editor, monaco ) => {
         editorRef.current = editor;
@@ -66,10 +65,10 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     return (
         <div className='renderer-container' style={ { position: 'relative' } }>
             <EditorHeader
+                className='renderer-header'
                 showErrors={ showErrors }
                 setShowErrors={ setShowErrors }
                 handleFormatCode={ handleFormatCodeWrapper }
-                fileInputRef={ fileInputRef }
                 setLastSaved={ setLastSaved }
                 setIsModified={ setIsModified }
                 setMessage={ setMessage }
@@ -94,18 +93,12 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                         hover: { enabled: false }
                     } }
                 />
-                { showErrors && (
-                    <div className="error-list-container" style={ { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 1000 } }>
-                        <ErrorList errors={ errors } />
-                    </div>
-                ) }
             </div>
-            <input
-                type="file"
-                ref={ fileInputRef }
-                style={ { display: 'none' } }
-                accept=".uitd"
-            />
+            { showErrors && (
+                <div className="error-list-container">
+                    <ErrorList errors={ errors } />
+                </div>
+            ) }
         </div>
     );
 };
