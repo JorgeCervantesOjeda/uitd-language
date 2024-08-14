@@ -4,17 +4,19 @@ import MonacoEditor from '@monaco-editor/react';
 const CodeViewer = ( { code, language } ) => {
 
     return (
-        <MonacoEditor
-            width="100%"
-            height="90vh"
-            language={ language }
-            value={ code }
-            theme="vs-dark"
-            options={ {
-                readOnly: true,
-                minimap: { enabled: true },
-            } }
-        />
+        <div style={ { position: 'relative', zIndex: 0, opacity: 0.98 } }>
+            <MonacoEditor
+                width="100%"
+                height="90vh"
+                language={ language }
+                value={ code }
+                theme="vs-dark"
+                options={ {
+                    readOnly: true,
+                    minimap: { enabled: true },
+                } }
+            />
+        </div>
     );
 };
 

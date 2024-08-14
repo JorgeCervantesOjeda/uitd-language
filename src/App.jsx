@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Editor from './components/Editor/Editor';
 import RendererD2 from './components/RendererD2';
 import { ExampleUITD } from './components/Editor/utils/ExampleUITD';
@@ -21,15 +21,15 @@ const App = () => {
   };
 
   return (
-    <div style={ { display: 'flex', width: '100vw', height: '100vh' } }>
-      <div className='space-screen'>
+    <div className='app-container'>
+      <div className='space-screen editor-container' >
         <Editor
           uitdlText={ uitdlText }
           onChange={ handleEditorChange }
           markers={ parsedData.errors }
         />
       </div>
-      <div className='space-screen'>
+      <div className='space-screen renderer-container' >
         <RendererD2 data={ parsedData } />
       </div>
     </div>

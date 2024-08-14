@@ -29,8 +29,8 @@ const FileMenu = ( { setLastSaved, setIsModified, setMessage, uitdlText, onChang
     };
 
     const fileMenuItems = [
-        { label: 'Save as...', onClick: handleSaveToFile },
         { label: 'Open...', onClick: () => fileInputRef.current.click() },
+        { label: 'Save as...', onClick: handleSaveToFile },
     ];
 
     return (

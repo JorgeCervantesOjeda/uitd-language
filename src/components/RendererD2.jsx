@@ -136,7 +136,7 @@ const RendererD2 = ( { data } ) => {
     return (
         <div className="renderer-container">
             <div className="renderer-header">
-                <div style={ { color: 'lightgreen' } }>D2 Translation</div>
+                <div style={ { color: 'lightgreen', width: 'auto', whiteSpace: 'nowrap' } }>D2 Translation</div>
                 <button onClick={ copyToClipboard } className="renderer-button">
                     Copy to Clipboard
                 </button>
@@ -144,7 +144,12 @@ const RendererD2 = ( { data } ) => {
                     SVG Renderer
                 </button>
             </div>
-            <div style={ { minHeight: '20px', color: 'yellow', backgroundColor: message ? 'darkred' : 'transparent' } }>
+            <div style={ {
+                minHeight: '20px',
+                color: 'yellow',
+                backgroundColor: message ? 'darkred' : 'black',
+                opacity: 1
+            } }>
                 { message || '\u00A0' }
             </div>
             <CodeViewer code={ d2Output } language="uitdl" />

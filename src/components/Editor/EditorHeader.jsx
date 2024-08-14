@@ -14,7 +14,7 @@ const EditorHeader = ( {
 } ) => {
     return (
         <div className="renderer-header">
-            <div className="language-label">UITD Language</div>
+            <div style={ { color: 'lightgreen', paddingRight: '10px', whiteSpace: 'nowrap' } }>UITD Language</div>
             <div className="menu-container">
                 <FileMenu
                     setLastSaved={ setLastSaved }

@@ -63,7 +63,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     };
 
     return (
-        <div className='renderer-container' style={ { position: 'relative' } }>
+        <div className='editor-container' style={ { position: 'relative' } }>
             <EditorHeader
                 className='renderer-header'
                 showErrors={ showErrors }
@@ -75,10 +75,15 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 uitdlText={ uitdlText }
                 onChange={ handleEditorChangeWrapper }
             />
-            <div style={ { minHeight: '20px', color: 'yellow', backgroundColor: message ? 'darkred' : 'transparent' } }>
+            <div style={ {
+                minHeight: '20px',
+                color: 'yellow',
+                backgroundColor: message ? 'darkred' : 'black',
+                opacity: 1
+            } }>
                 { message || '\u00A0' }
             </div>
-            <div style={ { position: 'relative', zIndex: 0 } }>
+            <div style={ { position: 'relative', zIndex: 0, opacity: 0.98 } }>
                 <MonacoEditor
                     width="100%"
                     height="90vh"

@@ -1,192 +1,192 @@
 UITD "TOP-Racing" {
     UI 0 "Navigation" actions {
-        clicks "Banner"
-        clicks "Welcome Page"
-        clicks "Standings"
-        clicks "Event Priorities"
-        clicks "Past Registrations"
-        clicks "Forum"
-        clicks "News"
-        clicks "Login"
-        clicks "Edit Profile"
-        clicks "Contact"
-        clicks "Logout"
+        clicks "Banner";
+        clicks "Welcome Page";
+        clicks "Standings";
+        clicks "Event Priorities";
+        clicks "Past Registrations";
+        clicks "Forum";
+        clicks "News";
+        clicks "Login";
+        clicks "Edit Profile";
+        clicks "Contact";
+        clicks "Logout";
     }
     UI 1 "Login" actions {
-        clicks "Login"
-        clicks "Create Account"
-        clicks "Request a password reset"
+        clicks "Login";
+        clicks "Create Account";
+        clicks "Request a password reset";
     }
     UI 2 "Contact" actions {
-        clicks "OK"
+        clicks "OK";
     }
     UI 3 "Welcome" actions {
-        clicks "What is TOP-Racing"
-        clicks "FAQ"  
-        clicks "Map" 
+        clicks "What is TOP-Racing";
+        clicks "FAQ";
+        clicks "Map";
     }
     UI 4 "Standings" actions {
-        types "in a search field"
-        selects "territorial level"
-        selects "temporal level"
+        types "in a search field";
+        selects "territorial level";
+        selects "temporal level";
     }
     UI 5 "Priorities" actions {
-        types "in a search field"
-        selects "territorial level"
-        selects "temporal level"
-        clicks "on an Event"
-        clicks "Create Event"
+        types "in a search field";
+        selects "territorial level";
+        selects "temporal level";
+        clicks "on an Event";
+        clicks "Create Event";
     }
     UI 6 "Past Registrations" actions {
-        types "in a search field"
+        types "in a search field";
     }
     UI 7 "View/Edit Event" actions {
-        clicks "Previous"
-        clicks "Next"
-        clicks "Next Status"
-        clicks "View/Edit Event registrations"
-        clicks "View Variants"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "Previous";
+        clicks "Next";
+        clicks "Next Status";
+        clicks "View/Edit Event registrations";
+        clicks "View Variants";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 8 "View/Edit Event Registrations" actions {
-        selects "Registration status"
-        clicks "Save Data"
-        clicks "Create Registration"
-        clicks "Return"
+        selects "Registration status";
+        clicks "Save Data";
+        clicks "Create Registration";
+        clicks "Return";
     }
     UI 9 "View/Edit Registration" actions {
-        clicks "View Drivers"
-        clicks "View Vehicles"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "View Drivers";
+        clicks "View Vehicles";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 10 "View Drivers" actions {
-        selects "Driver"
-        clicks "Return"
+        selects "Driver";
+        clicks "Return";
     }
     UI 11 "View Vehicles" actions {
-        selects "Vehicle"
-        clicks "Create Vehicle"
-        clicks "on a Vehicle"
+        selects "Vehicle";
+        clicks "Create Vehicle";
+        clicks "on a Vehicle";
     }
     UI 12 "Edit Vehicle" actions {
-        clicks "Save Data"
-        clicks "Return"
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 13 "Variants" actions {
-        types "in a search field"
-        clicks "Create Variant"
-        clicks "Select"
-        clicks "on a Variant"
-        clicks "Return"
+        types "in a search field";
+        clicks "Create Variant";
+        clicks "Select";
+        clicks "on a Variant";
+        clicks "Return";
     }
     UI 14 "View/Edit Variant" actions {
-        clicks "View Venues"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "View Venues";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 15 "Venues" actions {
-        types "in a search field"
-        clicks "Create Venue"
-        clicks "Select"
-        clicks "View in Map"
-        clicks "on a Venue"
-        clicks "Return"
+        types "in a search field";
+        clicks "Create Venue";
+        clicks "Select";
+        clicks "View in Map";
+        clicks "on a Venue";
+        clicks "Return";
     }
     UI 16 "View/Edit Venue" actions {
-        clicks "View Province Regions"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "View Province Regions";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 17 "Province Regions" actions {
-        types "in a search field"
-        clicks "Create Province Region"
-        clicks "Select"
-        clicks "on a Province Region"
-        clicks "Return"
+        types "in a search field";
+        clicks "Create Province Region";
+        clicks "Select";
+        clicks "on a Province Region";
+        clicks "Return";
     }
     UI 18 "View/Edit Province Region" actions {
-        clicks "View Provinces"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "View Provinces";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 19 "Provinces" actions {
-        types "in a search field"
-        clicks "Create Province"
-        clicks "Select"
-        clicks "on a Province"
-        clicks "Return"
+        types "in a search field";
+        clicks "Create Province";
+        clicks "Select";
+        clicks "on a Province";
+        clicks "Return";
     }
     UI 20 "View/Edit Province" actions {
-        clicks "View Country Regions"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "View Country Regions";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 21 "Country Regions" actions {
-        types "in a search field"
-        clicks "Create Country Region"
-        clicks "Select"
-        clicks "on a Country Region"
-        clicks "Return"
+        types "in a search field";
+        clicks "Create Country Region";
+        clicks "Select";
+        clicks "on a Country Region";
+        clicks "Return";
     }
     UI 22 "View/Edit Country Region" actions {
-        clicks "View Countries"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "View Countries";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 23 "Countries" actions {
-        types "in a search field"
-        clicks "Create Country"
-        clicks "Select"
-        clicks "on a Country"
-        clicks "Return"
+        types "in a search field";
+        clicks "Create Country";
+        clicks "Select";
+        clicks "on a Country";
+        clicks "Return";
     }
     UI 24 "View/Edit Country" actions {
-        clicks "View Planet Regions"
-        clicks "Save Data"
-        clicks "Return"
+        clicks "View Planet Regions";
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 25 "Planet Regions" actions {
-        types "in a search field"
-        clicks "Create Planet Region"
-        clicks "Select"
-        clicks "on a Planet Region"
-        clicks "Return"
+        types "in a search field";
+        clicks "Create Planet Region";
+        clicks "Select";
+        clicks "on a Planet Region";
+        clicks "Return";
     }
     UI 26 "View/Edit Planet Region" actions {
-        clicks "Save Data"
-        clicks "Return"
+        clicks "Save Data";
+        clicks "Return";
     }
     UI 27 "Edit Profile" actions {
-        clicks "View Venues"
-        clicks "Save Data"
+        clicks "View Venues";
+        clicks "Save Data";
     }
     UI 28 "Map" actions {
-        clicks "on Map"
-        clicks "Return"
+        clicks "on Map";
+        clicks "Return";
     }
     UI 29 "Forum" actions {
     }
     UI 30 "News" actions {
     }
     UI 31 "Login Failed Alert" actions {
-        clicks "OK"
+        clicks "OK";
     }
     UI 32 "Account Creation Failed Alert" actions {
-        clicks "OK"
+        clicks "OK";
     }
     UI 33 "Password Reset Success Alert" actions {
-        clicks "OK"
+        clicks "OK";
     }
     UI 34 "Next Status Alert" actions {
-        clicks "OK"
+        clicks "OK";
     }
 
     FRAGMENT "Navigation" {
-        DRAW { 0 }
-        DRAW { 1(0), 2(0), 3(0), 4(0) }
-        DRAW { 5(0), 6(0), 27(0), 29, 30 }
+        DRAW { 0 };
+        DRAW { 1(0), 2(0), 3(0), 4(0) };
+        DRAW { 5(0), 6(0), 27(0), 29, 30 };
 
         TRANSITION from 0 to 1 if user clicks "Login" AND "has no open session";
         TRANSITION from 0 to 2 if user clicks "Contact";
@@ -205,8 +205,8 @@ UITD "TOP-Racing" {
     }
 
     FRAGMENT "Login" {
-        DRAW { 31, 1, 33 }
-        DRAW { 3, 27, 32 }
+        DRAW { 31, 1, 33 };
+        DRAW { 3, 27, 32 };
 
         TRANSITION from 1 to 3 if user clicks "Login" AND "e-mail/password correct";
         TRANSITION from 1 to 31 if user clicks "Login" AND "e-mail or password incorrect";
@@ -220,7 +220,7 @@ UITD "TOP-Racing" {
     }
 
     FRAGMENT "Edit results" {
-        DRAW { 7, 8, 9, 10, 11, 12 }
+        DRAW { 7, 8, 9, 10, 11, 12 };
 
         TRANSITION from 7 to 8 if user clicks "View/Edit Event registrations" AND "is logged in";
         TRANSITION from 8 to 8 if user selects "Registration status" AND "is Event creator";
@@ -245,11 +245,11 @@ UITD "TOP-Racing" {
     }
 
     FRAGMENT "Priorities" {
-        DRAW { 1 }
-        DRAW { 5, 7, 34 }
-        DRAW { 13, 14 }
-        DRAW { 15, 16, 28 }
-        DRAW { 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 }
+        DRAW { 1 };
+        DRAW { 5, 7, 34 };
+        DRAW { 13, 14 };
+        DRAW { 15, 16, 28 };
+        DRAW { 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 };
 
         TRANSITION from 5 to 5 if user types "in a search field";
         TRANSITION from 5 to 5 if user selects "territorial level";
