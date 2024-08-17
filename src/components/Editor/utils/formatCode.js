@@ -1,7 +1,4 @@
 const formatCode = ( code ) => {
-    // Remove all '\n'
-    code = code.replace( /\n/g, '' );
-
     // Add space after comma
     code = code.replace( /,\s*/g, ', ' );
 
@@ -12,6 +9,8 @@ const formatCode = ( code ) => {
     code = code.replace( /\s*{\s*/g, '{' );
     // Remove spaces before and after }
     code = code.replace( /\s*}\s*/g, '}' );
+    // Remove spaces before and after ;
+    code = code.replace( /\s*;\s*/g, ';' );
 
     // Ensure { is followed by a newline and preceded by a space
     code = code.replace( /{([^\n])/g, '{\n$1' );

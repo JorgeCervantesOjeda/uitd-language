@@ -5,6 +5,13 @@ import DropdownMenu from './DropdownMenu.jsx';
 const FileMenu = ( { setLastSaved, setIsModified, setMessage, uitdlText, onChange } ) => {
     const fileInputRef = useRef( null );
 
+    const displayTemporaryMessage = ( message, duration = 2000 ) => {
+        setMessage( message );
+        setTimeout( () => {
+            setMessage( '' );
+        }, duration );
+    };
+
     const handleOpenFile = ( event ) => {
         const file = event.target.files[ 0 ];
         if( file && file.name.endsWith( '.uitd' ) ) {
@@ -14,18 +21,18 @@ const FileMenu = ( { setLastSaved, setIsModified, setMessage, uitdlText, onChang
             };
             reader.readAsText( file );
             setIsModified( true );
-            setMessage( '' );
+            displayTemporaryMessage( `File "${file.name}" was loaded.` );
         } else {
-            setMessage( 'Please select a valid .uitd file.' );
+            displayTemporaryMessage( 'Please select a valid .uitd file.' );
         }
     };
 
     const handleSaveToFile = () => {
         const blob = new Blob( [ uitdlText ], { type: 'text/plain;charset=utf-8' } );
-        saveAs( blob, 'uitdl_description.uitd' );
+        saveAs( blob, '_.uitd' );
         setLastSaved( Date.now() );
         setIsModified( false );
-        setMessage( '' );
+        displayTemporaryMessage( 'I will assume you really saved your file.', 10000 )
     };
 
     const fileMenuItems = [

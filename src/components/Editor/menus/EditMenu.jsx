@@ -3,12 +3,18 @@ import DropdownMenu from './DropdownMenu';
 import { ExampleUITD } from '../utils/ExampleUITD';
 
 const EditMenu = ( { handleFormatCode, setMessage, uitdlText, onChange } ) => {
+
+    const displayTemporaryMessage = ( message, duration = 2000 ) => {
+        setMessage( message );
+        setTimeout( () => {
+            setMessage( '' );
+        }, duration );
+    }
+
+
     const handleCopyToClipboard = () => {
         navigator.clipboard.writeText( uitdlText ).then( () => {
-            setMessage( 'Copied to clipboard!' );
-            setTimeout( () => {
-                setMessage( '' );
-            }, 2000 );
+            displayTemporaryMessage( 'Copied to clipboard!' );
         } ).catch( ( err ) => {
             console.error( 'Could not copy text: ', err );
         } );
@@ -17,6 +23,7 @@ const EditMenu = ( { handleFormatCode, setMessage, uitdlText, onChange } ) => {
     const handlePasteFromClipboard = () => {
         navigator.clipboard.readText().then( ( text ) => {
             onChange( text );
+            displayTemporaryMessage( 'Clipboard pasted.' );
         } ).catch( ( err ) => {
             console.error( 'Failed to read clipboard contents: ', err );
         } );

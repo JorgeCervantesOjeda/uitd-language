@@ -7,6 +7,7 @@ UITD "TOP-Racing" {
     clicks "Past Registrations";
     clicks "Forum";
     clicks "News";
+    clicks "target";
     clicks "Login";
     clicks "Edit Profile";
     clicks "Contact";

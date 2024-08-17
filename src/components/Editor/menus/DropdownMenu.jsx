@@ -3,10 +3,6 @@ import React, { useState } from 'react';
 const DropdownMenu = ( { label, items } ) => {
     const [ open, setOpen ] = useState( false );
 
-    const toggleMenu = () => {
-        setOpen( !open );
-    };
-
     const handleItemClick = ( onClick ) => {
         onClick();  // Ensure the click event is fully handled
         setOpen( false );  // Close the menu after the click event
@@ -20,7 +16,6 @@ const DropdownMenu = ( { label, items } ) => {
             <button
                 className="dropdown-button"
                 onMouseEnter={ () => setOpen( true ) }  // Open menu on hover
-                onClick={ toggleMenu }  // Toggle menu on click
             >
                 { label }
             </button>

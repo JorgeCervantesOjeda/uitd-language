@@ -7,12 +7,6 @@ import setErrors from './utils/setErrors.js';
 import { setupMonaco } from './utils/monacoSetup.js';
 import '../../App.css';
 
-const handleEditorChange = ( value, onChange, setIsModified ) => {
-    onChange( value );
-    setIsModified( true );
-    localStorage.setItem( 'uitdlContent', value );
-};
-
 const Editor = ( { uitdlText, onChange, markers } ) => {
     const editorRef = useRef( null );
     const markersRef = useRef( markers );
@@ -23,20 +17,30 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ showErrors, setShowErrors ] = useState( false );
 
     const handleEditorChangeWrapper = ( value ) => {
-        handleEditorChange( value, onChange, setIsModified );
+        onChange( value );
+        setIsModified( true );
+        localStorage.setItem( 'uitdlContent', value );
     };
 
     const handleFormatCodeWrapper = () => {
         handleFormatCode( editorRef, onChange, setIsModified );
     };
 
+    const displayTemporaryMessage = ( message, duration = 2000 ) => {
+        setMessage( message );
+        setTimeout( () => {
+            setMessage( '' );
+        }, duration );
+    };
+
     useEffect( () => {
         if( isModified ) {
             const timer = setInterval( () => {
-                if( Date.now() - lastSaved > 3 * 60 * 1000 ) {
-                    setMessage( 'Remember to save your file!' );
+                if( Date.now() - lastSaved > 60 * 1000 ) {
+                    displayTemporaryMessage( 'Remember to save your file!' );
+                    handleFormatCodeWrapper();
                 }
-            }, 10 * 1000 );
+            }, 30 * 1000 );
 
             return () => clearInterval( timer );
         }
