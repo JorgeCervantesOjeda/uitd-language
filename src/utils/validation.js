@@ -4,7 +4,7 @@ export const validateData = ( parsedData ) => {
     const markers = [];
     const uiNames = new Set();
     const fragmentNames = new Set();
-    const uiIds = new Set( parsedData.uis.map( ui => ui.id.toString() ) );
+    const uiIds = new Set();
 
     // Check for UIs with no actions and duplicate UI names
     parsedData.uis.forEach( ui => {
