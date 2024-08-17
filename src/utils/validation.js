@@ -6,6 +6,18 @@ export const validateData = ( parsedData ) => {
     const fragmentNames = new Set();
     const uiIds = new Set();
 
+    // Check if at lest 1 UI is defined
+    if( parsedData.uis.length === 0 ) {
+        markers.push( {
+            severity: 8,
+            startLineNumber: 0,
+            startColumn: 0,
+            endLineNumber: 0,
+            endColumn: 1,
+            message: `There are no UIs defined`,
+        } );
+    }
+
     // Check for UIs with no actions and duplicate UI names
     parsedData.uis.forEach( ui => {
         if( ui.actions.length === 0 ) {
