@@ -5,7 +5,7 @@ import DropdownMenu from './DropdownMenu.jsx';
 const FileMenu = ( { setLastSaved, setIsModified, setMessage, uitdlText, onChange } ) => {
     const fileInputRef = useRef( null );
 
-    const displayTemporaryMessage = ( message, duration = 2000 ) => {
+    const displayTemporaryMessage = ( message, duration = 5000 ) => {
         setMessage( message );
         setTimeout( () => {
             setMessage( '' );

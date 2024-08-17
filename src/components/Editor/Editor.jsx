@@ -26,7 +26,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         handleFormatCode( editorRef, onChange, setIsModified );
     };
 
-    const displayTemporaryMessage = ( message, duration = 2000 ) => {
+    const displayTemporaryMessage = ( message, duration = 5000 ) => {
         setMessage( message );
         setTimeout( () => {
             setMessage( '' );
@@ -38,7 +38,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             const timer = setInterval( () => {
                 if( Date.now() - lastSaved > 60 * 1000 ) {
                     displayTemporaryMessage( 'Remember to save your file!' );
-                    handleFormatCodeWrapper();
                 }
             }, 30 * 1000 );
 

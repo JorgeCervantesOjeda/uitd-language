@@ -4,7 +4,7 @@ import { ExampleUITD } from '../utils/ExampleUITD';
 
 const EditMenu = ( { handleFormatCode, setMessage, uitdlText, onChange } ) => {
 
-    const displayTemporaryMessage = ( message, duration = 2000 ) => {
+    const displayTemporaryMessage = ( message, duration = 5000 ) => {
         setMessage( message );
         setTimeout( () => {
             setMessage( '' );

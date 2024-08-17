@@ -122,7 +122,7 @@ const RendererD2 = ( { data } ) => {
             setMessage( 'Copied to clipboard!' );
             setTimeout( () => {
                 setMessage( '' );
-            }, 2000 );
+            }, 5000 );
         } ).catch( ( err ) => {
             console.error( 'Could not copy text: ', err );
         } );

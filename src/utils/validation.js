@@ -18,6 +18,18 @@ export const validateData = ( parsedData ) => {
                 message: `UI ${ui.id} has no actions defined`,
             } );
         }
+        if( uiIds.has( ui.id.toString() ) ) {
+            markers.push( {
+                severity: 8,
+                startLineNumber: ui.line,
+                startColumn: ui.column,
+                endLineNumber: ui.line,
+                endColumn: ui.column + ui.name.length,
+                message: `Duplicate UI Id: ${ui.id.toString()}`,
+            } );
+        } else {
+            uiIds.add( ui.id.toString() );
+        }
         if( uiNames.has( ui.name ) ) {
             markers.push( {
                 severity: 8,
