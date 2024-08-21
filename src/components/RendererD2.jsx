@@ -63,11 +63,19 @@ const translateToD2 = ( parsedData ) => {
             const hasMarkerOnLine = markers.some( marker => marker.startLineNumber === transition.line && marker.severity == 8 );
 
             if( !hasMarkerOnLine ) {
-                const transitionString = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}:${transition.action}\\n"${transition.target}"`;
-                d2 += `    ${transitionString}`;
+                const firstPart = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}: `;
+                let transitionString = `${transition.action} "${transition.target}"`;
                 if( transition.condition ) {
-                    d2 += ` AND\\n(${formatString( transition.condition )})`;
+                    transitionString += ` AND (${transition.condition})`;
                 }
+
+                // Use width as maxLength if present, otherwise use a default value
+                if( transition.width ) {
+                    transitionString = formatString( transitionString, transition.width );
+                } else {
+                    transitionString = formatString( transitionString );
+                }
+                d2 += `    ${firstPart + transitionString}`;
                 d2 += '\n';
             }
         } );
@@ -98,7 +106,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
         } );
         hierarchy += `${'  '.repeat( indentLevel )}}\n`;
     } else {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${ui.name}\n`;
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${formatString(ui.name)}\n`;
     }
 
     if( ref.full ) {

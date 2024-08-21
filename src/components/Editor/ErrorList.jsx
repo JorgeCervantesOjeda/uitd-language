@@ -1,17 +1,11 @@
 import React from 'react';
+import '../../App'; // Import the CSS file
 
 const Error = ( { messages, severity } ) => {
-    const borderColor = severity === 'warning' ? 'yellow' : 'red';
+    const className = `error ${severity === 'warning' ? 'error-warning' : 'error-error'}`;
+
     return (
-        <div style={ {
-            backgroundColor: 'black',
-            color: 'white',
-            border: `1px solid ${borderColor}`,
-            padding: '2px 8px',
-            borderRadius: '3px',
-            marginBottom: '5px',
-            whiteSpace: 'pre-wrap',
-        } }>
+        <div className={ className }>
             { messages.map( ( msg, index ) => (
                 <div key={ index } style={ { marginBottom: '1px' } }>
                     { msg }
@@ -23,10 +17,16 @@ const Error = ( { messages, severity } ) => {
 
 const ErrorList = ( { errors } ) => {
     return (
-        <div style={ { padding: '10px', overflowY: 'auto' } }>
-            { errors.map( ( error, index ) => (
-                <Error key={ index } messages={ error.messages } severity={ error.severity } />
-            ) ) }
+        <div className="error-list">
+            { errors.length === 0 ? (
+                <div className="no-errors">
+                    No errors to display.
+                </div>
+            ) : (
+                errors.map( ( error, index ) => (
+                    <Error key={ index } messages={ error.messages } severity={ error.severity } />
+                ) )
+            ) }
         </div>
     );
 };

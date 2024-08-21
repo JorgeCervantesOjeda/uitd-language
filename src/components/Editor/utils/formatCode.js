@@ -29,7 +29,7 @@ const formatCode = ( code ) => {
     // Split into lines and apply indentation correction
     const lines = code.split( '\n' );
     let indentLevel = 0;
-    const indentSize = 2;
+    const indentSize = 4;
     const formattedLines = lines.map( line => {
         if( line.trim() === '' ) return line; // Keep empty lines as they are
 

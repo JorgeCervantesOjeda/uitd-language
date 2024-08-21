@@ -276,6 +276,15 @@ class TokenParser {
                 this.undoGetNextToken();
             }
 
+            let width = null;
+            const nextWidthToken = this.getNextToken();
+            if( nextWidthToken.type === TokenType.KEYWORD && nextWidthToken.value === 'width' ) {
+                const widthToken = this.expectToken( TokenType.NUMBER );
+                width = parseInt( widthToken.value, 10 );
+            } else {
+                this.undoGetNextToken();
+            }
+
             this.expectToken( TokenType.PUNCTUATION, ';' );
 
             transitions.push( {
@@ -284,6 +293,7 @@ class TokenParser {
                 action,
                 target,
                 condition,
+                width,  // Add width to the transition object
                 line: startToken.line,
                 column: startToken.column
             } );

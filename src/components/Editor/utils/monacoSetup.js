@@ -8,7 +8,7 @@ export const setupMonaco = ( monacoInstance ) => {
         tokenizer: {
             root: [
                 [ new RegExp( validVerbs.join( '|' ) ), 'keyword' ],
-                [ /\b(UITD|UI|actions|FRAGMENT|DRAW|TRANSITION|from|to|if|user|AND)\b/, 'keyword' ],
+                [ /\b(UITD|UI|actions|FRAGMENT|DRAW|TRANSITION|from|to|if|user|AND|width)\b/, 'keyword' ],
                 [ /[{}]/, '@brackets' ],
                 [ /\d+/, 'number' ],
                 [ /"[^"]*"/, 'string' ],
@@ -23,9 +23,9 @@ export const setupMonaco = ( monacoInstance ) => {
                 {
                     label: 'UITD',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'UITD "${1:title}" {\n\t${2}\n}',
+                    insertText: 'UITD "${1:title}" {\n\tUI 1 "${2:name}" actions {\n\t\t${3:verb}\n\t}\n\tFRAGMENT "${4:description}" {\n\t\tDRAW { 1 };\n\t\tTRANSITION from 1 to ${5:id} if user ${6:verb}\n\t}\n}',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    documentation: 'Define the UITD structure with a title',
+                    documentation: 'Define the UITD structure with a title, a UI and a fragment',
                 },
                 {
                     label: 'UI',
@@ -37,7 +37,7 @@ export const setupMonaco = ( monacoInstance ) => {
                 {
                     label: 'FRAGMENT',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'FRAGMENT "${1:name}" {\n\tDRAW {${2:id}};\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb}\n}',
+                    insertText: 'FRAGMENT "${1:description}" {\n\tDRAW {${2:id}};\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb}\n}',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define a fragment with draw and transitions',
                 },
@@ -47,6 +47,13 @@ export const setupMonaco = ( monacoInstance ) => {
                     insertText: 'DRAW {${1:id}};',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define draw statements with UI IDs',
+                },
+                {
+                    label: 'width',
+                    kind: monacoInstance.languages.CompletionItemKind.Snippet,
+                    insertText: 'width ${1:id}',
+                    insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    documentation: 'Define width option',
                 },
                 {
                     label: 'TRANSITION',
