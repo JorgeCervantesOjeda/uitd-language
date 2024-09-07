@@ -1,7 +1,7 @@
 import { Token, TokenType, Tokens } from './tokens';
 
 const tokenSpec = [
-    [ TokenType.KEYWORD, /\b(UITD|UI|FRAGMENT|DRAW|TRANSITION|actions|from|to|if|user|AND|clicks|submits|selects|types|toggles|uploads|downloads|saves|deletes|waits for|width)\b/ ],
+    [ TokenType.KEYWORD, /\b(UITD|UI|FRAGMENT|DRAW|TRANSITION|actions|from|to|if|user|AND|clicks|submits|selects|types|toggles|uploads|downloads|saves|deletes|waits|width)\b/ ],
     [ TokenType.NUMBER, /\d+/ ],
     [ TokenType.QUOTE, /"/ ], // Quotation marks
     [ TokenType.PUNCTUATION, /[{}(),;]/ ],

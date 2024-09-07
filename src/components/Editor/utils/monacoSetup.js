@@ -58,7 +58,7 @@ export const setupMonaco = ( monacoInstance ) => {
                 {
                     label: 'TRANSITION',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'TRANSITION from ${1:id} to ${2:id} if user ${3:verb};',
+                    insertText: 'TRANSITION from ${1:id} to ${2:id} if user ${3:verb}',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define a transition between UIs with conditions',
                 },

@@ -6,7 +6,7 @@ export const validateData = ( parsedData ) => {
     const fragmentNames = new Set();
     const uiIds = new Set();
 
-    // Check if at lest 1 UI is defined
+    // Check if at least 1 UI is defined
     if( parsedData.uis.length === 0 ) {
         markers.push( {
             severity: 8,
@@ -14,7 +14,7 @@ export const validateData = ( parsedData ) => {
             startColumn: 0,
             endLineNumber: 0,
             endColumn: 1,
-            message: `There are no UIs defined`,
+            message: `There are no UIs defined.`,
         } );
     }
 
@@ -27,7 +27,7 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + ui.name.length,
-                message: `UI ${ui.id} has no actions defined`,
+                message: `UI ${ui.id} has no actions defined.`,
             } );
         }
         if( uiIds.has( ui.id.toString() ) ) {
@@ -37,7 +37,7 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + ui.name.length,
-                message: `Duplicate UI Id: ${ui.id.toString()}`,
+                message: `Duplicate UI Id: ${ui.id.toString()}.`,
             } );
         } else {
             uiIds.add( ui.id.toString() );
@@ -49,7 +49,7 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + ui.name.length,
-                message: `Duplicate UI name: ${ui.name}`,
+                message: `Duplicate UI name: ${ui.name}.`,
             } );
         } else {
             uiNames.add( ui.name );
@@ -65,16 +65,17 @@ export const validateData = ( parsedData ) => {
                 startColumn: fragment.column,
                 endLineNumber: fragment.line,
                 endColumn: fragment.column + fragment.name.length,
-                message: `Duplicate fragment name: ${fragment.name}`,
+                message: `Duplicate fragment name: ${fragment.name}.`,
             } );
         } else {
             fragmentNames.add( fragment.name );
         }
     } );
 
-    // Check if there are undrawn UIs referenced in transitions
+    // Check for undrawn UIs referenced in transitions and duplicate transitions
     parsedData.fragments.forEach( fragment => {
         const drawnUIs = new Set();
+        const uniqueTransitions = new Set(); // Track unique transitions
 
         const collectDrawnUIs = ( ref ) => {
             drawnUIs.add( ref.id.toString() );
@@ -88,9 +89,29 @@ export const validateData = ( parsedData ) => {
         } );
 
         fragment.transitions.forEach( transition => {
-            const checkUI = ( uiRef ) => {
-                const innermostId = getInnermostUIRef( uiRef );
-                if( !drawnUIs.has( innermostId ) ) {
+            // Use fromUI, toUI, and actionKey as requested
+            const fromUI = getInnermostUIRef( transition.from );
+            const toUI = getInnermostUIRef( transition.to );
+            const actionKey = `${fromUI}:${transition.action}:${transition.target}:${transition.condition || ''}`;
+
+            // Check for duplicate transitions (same 'from' UI, action, and condition)
+            if( uniqueTransitions.has( actionKey ) ) {
+                markers.push( {
+                    severity: 8,
+                    startLineNumber: transition.line,
+                    startColumn: transition.column,
+                    endLineNumber: transition.line,
+                    endColumn: transition.column + 20,
+                    message: `Duplicate transition found from ${fromUI}, action ${transition.action} "${transition.target}"` +
+                        ( transition.condition ? ` AND "${transition.condition}"` : '' ) + '.',
+                } );
+            } else {
+                uniqueTransitions.add( actionKey );
+            }
+
+            // Check if 'from' and 'to' UIs are drawn in the fragment
+            const checkUI = ( uiRef, uiId ) => {
+                if( !drawnUIs.has( uiId ) ) {
                     const uiRefString = formatUIRef( uiRef );
                     markers.push( {
                         severity: 8,
@@ -98,14 +119,16 @@ export const validateData = ( parsedData ) => {
                         startColumn: transition.column + 16,
                         endLineNumber: transition.line,
                         endColumn: transition.column + 16 + uiRefString.length + 4 + 2,
-                        message: `Undrawn UI referenced in transition: ${uiRefString}`,
+                        message: `Undrawn UI ${uiRefString} referenced in transition.`,
                     } );
                 }
             };
+            checkUI( transition.from, fromUI );
+            checkUI( transition.to, toUI );
 
             // Check if the 'from' and 'to' UIs exist
-            const fromUIExists = uiIds.has( getInnermostUIRef( transition.from ) );
-            const toUIExists = uiIds.has( getInnermostUIRef( transition.to ) );
+            const fromUIExists = uiIds.has( fromUI );
+            const toUIExists = uiIds.has( toUI );
 
             if( !fromUIExists ) {
                 const uiRefString = formatUIRef( transition.from );
@@ -115,7 +138,7 @@ export const validateData = ( parsedData ) => {
                     startColumn: transition.column,
                     endLineNumber: transition.line,
                     endColumn: transition.column + 16 + uiRefString.length,
-                    message: `Referenced 'from' UI does not exist: ${uiRefString}`,
+                    message: `Referenced 'from' UI ${uiRefString} does not exist.`,
                 } );
             }
 
@@ -127,15 +150,12 @@ export const validateData = ( parsedData ) => {
                     startColumn: transition.column,
                     endLineNumber: transition.line,
                     endColumn: transition.column + 16 + uiRefString.length,
-                    message: `Referenced 'to' UI does not exist: ${uiRefString}`,
+                    message: `Referenced 'to' UI ${uiRefString} does not exist.`,
                 } );
             }
 
-            checkUI( transition.from );
-            checkUI( transition.to );
-
             // Validate that transition actions are defined in the origin UI
-            const originUI = parsedData.uis.find( ui => ui.id.toString() === getInnermostUIRef( transition.from ) );
+            const originUI = parsedData.uis.find( ui => ui.id.toString() === fromUI );
             if( !originUI || !originUI.actions.some( action => action.verb === transition.action && action.target === transition.target ) ) {
                 const uiRefString = formatUIRef( transition.from );
                 markers.push( {
@@ -144,7 +164,7 @@ export const validateData = ( parsedData ) => {
                     startColumn: transition.column + 16,
                     endLineNumber: transition.line,
                     endColumn: transition.column + 16 + uiRefString.length,
-                    message: `Action "${transition.action} ${transition.target}" in transition is not defined in UI ${uiRefString}`,
+                    message: `Action ${transition.action} "${transition.target}" in transition is not defined in UI ${uiRefString}.`,
                 } );
             }
         } );
@@ -162,7 +182,7 @@ export const validateData = ( parsedData ) => {
                             startColumn: draw.column,
                             endLineNumber: draw.line,
                             endColumn: draw.column + 4,
-                            message: `Referenced UI in DRAW does not exist: ${uiRefString}`,
+                            message: `Referenced UI ${uiRefString} in DRAW does not exist.`,
                         } );
                     }
                     ref.nested.forEach( nestedRef => checkUIExists( nestedRef ) );
@@ -188,7 +208,7 @@ export const validateData = ( parsedData ) => {
                     startColumn: action.column,
                     endLineNumber: action.line,
                     endColumn: action.column + 1 + action.verb.length + 1 + action.target.length + 1,
-                    message: `Unused action: ${action.verb} "${action.target}" in UI ${ui.id}`,
+                    message: `Unused action: ${action.verb} "${action.target}" in UI ${ui.id}.`,
                 } );
             }
         } );
@@ -217,7 +237,7 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + ui.name.length,
-                message: `UI ${ui.id} is not drawn in any fragment`,
+                message: `UI ${ui.id} is not drawn in any fragment.`,
             } );
         }
     } );
@@ -238,7 +258,7 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + 3 + ui.id.toString().length,
-                message: `UI ${ui.id} is not used as 'from' UI in any transition`,
+                message: `UI ${ui.id} is not used as 'from' UI in any transition.`,
             } );
         }
     } );

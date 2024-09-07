@@ -6,7 +6,7 @@ import { validateData } from './validation';
 
 export const validVerbs = [
     'clicks', 'submits', 'selects', 'types', 'toggles',
-    'uploads', 'downloads', 'saves', 'deletes', 'waits for'
+    'uploads', 'downloads', 'saves', 'deletes', 'waits'
 ];
 
 class TokenParser {
