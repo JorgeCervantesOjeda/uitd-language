@@ -40,21 +40,33 @@ const formatString = ( name, maxLength = 20 ) => {
 };
 
 // Function to translate parsed UITD to D2 language
+// Function to translate parsed UITD to D2 language
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 
     const markers = parsedData.errors;
 
-    let d2 = `direction: right\n"${parsedData.name}": {\n`;
+    // Initialize D2 output with the requested beginning
+    let d2 = `direction: right\nUITD.style.fill: white\nUITD.style.stroke-width: 0\nUITD: ${parsedData.name} {\n`;
 
-    // Build UI hierarchy
+    // Create a counter for assigning consecutive alphabet letters to fragments (A, B, C, etc.)
+    let fragmentCounter = 65; // ASCII value of 'A'
+
+    // Build UI hierarchy for each fragment
     parsedData.fragments.forEach( ( fragment ) => {
-        const formattedName = formatString( fragment.name );
-        d2 += `  "${formattedName}": {\n`;
+        const fragmentLetter = String.fromCharCode( fragmentCounter ); // Get the alphabet letter
+        fragmentCounter += 1; // Move to the next letter
+
+        const formattedFragmentName = formatString( fragment.name );
+
+        // Add fragment with styles
+        d2 += `  ${fragmentLetter}.style.fill: white\n`;
+        d2 += `  ${fragmentLetter}.style.stroke-dash: 1\n`;
+        d2 += `  ${fragmentLetter}: ${formattedFragmentName} {\n`;
 
         fragment.draws.forEach( ( draw ) => {
             draw.uiRefs.forEach( ( ref ) => {
-                d2 += buildUIHierarchy( ref, 2, parsedData.uis, '' );
+                d2 += buildUIHierarchy( ref, 2, parsedData.uis, '' ); // Increase indent level
             } );
         } );
 
@@ -75,22 +87,21 @@ const translateToD2 = ( parsedData ) => {
                 } else {
                     transitionString = formatString( transitionString );
                 }
-                d2 += `    ${firstPart + transitionString}`;
-                d2 += '\n';
+                d2 += `    ${firstPart + transitionString}\n`;
             }
         } );
 
-        d2 += '  }\n';
+        d2 += '  }\n'; // Close fragment
     } );
 
-    d2 += '}\n';
+    d2 += '}\n'; // Close UITD
 
     return d2;
 };
 
 // Helper function to build the UI hierarchy
 const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
-    const ui = uis.find( ui => ui.id === parseInt( ref.id ) );
+    const ui = uis.find( ( ui ) => ui.id === parseInt( ref.id ) );
     if( !ui ) {
         console.error( `UI with id ${ref.id} not found in the parsed data.` );
         return '';
@@ -99,6 +110,14 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
     let hierarchy = '';
     const formattedName = formatString( ui.name );
 
+    // Check if the UI has a stroke-width of 6, otherwise use stroke-dash
+    if( ref.full ) {
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}.style.stroke-width: 6\n`;
+    } else {
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}.style.stroke-dash: 5\n`;
+    }
+
+    // Add the UI element with its ID and name
     if( ref.nested.length > 0 ) {
         hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${formattedName} {\n`;
         ref.nested.forEach( ( nestedRef ) => {
@@ -106,11 +125,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
         } );
         hierarchy += `${'  '.repeat( indentLevel )}}\n`;
     } else {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${formatString(ui.name)}\n`;
-    }
-
-    if( ref.full ) {
-        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}.style.stroke-width: 6\n`;
+        hierarchy += `${'  '.repeat( indentLevel )}${ref.id}: ${ref.id} ${formattedName}\n`;
     }
 
     return hierarchy;

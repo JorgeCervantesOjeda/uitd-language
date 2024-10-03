@@ -26,7 +26,11 @@ class TokenParser {
     }
 
     getNextToken() {
-        this.currentToken = this.tokens.getNext();
+        let token;
+        do {
+            token = this.tokens.getNext();
+        } while( token && token.type === TokenType.COMMENT ); // Skip COMMENT tokens
+        this.currentToken = token;
         return this.currentToken;
     }
 
