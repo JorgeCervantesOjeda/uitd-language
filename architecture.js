@@ -11,6 +11,9 @@ const SRC_DIR = path.resolve( "./src" );
 // Inicializar la variable para contar las líneas totales
 let totalLines = 0;
 
+// Mapa para almacenar el conteo de líneas por archivo
+const lineCountMap = {};
+
 // Función para normalizar rutas de archivos de manera consistente
 function normalizePath( filePath ) {
     return path.relative( SRC_DIR, filePath ).replace( /\\/g, "/" );
@@ -22,9 +25,11 @@ function normalizeNodeName( input ) {
 }
 
 // Función para calcular el grosor del borde basado en el número de líneas
-function getStrokeWidth( lineCount ) {
+function getStrokeWidth( lineCount, minLines, maxLines ) {
     if( lineCount === null ) return 1; // Valor por defecto si no se puede contar las líneas
-    return 1 + Math.floor( lineCount / 30 );
+    if( minLines === maxLines ) return 1; // Evitar división por cero
+    // Mapear lineCount de minLines-maxLines a 1-15
+    return 1 + Math.round( ( ( lineCount - minLines ) * ( 15 - 1 ) ) / ( maxLines - minLines ) );
 }
 
 // Función para contar líneas en un archivo
@@ -35,10 +40,12 @@ function getLineCount( filePath ) {
         const content = fs.readFileSync( absolutePath, "utf-8" );
         const lines = content.split( "\n" ).length;
         totalLines += lines; // Acumular el número de líneas
+        lineCountMap[ filePath ] = lines; // Almacenar el conteo en el mapa
         console.log( `File: ${filePath}, Lines: ${lines}` );
         return lines;
     } catch( error ) {
         console.warn( `Failed to read file: ${absolutePath}` );
+        lineCountMap[ filePath ] = null; // Marcar como no disponible
         return null;
     }
 }
@@ -48,7 +55,6 @@ function memoize( fn ) {
     const cache = {};
     return function ( filePath ) {
         if( cache[ filePath ] !== undefined ) {
-            //console.log(`Usando el caché para: ${filePath}`);
             return cache[ filePath ];
         } else {
             const result = fn( filePath );
@@ -182,13 +188,27 @@ function generateD2Diagram( files, dependencies, outputFile ) {
 
     const fileToNodeMap = {};
 
+    // Obtener todos los line counts para encontrar min y max
+    const validLineCounts = files.map( file => lineCountMap[ file ] ).filter( count => count !== null );
+
+    if( validLineCounts.length === 0 ) {
+        console.error( "No valid line counts found. Aborting diagram generation." );
+        return;
+    }
+
+    const minLines = Math.min( ...validLineCounts );
+    const maxLines = Math.max( ...validLineCounts );
+
+    console.log( `Minimum lines in a file: ${minLines}` );
+    console.log( `Maximum lines in a file: ${maxLines}` );
+
     // Crear nodos con estilos basados en el número de líneas
     files.forEach( ( file ) => {
         const nodeName = normalizeNodeName( file );
         fileToNodeMap[ file ] = nodeName;
-        const lineCount = getLineCountMemoized( file ); // Llamada memoizada
+        const lineCount = lineCountMap[ file ]; // Ya está almacenado en lineCountMap
         const nodeLabel = formatNodeLabel( file );
-        const strokeWidth = getStrokeWidth( lineCount );
+        const strokeWidth = getStrokeWidth( lineCount, minLines, maxLines );
         d2Lines.push(
             `${nodeName}: "${nodeLabel}" { style: { stroke-width: ${strokeWidth} } }`
         );
