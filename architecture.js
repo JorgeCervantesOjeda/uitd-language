@@ -8,37 +8,68 @@ const traverse = require( "@babel/traverse" ).default;
 
 const SRC_DIR = path.resolve( "./src" );
 
-// Function to normalize file paths consistently
+// Inicializar la variable para contar las líneas totales
+let totalLines = 0;
+
+// Función para normalizar rutas de archivos de manera consistente
 function normalizePath( filePath ) {
     return path.relative( SRC_DIR, filePath ).replace( /\\/g, "/" );
 }
 
-// Function to generate unique node names
+// Función para generar nombres únicos para los nodos
 function normalizeNodeName( input ) {
     return input.replace( /[^a-zA-Z0-9_]/g, "_" ).toLowerCase();
 }
 
-// Function to count lines in a file
+// Función para calcular el grosor del borde basado en el número de líneas
+function getStrokeWidth( lineCount ) {
+    if( lineCount === null ) return 1; // Valor por defecto si no se puede contar las líneas
+    return 1 + Math.floor( lineCount / 30 );
+}
+
+// Función para contar líneas en un archivo
 function getLineCount( filePath ) {
-    filePath = SRC_DIR + '\\' + filePath;
+    // Construir la ruta absoluta correctamente
+    const absolutePath = path.join( SRC_DIR, filePath );
     try {
-        const content = fs.readFileSync( filePath, "utf-8" );
-        return content.split( "\n" ).length;
+        const content = fs.readFileSync( absolutePath, "utf-8" );
+        const lines = content.split( "\n" ).length;
+        totalLines += lines; // Acumular el número de líneas
+        console.log( `File: ${filePath}, Lines: ${lines}` );
+        return lines;
     } catch( error ) {
-        console.warn( `Failed to read file: ${filePath}` );
+        console.warn( `Failed to read file: ${absolutePath}` );
         return null;
     }
 }
 
-// Function to format node labels
+// Función memoizada para contar líneas
+function memoize( fn ) {
+    const cache = {};
+    return function ( filePath ) {
+        if( cache[ filePath ] !== undefined ) {
+            //console.log(`Usando el caché para: ${filePath}`);
+            return cache[ filePath ];
+        } else {
+            const result = fn( filePath );
+            cache[ filePath ] = result;
+            return result;
+        }
+    };
+}
+
+// Crear una versión memoizada de getLineCount
+const getLineCountMemoized = memoize( getLineCount );
+
+// Función para formatear etiquetas de nodos
 function formatNodeLabel( filePath ) {
     const normalizedPath = normalizePath( filePath );
-    const lineCount = getLineCount( filePath );
+    const lineCount = getLineCountMemoized( filePath ); // Usar la versión memoizada
     const lineCountLabel = lineCount !== null ? `\\n(${lineCount} lines)` : "";
     return `${normalizedPath.replace( /\//g, "/\\n" )}${lineCountLabel}`;
 }
 
-// Function to resolve file extensions
+// Función para resolver extensiones de archivos
 function resolveFileExtension( filePath ) {
     const extensions = [ ".js", ".jsx", ".ts", ".tsx", ".css", ".json", ".svg" ];
     for( const ext of extensions ) {
@@ -56,11 +87,14 @@ function resolveFileExtension( filePath ) {
     return null;
 }
 
-// Function to parse files and extract dependencies
+// Función para analizar archivos y extraer dependencias
 function parseFile( filePath ) {
     const code = fs.readFileSync( filePath, "utf-8" );
     const normalizedFilePath = normalizePath( filePath );
     const fileDependencies = [];
+
+    // Obtener el conteo de líneas una sola vez
+    getLineCountMemoized( normalizedFilePath );
 
     if( filePath.endsWith( ".css" ) ) {
         return [ { source: normalizedFilePath, imports: [] } ];
@@ -75,18 +109,26 @@ function parseFile( filePath ) {
         traverse( ast, {
             ImportDeclaration( importPath ) {
                 const source = importPath.node.source.value;
-                const imports = importPath.node.specifiers.map( ( specifier ) => specifier.local.name );
+                const imports = importPath.node.specifiers.map(
+                    ( specifier ) => specifier.local.name
+                );
 
                 if( source.startsWith( "." ) ) {
-                    const importedFile = path.resolve( path.dirname( filePath ), source );
+                    const importedFile = path.resolve(
+                        path.dirname( filePath ),
+                        source
+                    );
                     const resolvedFile = resolveFileExtension( importedFile );
                     if( resolvedFile ) {
+                        const normalizedResolvedFile = normalizePath( resolvedFile );
                         fileDependencies.push( {
-                            source: normalizePath( resolvedFile ),
+                            source: normalizedResolvedFile,
                             imports,
                         } );
                     } else {
-                        console.warn( `Unresolved relative import: ${source} in ${filePath}` );
+                        console.warn(
+                            `Unresolved relative import: ${source} in ${filePath}`
+                        );
                     }
                 } else {
                     fileDependencies.push( { source, imports } );
@@ -101,7 +143,7 @@ function parseFile( filePath ) {
     return fileDependencies;
 }
 
-// Function to walk through the directory and extract dependencies
+// Función para recorrer el directorio y extraer dependencias
 function extractFileDependencies( directory ) {
     const files = new Set();
     const dependencies = [];
@@ -111,7 +153,13 @@ function extractFileDependencies( directory ) {
             const fullPath = path.join( dir, file );
             if( fs.statSync( fullPath ).isDirectory() ) {
                 walkDirectory( fullPath );
-            } else if( fullPath.endsWith( ".jsx" ) || fullPath.endsWith( ".js" ) || fullPath.endsWith( ".tsx" ) || fullPath.endsWith( ".ts" ) || fullPath.endsWith( ".css" ) ) {
+            } else if(
+                fullPath.endsWith( ".jsx" ) ||
+                fullPath.endsWith( ".js" ) ||
+                fullPath.endsWith( ".tsx" ) ||
+                fullPath.endsWith( ".ts" ) ||
+                fullPath.endsWith( ".css" )
+            ) {
                 const normalizedFilePath = normalizePath( fullPath );
                 if( !files.has( normalizedFilePath ) ) {
                     files.add( normalizedFilePath );
@@ -128,16 +176,22 @@ function extractFileDependencies( directory ) {
     return { files: Array.from( files ), dependencies };
 }
 
-// Function to generate the D2 diagram
+// Función para generar el diagrama D2
 function generateD2Diagram( files, dependencies, outputFile ) {
-    const d2Lines = [ "// React App Architecture", "direction: down" ];
+    const d2Lines = [ "direction: down" ]; // Eliminamos la línea de comentario inicial
 
     const fileToNodeMap = {};
+
+    // Crear nodos con estilos basados en el número de líneas
     files.forEach( ( file ) => {
         const nodeName = normalizeNodeName( file );
         fileToNodeMap[ file ] = nodeName;
+        const lineCount = getLineCountMemoized( file ); // Llamada memoizada
         const nodeLabel = formatNodeLabel( file );
-        d2Lines.push( `${nodeName}: "${nodeLabel}"` );
+        const strokeWidth = getStrokeWidth( lineCount );
+        d2Lines.push(
+            `${nodeName}: "${nodeLabel}" { style: { stroke-width: ${strokeWidth} } }`
+        );
     } );
 
     const externalNodes = new Set();
@@ -146,7 +200,9 @@ function generateD2Diagram( files, dependencies, outputFile ) {
             const nodeName = normalizeNodeName( source );
             if( !externalNodes.has( nodeName ) ) {
                 externalNodes.add( nodeName );
-                d2Lines.push( `${nodeName}: "${source}"` );
+                d2Lines.push(
+                    `${nodeName}: "${source}" { style: { stroke-width: 1 } }`
+                ); // Valor por defecto para nodos externos
             }
         }
     } );
@@ -158,6 +214,8 @@ function generateD2Diagram( files, dependencies, outputFile ) {
         if( fromNode && toNode && fromNode !== toNode ) {
             const label = imports.length > 0 ? `: "${imports.join( ",\\n" )}"` : "";
             d2Lines.push( `${fromNode} -> ${toNode}${label}` );
+        } else {
+            console.warn( `Dependencia no encontrada entre ${from} y ${source}` );
         }
     } );
 
@@ -165,7 +223,7 @@ function generateD2Diagram( files, dependencies, outputFile ) {
     console.log( `D2 diagram saved to ${outputFile}` );
 }
 
-// Main execution
+// Ejecución principal
 const sourceDir = SRC_DIR;
 const outputFile = "react_app_architecture.d2";
 
@@ -176,3 +234,6 @@ if( !fs.existsSync( sourceDir ) ) {
 
 const { files, dependencies } = extractFileDependencies( sourceDir );
 generateD2Diagram( files, dependencies, outputFile );
+
+// Reportar el total de líneas
+console.log( `Total number of lines: ${totalLines}` );
