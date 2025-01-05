@@ -1,4 +1,3 @@
-import { parseUITDL } from './TokenParser';
 
 // Utility function to get the innermost UI string from a UI reference string
 export const getInnermostUIStr = ( uiRefStr ) => {

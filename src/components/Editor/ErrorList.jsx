@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../App'; // Import the CSS file
+import '../../App.css'; // Import the CSS file
 
 const Error = ( { messages, severity } ) => {
     const className = `error ${severity === 'warning' ? 'error-warning' : 'error-error'}`;

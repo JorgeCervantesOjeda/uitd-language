@@ -1,4 +1,3 @@
-import * as monaco from 'monaco-editor';
 import { validVerbs } from '../../../utils/TokenParser';
 
 export const setupMonaco = ( monacoInstance ) => {
