@@ -18,7 +18,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         ( async () => {
             try {
                 const { diagram, renderOptions } =
-                    await d2.current.compile( d2Source , { layout: 'elk' }  );
+                    await d2.current.compile( d2Source, { layout: 'elk' } );
                 const svgText = await d2.current.render( diagram, renderOptions );
                 setSvg( svgText );
             } catch( e ) {
@@ -54,7 +54,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                 <header>
                     {/* Maximizar / Restaurar */ }
                     <button onClick={ () => setFull( f => !f ) } disabled={ loading }>
-                        { full ? 'Restaurar' : 'Maximizar' }
+                        { full ? 'Restore' : 'Maximize' }
                     </button>
                     {/* Descargar SVG */ }
                     <button onClick={ onDownloadSVG } disabled={ !svg }>
@@ -66,13 +66,13 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                     </button>
                     {/* Cerrar en esquina */ }
                     <button className="close-btn" onClick={ onClose }>
-                        ×
+                        X
                     </button>
                 </header>
 
                 <div className="content">
                     { loading
-                        ? <p>Cargando diagrama…</p>
+                        ? <p>Loading diagram...</p>
                         : <div dangerouslySetInnerHTML={ { __html: svg } } />
                     }
                 </div>

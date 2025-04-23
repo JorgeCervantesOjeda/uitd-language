@@ -169,12 +169,6 @@ const RendererD2 = ( { data } ) => {
                     >
                         View Diagram
                     </button>
-                    <button onClick={ copyToClipboard } className="renderer-button">
-                        Copy to Clipboard
-                    </button>
-                    <button onClick={ openInPlayground } className="renderer-button">
-                        D2 playground
-                    </button>
                 </div>
                 <div className="alert-message"
                     style={ {
