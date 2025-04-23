@@ -1,0 +1,104 @@
+direction: down
+app_css: "app_css\n(226 lines)" { style: { stroke-width: 9 }
+ shape: "rectangle" }
+app_jsx: "app_jsx\n(40 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+components_codeviewer_jsx: "components_codeviewer_jsx\n(24 lines)" { style: { stroke-width: 1 }
+ shape: "rectangle" }
+components_editor_editor_jsx: "components_editor_editor_jsx\n(115 lines)" { style: { stroke-width: 5 }
+ shape: "rectangle" }
+components_editor_editorheader_jsx: "components_editor_editorheader_jsx\n(44 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+components_editor_errorlist_jsx: "components_editor_errorlist_jsx\n(35 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+components_editor_menus_dropdownmenu_jsx: "components_editor_menus_dropdownmenu_jsx\n(40 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+components_editor_menus_editmenu_jsx: "components_editor_menus_editmenu_jsx\n(47 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+components_editor_menus_filemenu_jsx: "components_editor_menus_filemenu_jsx\n(58 lines)" { style: { stroke-width: 3 }
+ shape: "rectangle" }
+components_editor_utils_exampleuitd_js: "components_editor_utils_exampleuitd_js\n(45 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+components_editor_utils_formatcode_js: "components_editor_utils_formatcode_js\n(68 lines)" { style: { stroke-width: 3 }
+ shape: "rectangle" }
+components_editor_utils_monacosetup_js: "components_editor_utils_monacosetup_js\n(91 lines)" { style: { stroke-width: 4 }
+ shape: "rectangle" }
+components_editor_utils_seterrors_js: "components_editor_utils_seterrors_js\n(24 lines)" { style: { stroke-width: 1 }
+ shape: "rectangle" }
+components_rendererd2_jsx: "components_rendererd2_jsx\n(184 lines)" { style: { stroke-width: 7 }
+ shape: "rectangle" }
+index_css: "index_css\n(75 lines)" { style: { stroke-width: 3 }
+ shape: "rectangle" }
+main_jsx: "main_jsx\n(11 lines)" { style: { stroke-width: 1 }
+ shape: "rectangle" }
+utils_lexer_js: "utils_lexer_js\n(100 lines)" { style: { stroke-width: 4 }
+ shape: "rectangle" }
+utils_tokenparser_js: "utils_tokenparser_js\n(392 lines)" { style: { stroke-width: 15 }
+ shape: "rectangle" }
+utils_tokens_js: "utils_tokens_js\n(48 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+utils_utils_js: "utils_utils_js\n(34 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+utils_validation_js: "utils_validation_js\n(268 lines)" { style: { stroke-width: 10 }
+ shape: "rectangle" }
+react: "react" { style: { stroke-width: 1 }
+ shape: "hexagon" }
+monaco-editor_react: "@monaco-editor_react" { style: { stroke-width: 1 }
+ shape: "oval" }
+file-saver: "file-saver" { style: { stroke-width: 1 }
+ shape: "oval" }
+react-dom_client: "react-dom_client" { style: { stroke-width: 1 }
+ shape: "oval" }
+app_jsx -> react:  "React,\nuseState,\nuseEffect" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+app_jsx -> components_editor_editor_jsx:  "Editor" { style: { stroke: "#808080" } }
+app_jsx -> components_rendererd2_jsx:  "RendererD2" { style: { stroke: "#808080" } }
+app_jsx -> components_editor_utils_exampleuitd_js:  "ExampleUITD" { style: { stroke: "#808080" } }
+app_jsx -> utils_tokenparser_js:  "parseUITDL" { style: { stroke: "#808080" } }
+app_jsx -> app_css: { style: { stroke: "#808080" } }
+components_codeviewer_jsx -> react:  "React" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_codeviewer_jsx -> monaco-editor_react:  "MonacoEditor" { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> react:  "React,\nuseRef,\nuseState,\nuseEffect" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_editor_jsx -> monaco-editor_react:  "MonacoEditor" { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> components_editor_errorlist_jsx:  "ErrorList" { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> components_editor_editorheader_jsx:  "EditorHeader" { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> components_editor_utils_formatcode_js:  "handleFormatCode" { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> components_editor_utils_seterrors_js:  "setErrors" { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> components_editor_utils_monacosetup_js:  "setupMonaco" { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> app_css: { style: { stroke: "#808080" } }
+components_editor_editorheader_jsx -> react:  "React" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_editorheader_jsx -> components_editor_menus_filemenu_jsx:  "FileMenu" { style: { stroke: "#808080" } }
+components_editor_editorheader_jsx -> components_editor_menus_editmenu_jsx:  "EditMenu" { style: { stroke: "#808080" } }
+components_editor_errorlist_jsx -> react:  "React" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_errorlist_jsx -> app_css: { style: { stroke: "#808080" } }
+components_editor_menus_dropdownmenu_jsx -> react:  "React,\nuseState" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_menus_editmenu_jsx -> react:  "React" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_menus_editmenu_jsx -> components_editor_menus_dropdownmenu_jsx:  "DropdownMenu" { style: { stroke: "#808080" } }
+components_editor_menus_editmenu_jsx -> components_editor_utils_exampleuitd_js:  "ExampleUITD" { style: { stroke: "#808080" } }
+components_editor_menus_filemenu_jsx -> react:  "React,\nuseRef" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_menus_filemenu_jsx -> file-saver:  "saveAs" { style: { stroke: "lightgreen"
+    stroke-dash: 5 } }
+components_editor_menus_filemenu_jsx -> components_editor_menus_dropdownmenu_jsx:  "DropdownMenu" { style: { stroke: "#808080" } }
+components_editor_utils_monacosetup_js -> utils_tokenparser_js:  "validVerbs" { style: { stroke: "#808080" } }
+components_rendererd2_jsx -> react:  "React,\nuseEffect,\nuseState" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_rendererd2_jsx -> components_codeviewer_jsx:  "CodeViewer" { style: { stroke: "#808080" } }
+components_rendererd2_jsx -> app_css: { style: { stroke: "#808080" } }
+main_jsx -> react:  "React" { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+main_jsx -> react-dom_client:  "ReactDOM" { style: { stroke: "#808080" } }
+main_jsx -> app_jsx:  "App" { style: { stroke: "#808080" } }
+main_jsx -> index_css: { style: { stroke: "#808080" } }
+utils_lexer_js -> utils_tokens_js:  "Token,\nTokenType,\nTokens" { style: { stroke: "#808080" } }
+utils_tokenparser_js -> utils_lexer_js:  "tokenize" { style: { stroke: "#808080" } }
+utils_tokenparser_js -> utils_tokens_js:  "TokenType" { style: { stroke: "#808080" } }
+utils_tokenparser_js -> utils_utils_js:  "getInnermostUIStr,\ngetInnermostUIRef,\nformatUIRef" { style: { stroke: "#808080" } }
+utils_tokenparser_js -> utils_validation_js:  "validateData" { style: { stroke: "#808080" } }
+utils_validation_js -> utils_utils_js:  "getInnermostUIRef,\nformatUIRef" { style: { stroke: "#808080" } }

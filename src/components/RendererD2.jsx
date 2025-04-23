@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CodeViewer from './CodeViewer';
 import '../App.css';  // Ensure this import is present
+import RenderModal from './RenderModal';
 
 // Helper function to format nested UIRefs in transitions
 const formatTransitionUIRef = ( uiRef ) => {
@@ -134,6 +135,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
 const RendererD2 = ( { data } ) => {
     const [ d2Output, setD2Output ] = useState( '' );
     const [ message, setMessage ] = useState( '' );
+    const [ modalOpen, setModalOpen ] = useState( false );  // ② Estado modal
 
     useEffect( () => {
         const d2Text = translateToD2( data );
@@ -158,25 +160,39 @@ const RendererD2 = ( { data } ) => {
 
     return (
         <div className="renderer-container">
-            <div className="renderer-header">
-                <div style={ { color: 'lightgreen', width: 'auto', whiteSpace: 'nowrap' } }>D2 Translation</div>
-                <button onClick={ copyToClipboard } className="renderer-button">
-                    Copy to Clipboard
-                </button>
-                <button onClick={ openInPlayground } className="renderer-button">
-                    SVG Renderer
-                </button>
+            <div className='sticky-area'>
+                <div className="renderer-header">
+                    <div style={ { color: 'lightgreen', width: 'auto', whiteSpace: 'nowrap' } }>D2 Translation</div>
+                    <button
+                        onClick={ () => setModalOpen( true ) }
+                        className="renderer-button"
+                    >
+                        View Diagram
+                    </button>
+                    <button onClick={ copyToClipboard } className="renderer-button">
+                        Copy to Clipboard
+                    </button>
+                    <button onClick={ openInPlayground } className="renderer-button">
+                        D2 playground
+                    </button>
+                </div>
+                <div className="alert-message"
+                    style={ {
+                        '--message-bg': message ? 'darkred' : 'black'
+                    } }
+                >
+                    { message || '\u00A0' }
+                </div>
             </div>
-            <div style={ {
-                minHeight: '20px',
-                color: 'yellow',
-                backgroundColor: message ? 'darkred' : 'black',
-                opacity: 1
-            } }>
-                { message || '\u00A0' }
+            <div className='scroll-area'>
+                <CodeViewer code={ d2Output } language="uitdl" />
             </div>
-            <CodeViewer code={ d2Output } language="uitdl" />
-        </div>
+            <RenderModal
+                d2Source={ d2Output }
+                isOpen={ modalOpen }
+                onClose={ () => setModalOpen( false ) }
+            />
+        </div >
     );
 };
 

@@ -4,7 +4,7 @@ import MonacoEditor from '@monaco-editor/react';
 const CodeViewer = ( { code, language } ) => {
 
     return (
-        <div style={ { position: 'relative', zIndex: 0, opacity: 0.98 } }>
+        <div style={ { position: 'relative', zIndex: 0 } }>
             <MonacoEditor
                 width="100%"
                 height="90vh"

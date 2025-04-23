@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import ErrorList from './ErrorList.jsx';
-import EditorHeader from './EditorHeader.jsx';
-import handleFormatCode from './utils/formatCode.js';
-import setErrors from './utils/setErrors.js';
-import { setupMonaco } from './utils/monacoSetup.js';
+import ErrorList from './ErrorList';
+import EditorHeader from './EditorHeader';
+import handleFormatCode from './utils/formatCode';
+import setErrors from './utils/setErrors';
+import { setupMonaco } from './utils/monacoSetup';
 import '../../App.css';
 
 const Editor = ( { uitdlText, onChange, markers } ) => {
@@ -67,26 +67,27 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
 
     return (
         <div className='editor-container' style={ { position: 'relative' } }>
-            <EditorHeader
-                className='renderer-header'
-                showErrors={ showErrors }
-                setShowErrors={ setShowErrors }
-                handleFormatCode={ handleFormatCodeWrapper }
-                setLastSaved={ setLastSaved }
-                setIsModified={ setIsModified }
-                setMessage={ setMessage }
-                uitdlText={ uitdlText }
-                onChange={ handleEditorChangeWrapper }
-            />
-            <div style={ {
-                minHeight: '20px',
-                color: 'yellow',
-                backgroundColor: message ? 'darkred' : 'black',
-                opacity: 1
-            } }>
-                { message || '\u00A0' }
+            <div className='sticky-area' >
+                <EditorHeader
+                    className='renderer-header'
+                    showErrors={ showErrors }
+                    setShowErrors={ setShowErrors }
+                    handleFormatCode={ handleFormatCodeWrapper }
+                    setLastSaved={ setLastSaved }
+                    setIsModified={ setIsModified }
+                    setMessage={ setMessage }
+                    uitdlText={ uitdlText }
+                    onChange={ handleEditorChangeWrapper }
+                />
+                <div className="alert-message"
+                    style={ {
+                        '--message-bg': message ? 'darkred' : 'black'
+                    } }
+                >
+                    { message || '\u00A0' }
+                </div>
             </div>
-            <div style={ { position: 'relative', zIndex: 0, opacity: 0.98 } }>
+            <div className='scroll-area'>
                 <MonacoEditor
                     width="100%"
                     height="90vh"

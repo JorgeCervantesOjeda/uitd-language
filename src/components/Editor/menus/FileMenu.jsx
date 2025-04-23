@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { saveAs } from 'file-saver';
-import DropdownMenu from './DropdownMenu.jsx';
+import DropdownMenu from './DropdownMenu';
 
 const FileMenu = ( { setLastSaved, setIsModified, setMessage, uitdlText, onChange } ) => {
     const fileInputRef = useRef( null );

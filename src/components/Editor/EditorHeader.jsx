@@ -1,6 +1,6 @@
 import React from 'react';
-import FileMenu from './menus/FileMenu.jsx';
-import EditMenu from './menus/EditMenu.jsx';
+import FileMenu from './menus/FileMenu';
+import EditMenu from './menus/EditMenu';
 
 const EditorHeader = ( {
     showErrors,
