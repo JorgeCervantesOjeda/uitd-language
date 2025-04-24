@@ -1,0 +1,1 @@
+store-dir=C:\ruta\personalizada\pnpm_store

@@ -304,9 +304,9 @@ button {
   background: #fff;
   border-radius: 4px;
   width: 80vw;
-  max-width: 1000px;
+  max-width: none;
   height: 80vh;
-  max-height: 800px;
+  max-height: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;

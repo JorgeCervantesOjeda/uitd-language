@@ -134,24 +134,12 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey ) => {
 
 const RendererD2 = ( { data } ) => {
     const [ d2Output, setD2Output ] = useState( '' );
-    const [ message, setMessage ] = useState( '' );
     const [ modalOpen, setModalOpen ] = useState( false );  // ② Estado modal
 
     useEffect( () => {
         const d2Text = translateToD2( data );
         setD2Output( d2Text );
     }, [ data ] );
-
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText( d2Output ).then( () => {
-            setMessage( 'Copied to clipboard!' );
-            setTimeout( () => {
-                setMessage( '' );
-            }, 5000 );
-        } ).catch( ( err ) => {
-            console.error( 'Could not copy text: ', err );
-        } );
-    };
 
     const openInPlayground = () => {
         const playgroundUrl = 'https://play.d2lang.com';
@@ -169,13 +157,6 @@ const RendererD2 = ( { data } ) => {
                     >
                         View Diagram
                     </button>
-                </div>
-                <div className="alert-message"
-                    style={ {
-                        '--message-bg': message ? 'darkred' : 'black'
-                    } }
-                >
-                    { message || '\u00A0' }
                 </div>
             </div>
             <div className='scroll-area'>
