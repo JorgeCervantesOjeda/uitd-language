@@ -13,7 +13,7 @@ const formatTransitionUIRef = ( uiRef ) => {
     return `${uiRef.id}.${nestedRefs}`;
 };
 
-const formatString = ( name, maxLength = 20 ) => {
+const formatString = ( name, maxLength = 50 ) => {
     if( !name ) return '';
     const words = name.split( ' ' );
     let formattedName = '';
