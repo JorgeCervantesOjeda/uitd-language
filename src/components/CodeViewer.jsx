@@ -1,8 +1,7 @@
 import React from 'react';
 import MonacoEditor from '@monaco-editor/react';
 
-const CodeViewer = ( { code, language } ) => {
-
+const CodeViewer = ( { code, language, onChange } ) => {
     return (
         <div style={ { position: 'relative', zIndex: 0 } }>
             <MonacoEditor
@@ -11,8 +10,9 @@ const CodeViewer = ( { code, language } ) => {
                 language={ language }
                 value={ code }
                 theme="vs-dark"
+                onChange={ onChange }
                 options={ {
-                    readOnly: true,
+                    readOnly: false,
                     minimap: { enabled: true },
                 } }
             />

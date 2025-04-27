@@ -149,6 +149,9 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                     <button onClick={ onDownloadJPG } disabled={ !svg || loading }>
                         JPG
                     </button>
+                    <button className="close-btn" onClick={ onClose }>
+                        X
+                    </button>
                 </header>
                 <div className="content">
                     { loading ? <p>Loading diagram...</p> : <div dangerouslySetInnerHTML={ { __html: svg } } /> }
