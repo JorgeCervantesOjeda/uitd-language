@@ -5,15 +5,22 @@ import { ExampleUITD } from './components/Editor/utils/ExampleUITD';
 import { parseUITDL } from './utils/TokenParser';
 import './App.css';
 
+const DEBOUNCE_DELAY = 500; // Milisegundos
+
 const App = () => {
   const [ uitdlText, setUitdlText ] = useState( ExampleUITD );
   const initialParsedData = parseUITDL( uitdlText );
   const [ parsedData, setParsedData ] = useState( initialParsedData );
 
   useEffect( () => {
-    // Handle text changes in the editor by parsing the text
-    const parsed = parseUITDL( uitdlText );
-    setParsedData( parsed );
+    const handler = setTimeout( () => {
+      const parsed = parseUITDL( uitdlText );
+      setParsedData( parsed );
+    }, DEBOUNCE_DELAY );
+
+    return () => {
+      clearTimeout( handler );
+    };
   }, [ uitdlText ] );
 
   const handleEditorChange = ( text ) => {
@@ -22,14 +29,14 @@ const App = () => {
 
   return (
     <div className='app-container'>
-      <div className='space-screen editor-container' >
+      <div className='space-screen editor-container'>
         <Editor
           uitdlText={ uitdlText }
           onChange={ handleEditorChange }
           markers={ parsedData.errors }
         />
       </div>
-      <div className='space-screen renderer-container' >
+      <div className='space-screen renderer-container'>
         <RendererD2 data={ parsedData } />
       </div>
     </div>

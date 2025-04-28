@@ -137,8 +137,8 @@ const RendererD2 = ( { data } ) => {
             <div className='scroll-area'>
                 <CodeViewer
                     code={ renderCode }
-                    language="d2"
-                    onChange={ ( value ) => setRenderCode( value )} />
+                    language="uitdl"
+                    onChange={ ( value ) => setRenderCode( value ) } />
             </div>
             <RenderModal
                 d2Source={ renderCode }
