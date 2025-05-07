@@ -14,6 +14,7 @@ const formatTransitionUIRef = ( uiRef ) => {
 
 const formatString = ( name, maxLength = 50 ) => {
     if( !name ) return '';
+    if( !maxLength ) maxLength = 50;
     const words = name.split( ' ' );
     let formattedName = '';
     let line = '';
