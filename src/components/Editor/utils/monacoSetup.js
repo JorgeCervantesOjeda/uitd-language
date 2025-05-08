@@ -7,7 +7,7 @@ export const setupMonaco = ( monacoInstance ) => {
         tokenizer: {
             root: [
                 [ new RegExp( validVerbs.join( '|' ) ), 'keyword' ],
-                [ /\b(UITD|UI|actions|FRAGMENT|DRAW|TRANSITION|from|to|if|user|AND|width)\b/, 'keyword' ],
+                [ /\b(UITD|UI|actions|FRAGMENT|DRAW|TRANSITION|from|to|if|user|AND|WIDTH)\b/, 'keyword' ],
                 [ /[{}]/, '@brackets' ],
                 [ /\d+/, 'number' ],
                 [ /"[^"]*"/, 'string' ],
@@ -48,9 +48,9 @@ export const setupMonaco = ( monacoInstance ) => {
                     documentation: 'Define draw statements with UI IDs',
                 },
                 {
-                    label: 'width',
+                    label: 'WIDTH',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'width ${1:id}',
+                    insertText: 'WIDTH ${1:id}',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define width option',
                 },

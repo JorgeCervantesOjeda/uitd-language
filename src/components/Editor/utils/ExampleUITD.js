@@ -24,10 +24,11 @@ export const ExampleUITD = `UITD "System Title" {
 
     }
     FRAGMENT "Menu Navigation and Login" {
+      WIDTH 40;
       DRAW { 1, 0 };
       DRAW { 2(3(0)), 4(0), 5(0) };
       TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin";
-      TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal" width 15;
+      TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal" WIDTH 15;
       TRANSITION from 0 to 4 if user clicks "Standings";
       TRANSITION from 0 to 5 if user clicks "Events";
       TRANSITION from 0 to 1 if user clicks "Logout";  

@@ -181,12 +181,22 @@ class TokenParser {
             const fragmentName = nameToken.value;
             this.expectToken( TokenType.PUNCTUATION, '{' );
 
+            // --- Inicializamos el width aquí ---
             const draws = [];
             const transitions = [];
+            let width = null;              // <-- Default
+
             let token = this.getNextToken();
-            while( token.type !== TokenType.PUNCTUATION || token.value !== '}' ) {
+            while( !( token.type === TokenType.PUNCTUATION && token.value === '}' ) ) {
                 try {
-                    if( token.type === TokenType.KEYWORD && token.value === 'DRAW' ) {
+                    // --- Nuevo: capturamos WIDTH; ---
+                    if( token.type === TokenType.KEYWORD && token.value === 'WIDTH' ) {
+                        const widthToken = this.expectToken( TokenType.NUMBER );
+                        width = parseInt( widthToken.value, 10 );
+                        this.expectToken( TokenType.PUNCTUATION, ';' );
+                    }
+                    // --- DRAW & TRANSITION siguen igual ---
+                    else if( token.type === TokenType.KEYWORD && token.value === 'DRAW' ) {
                         this.undoGetNextToken();
                         this.parseDraw( draws );
                     } else if( token.type === TokenType.KEYWORD && token.value === 'TRANSITION' ) {
@@ -198,12 +208,14 @@ class TokenParser {
                     token = this.getNextToken();
                 } catch( e ) {
                     this.handleParsingError( e );
-                    break; // Exit the loop on error
+                    break;
                 }
             }
 
+            // Ahora incluimos width en el objeto fragment
             this.result.fragments.push( {
                 name: fragmentName,
+                width,                     // <-- aquí
                 draws,
                 transitions,
                 line: fragmentStartToken.line,
@@ -213,6 +225,7 @@ class TokenParser {
             this.handleParsingError( e );
         }
     }
+
 
     parseDraw( draws ) {
         try {
@@ -282,7 +295,7 @@ class TokenParser {
 
             let width = null;
             const nextWidthToken = this.getNextToken();
-            if( nextWidthToken.type === TokenType.KEYWORD && nextWidthToken.value === 'width' ) {
+            if( nextWidthToken.type === TokenType.KEYWORD && nextWidthToken.value === 'WIDTH' ) {
                 const widthToken = this.expectToken( TokenType.NUMBER );
                 width = parseInt( widthToken.value, 10 );
             } else {

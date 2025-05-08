@@ -47,13 +47,15 @@ const translateToD2 = ( parsedData ) => {
                 d2 += buildUIHierarchy( ref, 2, parsedData.uis, '' );
             } );
         } );
+        const defaultWidth = fragment.width ?? 50;
         fragment.transitions.forEach( transition => {
             const hasMarker = markers.some( m => m.startLineNumber === transition.line && m.severity === 8 );
             if( !hasMarker ) {
                 const firstPart = `${formatTransitionUIRef( transition.from )} -> ${formatTransitionUIRef( transition.to )}: `;
+                const useWidth = ( transition.width != null ) ? transition.width : defaultWidth;
                 let transitionStr = `${transition.action} \"${transition.target}\"`;
                 if( transition.condition ) transitionStr += ` AND (${transition.condition})`;
-                transitionStr = formatString( transitionStr, transition.width );
+                transitionStr = formatString( transitionStr, useWidth );
                 d2 += `    ${firstPart + transitionStr}\n`;
             }
         } );
