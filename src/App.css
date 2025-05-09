@@ -22,7 +22,7 @@
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 60px;
+  top: 70px;
   left: 50%;
   right: 0;
   bottom: auto;
@@ -211,6 +211,11 @@ button {
   z-index: 2000 !important;
   justify-content: center;
   align-items: center;
+}
+
+.renderer-header .title {
+  /* un poco de padding o margin si quieres más separación */
+  margin-right: 1rem;
 }
 
 .renderer-header div {

@@ -1,37 +1,24 @@
+// En App.js
 import React, { useState, useEffect } from 'react';
 import Editor from './components/Editor/Editor';
 import RendererD2 from './components/RendererD2';
 import { parseUITDL } from './utils/TokenParser';
-import './App.css';
-
-const DEBOUNCE_DELAY = 1000; // Milisegundos
 
 const App = () => {
-  const [ uitdlText, setUitdlText ] = useState( '' );
-  const initialParsedData = parseUITDL( uitdlText );
-  const [ parsedData, setParsedData ] = useState( initialParsedData );
+  const [ uitdlText, setUitdlText ] = useState( 'UITD "X" {}' );
+  const [ parsedData, setParsedData ] = useState( parseUITDL( uitdlText ) );
 
+  // Ya no necesitamos debounce aquí
   useEffect( () => {
-    const handler = setTimeout( () => {
-      const parsed = parseUITDL( uitdlText );
-      setParsedData( parsed );
-    }, DEBOUNCE_DELAY );
-
-    return () => {
-      clearTimeout( handler );
-    };
+    setParsedData( parseUITDL( uitdlText ) );
   }, [ uitdlText ] );
-
-  const handleEditorChange = ( text ) => {
-    setUitdlText( text );
-  };
 
   return (
     <div className='app-container'>
       <div className='space-screen editor-container'>
         <Editor
           uitdlText={ uitdlText }
-          onChange={ handleEditorChange }
+          onChange={ setUitdlText }
           markers={ parsedData.errors }
         />
       </div>

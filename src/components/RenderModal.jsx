@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { D2 } from '@terrastruct/d2';
 
 export default function RenderModal( { d2Source, isOpen, onClose } ) {
-    console.log( '▶ RenderModal inicializado con:', { d2Source, isOpen } );
 
     const [ svg, setSvg ] = useState( '' );
     const [ loading, setLoading ] = useState( false );
@@ -20,7 +19,6 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
 
         // Si existe en caché, usar y actualizar LRU
         if( cache.current.has( key ) ) {
-            console.log( 'Usando SVG cacheado para la clave', key );
             const cachedSvg = cache.current.get( key );
             // Mover al final para marcar como recientemente usado
             cache.current.delete( key );
@@ -30,18 +28,14 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
             return;
         }
 
-        console.log( 'Modal abierto: iniciando render para fuente' );
         setSvg( '' );
         setLoading( true );
 
         ( async () => {
             try {
-                console.log( 'Compilando D2…' );
                 const { diagram, renderOptions } =
                     await d2.current.compile( key, { layout: 'elk' } );
-                console.log( 'Diagram listo, renderizando SVG…' );
                 const svgText = await d2.current.render( diagram, renderOptions );
-                console.log( 'SVG generado, actualizando estado…' );
                 setSvg( svgText );
 
                 // Guardar en caché y aplicar política LRU
@@ -50,13 +44,11 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                     // Eliminar la entrada menos recientemente usada (la primera)
                     const firstKey = cache.current.keys().next().value;
                     cache.current.delete( firstKey );
-                    console.log( 'Cache excedido, eliminando clave antigua:', firstKey );
                 }
             } catch( e ) {
                 console.error( 'Error al renderizar con D2:', e );
             } finally {
                 setLoading( false );
-                console.log( 'Render finalizado' );
             }
         } )();
     }, [ isOpen, d2Source ] );
