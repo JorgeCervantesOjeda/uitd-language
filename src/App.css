@@ -51,6 +51,18 @@
   border-radius: 10px;
 }
 
+.error-warning:hover {
+  background-color: rgba(50, 50, 0, 1);
+  color: yellow;
+  font-size: large;
+}
+
+.error-error:hover {
+  background-color: rgba(50, 0, 0, 1);
+  color: yellow;
+  font-size: large;
+}
+
 .error-warning {
   border: 1px solid yellow;
 }

@@ -49,9 +49,16 @@ const EditorHeader = ( {
         if( name ) displayMsg( `Se cargó "${name}".` );
     }, [ onOpen, displayMsg ] );
 
+    // dentro de EditorHeader.jsx
     const handleSaveFile = useCallback( async () => {
+        // ¿estamos en el flujo nativo?
+        const isNative = !!window.showSaveFilePicker;
+
         const ok = await onSave();
-        if( ok ) displayMsg( 'Archivo guardado con éxito.' );
+        // sólo para el caso nativo mostramos éxito
+        if( ok && isNative ) {
+            displayMsg( 'Archivo guardado con éxito.' );
+        }
     }, [ onSave, displayMsg ] );
 
     const toggleErrors = useCallback( () => setShowErrors( v => !v ), [] );

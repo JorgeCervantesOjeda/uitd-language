@@ -10,6 +10,8 @@ const setErrors = ( editor, markers, setErrorState ) => {
 
     const newErrors = markers.map( marker => ( {
         startLineNumber: marker.startLineNumber,
+        columnNumber: marker.startColumn,        // <— Añadido
+
         messages: [ 'Line ' + marker.startLineNumber + ': ' + marker.message ],
         severity: marker.severity === monaco.MarkerSeverity.Error ? 'error' : 'warning',
     } ) );

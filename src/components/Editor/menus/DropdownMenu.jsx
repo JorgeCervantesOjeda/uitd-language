@@ -1,31 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const DropdownMenu = ( { label, items } ) => {
     const [ open, setOpen ] = useState( false );
+    const menuRef = useRef( null );
 
-    const handleItemClick = ( onClick ) => {
-        onClick();  // Ensure the click event is fully handled
-        setOpen( false );  // Close the menu after the click event
+    // Alterna el menú al hacer click en el botón
+    const toggleMenu = () => setOpen( v => !v );
+
+    // Ejecuta la acción y cierra el menú después
+    const handleItemClick = async ( action, label ) => {
+        console.log( `▶️ Dropdown: clic en "${label}"` );
+        try {
+            await action();
+        } finally {
+            setOpen( false );
+        }
     };
+
+    // Cierra el menú al hacer click fuera
+    useEffect( () => {
+        const onClickOutside = ( e ) => {
+            if( menuRef.current && !menuRef.current.contains( e.target ) ) {
+                setOpen( false );
+            }
+        };
+        document.addEventListener( 'mousedown', onClickOutside );
+        return () => document.removeEventListener( 'mousedown', onClickOutside );
+    }, [] );
 
     return (
         <div
+            ref={ menuRef }
             className={ `dropdown ${open ? 'open' : ''}` }
-            onMouseLeave={ () => setOpen( false ) }  // Close menu when mouse leaves
         >
             <button
+                type="button"
                 className="dropdown-button"
-                onMouseEnter={ () => setOpen( true ) }  // Open menu on hover
+                onClick={ toggleMenu }
             >
                 { label }
             </button>
+
             { open && (
                 <div className="dropdown-menu">
-                    { items.map( ( item, index ) => (
+                    { items.map( ( item, i ) => (
                         <button
-                            key={ index }
+                            key={ i }
+                            type="button"
                             className="dropdown-item"
-                            onClick={ () => handleItemClick( item.onClick ) }
+                            onClick={ () => handleItemClick( item.onClick, item.label ) }
                         >
                             { item.label }
                         </button>
