@@ -45,21 +45,46 @@ const EditorHeader = ( {
     }, [ lastSaved ] );
 
     const handleOpenFile = useCallback( async () => {
+        displayMsg( 'Open File...' )
         const name = await onOpen();
-        if( name ) displayMsg( `Se cargó "${name}".` );
+        if( name )
+            displayMsg( `Loaded: "${name}".` );
+        else
+            displayMsg( '' );
     }, [ onOpen, displayMsg ] );
 
     // dentro de EditorHeader.jsx
     const handleSaveFile = useCallback( async () => {
+        displayMsg( 'Save File...' );
         // ¿estamos en el flujo nativo?
         const isNative = !!window.showSaveFilePicker;
 
         const ok = await onSave();
         // sólo para el caso nativo mostramos éxito
-        if( ok && isNative ) {
-            displayMsg( 'Archivo guardado con éxito.' );
-        }
+        if( ok && isNative ) 
+            displayMsg( 'File Saved.' );
+        else
+            displayMsg( '' );
     }, [ onSave, displayMsg ] );
+
+    // Si también quieres mover Load Example aquí (FileMenu):
+    const handleLoadExampleFile = useCallback( async () => {
+        displayMsg( 'Loading…' );
+        await onLoadExample();
+        displayMsg( 'Loaded example.' )
+    }, [ onLoadExample ] );
+
+    // Envuelve onCopyAll para disparar tu displayMsg
+    const handleCopy = useCallback( async () => {
+        await onCopyAll();
+        displayMsg( 'Copied to clipboard!' );
+    }, [ onCopyAll ] );
+
+    // Envuelve onPaste
+    const handlePaste = useCallback( async () => {
+        await onPaste( );
+        displayMsg( 'Clipboard pasted.' );
+    }, [ onPaste ] );
 
     const toggleErrors = useCallback( () => setShowErrors( v => !v ), [] );
 
@@ -71,12 +96,15 @@ const EditorHeader = ( {
                 </div>
 
                 <div className="menu-container">
-                    <FileMenu onOpen={ handleOpenFile } onSave={ handleSaveFile } displayTemporaryMessage={ displayMsg } />
+                    <FileMenu
+                        onOpen={ handleOpenFile }
+                        onSave={ handleSaveFile }
+                        onLoadExample={ handleLoadExampleFile }
+                    />
                     <EditMenu
-                        onCopyAll={ () => onCopyAll( displayMsg ) }
-                        onPaste={ () => onPaste( displayMsg ) }
+                        onCopyAll={ handleCopy }
+                        onPaste={ handlePaste }
                         onFormat={ onFormat }
-                        onLoadExample={ () => onLoadExample( displayMsg ) }
                     />
                     <button className="renderer-button" onClick={ toggleErrors }>
                         { showErrors ? 'Hide' : 'Show' } Errors

@@ -13,18 +13,12 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const editorRef = useRef( null );
     const markersRef = useRef( markers );
 
-    // — Estados de guardado y modificación —
     const [ lastSaved, setLastSaved ] = useState( Date.now() );
     const [ isModified, setIsModified ] = useState( false );
-
-    // — Lista de errores y visibilidad —
     const [ errors, setErrorsState ] = useState( [] );
     const [ showErrors, setShowErrors ] = useState( false );
-
-    // — Texto local —
     const [ localText, setLocalText ] = useState( uitdlText );
 
-    // — Debounce + localStorage —
     const debouncedOnChange = useCallback(
         debounce( ( value ) => {
             localStorage.setItem( 'uitdlContent', value );
@@ -42,7 +36,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         [ debouncedOnChange ]
     );
 
-    // — Carga inicial de localStorage —
     useEffect( () => {
         const saved = localStorage.getItem( 'uitdlContent' );
         if( saved ) {
@@ -51,44 +44,49 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         }
     }, [ onChange ] );
 
-    // — Sincronización de errores —
     useEffect( () => {
-        console.log( '🔍 markers recibidos:', markers );
         markersRef.current = markers;
         if( editorRef.current ) {
             setErrors( editorRef.current, markersRef.current, setErrorsState );
         }
     }, [ markers ] );
 
-    // — Montaje del editor —
-    const handleEditorDidMount = useCallback( ( editor, monaco ) => {
+    const collapseAll = () => {
+        setTimeout( () => {
+            editorRef.current.trigger( 'keyboard', 'editor.foldLevel2', {} );
+            editorRef.current.trigger( 'keyboard', 'editor.foldLevel3', {} );
+        }, 500 );
+    };
+
+    const handleEditorDidMount = useCallback( ( editor ) => {
         editorRef.current = editor;
         setErrors( editor, markersRef.current, setErrorsState );
+        collapseAll();
     }, [] );
 
-    // — Manejar clic en error: saltar a línea y centrarla —
-    const handleErrorClick = useCallback( ( lineNumber, column = 1 ) => {
+    const handleErrorHover = useCallback( ( lineNumber, column = 1 ) => {
         const editor = editorRef.current;
         if( editor ) {
-            // Sitúa el cursor en la línea y columna del error
-            console.log( 'Moviendo cursor a linea columna ', lineNumber, column );
             editor.setPosition( { lineNumber, column } );
-            // Centra esa posición en la vista
             editor.revealPositionInCenter( { lineNumber, column } );
-            // Devuelve el foco al editor
-            editor.focus();
         }
     }, [] );
 
-    // — Guardar archivo —
-    // — Guardar archivo con fallback para navegadores sin showSaveFilePicker —
-    // — Guardar archivo con fallback “más real” —
+    const handleErrorClick = useCallback( ( lineNumber, column = 1 ) => {
+        setShowErrors( false );
+        const editor = editorRef.current;
+        if( editor ) {
+            editor.setPosition( { lineNumber, column } );
+            editor.revealPositionInCenter( { lineNumber, column } );
+            editor.focus();
+        }
+    }, [ setShowErrors ] );
+
     const handleSave = useCallback( async () => {
         try {
             let ok = false;
 
             if( window.showSaveFilePicker ) {
-                // 1) File System Access API
                 const handle = await window.showSaveFilePicker( {
                     suggestedName: '_.uitd',
                     types: [ { description: 'UITD files', accept: { 'text/plain': [ '.uitd' ] } } ]
@@ -98,11 +96,8 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 await writable.close();
                 ok = true;
             } else {
-                // 2) Fallback con file-saver + “await focus”
                 const blob = new Blob( [ localText ], { type: 'text/plain;charset=utf-8' } );
                 saveAs( blob, '_.uitd' );
-
-                // Espera al retorno del foco, que indica que el diálogo de guardado se cerró
                 await new Promise( resolve => {
                     const onFocus = () => {
                         window.removeEventListener( 'focus', onFocus );
@@ -110,7 +105,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     };
                     window.addEventListener( 'focus', onFocus );
                 } );
-
                 ok = true;
             }
 
@@ -119,21 +113,17 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 setIsModified( false );
             }
             return ok;
-
         } catch( err ) {
             if( err.name !== 'AbortError' ) console.error( err );
             return false;
         }
     }, [ localText ] );
 
-    // — Abrir archivo —
-    // — Abrir archivo con fallback para navegadores sin showOpenFilePicker —
     const handleOpen = useCallback( async () => {
         try {
             let fileHandle, file, text, fileName;
 
             if( window.showOpenFilePicker ) {
-                // Chrome, Edge (File System Access API)
                 [ fileHandle ] = await window.showOpenFilePicker( {
                     types: [ { description: 'UITD files', accept: { 'text/plain': [ '.uitd' ] } } ],
                     multiple: false
@@ -142,7 +132,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 fileName = file.name;
                 text = await file.text();
             } else {
-                // Fallback: input type="file"
                 text = await new Promise( ( resolve, reject ) => {
                     const input = document.createElement( 'input' );
                     input.type = 'file';
@@ -171,62 +160,49 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 } );
             }
 
-            // Si llegamos aquí, ya tenemos `text` y `fileName`
             setLocalText( text );
             setIsModified( true );
             localStorage.setItem( 'uitdlContent', text );
             onChange( text );
+            setLastSaved( Date.now() );
+            setIsModified( false );
+            collapseAll();
             return fileName;
         } catch( err ) {
-            // El usuario canceló o hubo otro error
             if( err.name !== 'AbortError' ) console.error( err );
             return null;
         }
     }, [ onChange ] );
 
-    // — Formatear código —
     const handleFormat = useCallback( () => {
         handleFormatCode( editorRef, onChange, setIsModified );
     }, [ onChange ] );
 
-    // — Clipboard: copiar y pegar —
-    const handleCopyAll = useCallback(
-        async ( displayMsg ) => {
-            try {
-                await navigator.clipboard.writeText( localText );
-                displayMsg( 'Copied to clipboard!' );
-            } catch( err ) {
-                console.error( err );
-            }
-        },
-        [ localText ]
-    );
+    const handleCopyAll = useCallback( async () => {
+        try {
+            await navigator.clipboard.writeText( localText );
+        } catch( err ) {
+            console.error( err );
+        }
+    }, [ localText ] );
 
-    const handlePaste = useCallback(
-        async ( displayMsg ) => {
-            try {
-                const text = await navigator.clipboard.readText();
-                setLocalText( text );
-                onChange( text );
-                displayMsg( 'Clipboard pasted.' );
-            } catch( err ) {
-                console.error( err );
-            }
-        },
-        [ onChange ]
-    );
+    const handlePaste = useCallback( async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            setLocalText( text );
+            onChange( text );
+        } catch( err ) {
+            console.error( err );
+        }
+    }, [ onChange ] );
 
-    // — Cargar ejemplo —
-    const handleLoadExample = useCallback(
-        async ( displayMsg ) => {
-            const { ExampleUITD } = await import( './utils/ExampleUITD' );
-            setLocalText( ExampleUITD );
-            onChange( ExampleUITD );
-            setIsModified( true );
-            displayMsg( 'Loaded example.' );
-        },
-        [ onChange ]
-    );
+    const handleLoadExample = useCallback( async () => {
+        const { ExampleUITD } = await import( './utils/ExampleUITD' );
+        setLocalText( ExampleUITD );
+        onChange( ExampleUITD );
+        setIsModified( true );
+        collapseAll();
+    }, [ onChange ] );
 
     return (
         <div className="editor-container">
@@ -246,7 +222,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             </div>
             <div className="scroll-area">
                 <MonacoEditor
-                    beforeMount={ setupMonaco } 
+                    beforeMount={ setupMonaco }
                     width="100%"
                     height="90vh"
                     defaultLanguage="uitdl"
@@ -257,20 +233,19 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     options={ {
                         readOnly: false,
                         minimap: { enabled: true },
-                        hover: {enabled:false},
+                        hover: { enabled: false },
                         folding: true,
-                        foldingStrategy: 'auto',        // <- importante: auto = bracket-based folding
-                        showFoldingControls: 'always',  // <- para ver siempre el icono de plegar
+                        foldingStrategy: 'auto',
+                        showFoldingControls: 'always',
                         automaticLayout: true
                     } }
-
                 />
             </div>
-
             { showErrors && (
                 <div className="error-list-container">
                     <ErrorList
                         errors={ errors }
+                        onErrorHover={ handleErrorHover }
                         onErrorClick={ handleErrorClick }
                     />
                 </div>
