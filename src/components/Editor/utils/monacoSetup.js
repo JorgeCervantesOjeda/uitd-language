@@ -81,10 +81,94 @@ export const setupMonaco = ( monacoInstance ) => {
     } );
 
     monacoInstance.languages.setLanguageConfiguration( 'uitdl', {
+        // Indica que {} son delimiters
+        brackets: [ [ '{', '}' ] ],
+        // Auto-fold con esas llaves
+        folding: {
+            offSide: false, // desactiva indent-based folding
+            markers: {
+                // opcional: plegado vía comentarios tipo //#region / //#endregion
+                start: /^\s*\/\/\s*#?region\b/,
+                end: /^\s*\/\/\s*#?endregion\b/
+            }
+        },
         autoClosingPairs: [
             { open: '{', close: '}' },
             { open: '"', close: '"' },
             { open: '(', close: ')' },
         ],
     } );
+
+    monacoInstance.editor.defineTheme( 'uitdlTheme', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+            { token: 'number', foreground: 'e5eE08' },
+            { token: 'comment', foreground: '6A9955' },
+            // …tus otros token-rules…
+        ],
+        colors: {
+            'editor.foreground': '#F8F8F8',
+            'editor.background': '#000000',
+        }
+    } );
+
+
+    monacoInstance.languages.registerFoldingRangeProvider( 'uitdl', {
+        provideFoldingRanges( model ) {
+            const ranges = [];
+            const stack = [];
+            const total = model.getLineCount();
+
+            for( let line = 1; line <= total; line++ ) {
+                const text = model.getLineContent( line );
+                // Por cada “{” detectada, anotamos la línea
+                for( const _ of text.matchAll( /{/g ) ) {
+                    stack.push( line );
+                }
+                // Por cada “}”, emparejamos con la última apertura
+                for( const _ of text.matchAll( /}/g ) ) {
+                    const start = stack.pop();
+                    // Sólo plegar si tiene al menos una línea interna
+                    if( start != null && line > start + 1 ) {
+                        ranges.push( {
+                            start,
+                            end: line,
+                            kind: monaco.languages.FoldingRangeKind.Region
+                        } );
+                    }
+                }
+            }
+
+            return ranges;
+        }
+    } );
+
 };
+
+
+// in utils/monacoSetup.js (or utils/d2Setup.js)
+
+export function setupD2( monaco ) {
+    monaco.languages.register( { id: 'd2' } );
+
+    monaco.languages.setMonarchTokensProvider( 'd2', {
+        // very crude example—tweak to match your D2 syntax
+        tokenizer: {
+            root: [
+                [ /\b(direction|style|stroke|width|right|fill|dash)\b/, 'keyword' ],
+                [ /\b\d+(?:\.\d+)?\b/, 'number' ],
+                [ /"[^"]*"/, 'string' ],
+                [ /[{};]/, '@brackets' ],
+                [ /[(),:]/, 'delimiter' ],
+                [ /[A-Za-z_]\w*/, 'identifier' ],
+            ]
+        }
+    } );
+
+    monaco.languages.setLanguageConfiguration( 'd2', {
+        brackets: [ [ '{', '}' ], [ '(', ')' ] ],
+        autoClosingPairs: [ { open: '{', close: '}' }, { open: '(', close: ')' } ],
+        surroundingPairs: [ { open: '"', close: '"' } ],
+    } );
+}

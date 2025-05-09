@@ -140,7 +140,6 @@ const RendererD2 = ( { data } ) => {
             <div className='scroll-area'>
                 <CodeViewer
                     code={ renderCode }
-                    language="uitdl"
                     onChange={ ( value ) => setRenderCode( value ) } />
             </div>
             <RenderModal

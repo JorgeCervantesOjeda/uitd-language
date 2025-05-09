@@ -63,7 +63,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     // — Montaje del editor —
     const handleEditorDidMount = useCallback( ( editor, monaco ) => {
         editorRef.current = editor;
-        setupMonaco( monaco );
         setErrors( editor, markersRef.current, setErrorsState );
     }, [] );
 
@@ -247,6 +246,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             </div>
             <div className="scroll-area">
                 <MonacoEditor
+                    beforeMount={ setupMonaco } 
                     width="100%"
                     height="90vh"
                     defaultLanguage="uitdl"
@@ -254,7 +254,16 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     onChange={ handleEditorChange }
                     onMount={ handleEditorDidMount }
                     theme="vs-dark"
-                    options={ { readOnly: false, minimap: { enabled: true }, hover: { enabled: false } } }
+                    options={ {
+                        readOnly: false,
+                        minimap: { enabled: true },
+                        hover: {enabled:false},
+                        folding: true,
+                        foldingStrategy: 'auto',        // <- importante: auto = bracket-based folding
+                        showFoldingControls: 'always',  // <- para ver siempre el icono de plegar
+                        automaticLayout: true
+                    } }
+
                 />
             </div>
 
