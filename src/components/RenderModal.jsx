@@ -15,42 +15,50 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
 
     useEffect( () => {
         if( !isOpen ) return;
-        const key = d2Source;
 
-        // Si existe en caché, usar y actualizar LRU
+        const key = d2Source;
+        // Indicador para ignorar resultados antiguos
+        let cancelled = false;
+
+        // Primero comprueba caché
         if( cache.current.has( key ) ) {
-            const cachedSvg = cache.current.get( key );
-            // Mover al final para marcar como recientemente usado
-            cache.current.delete( key );
-            cache.current.set( key, cachedSvg );
-            setSvg( cachedSvg );
+            setSvg( cache.current.get( key ) );
             setLoading( false );
             return;
         }
 
+        // Si no estaba en caché, compila
         setSvg( '' );
         setLoading( true );
 
         ( async () => {
             try {
-                const { diagram, renderOptions } =
-                    await d2.current.compile( key, { layout: 'elk' } );
+                const { diagram, renderOptions } = await d2.current.compile( key, { layout: 'elk' } );
                 const svgText = await d2.current.render( diagram, renderOptions );
-                setSvg( svgText );
-
-                // Guardar en caché y aplicar política LRU
-                cache.current.set( key, svgText );
-                if( cache.current.size > MAX_CACHE_ENTRIES ) {
-                    // Eliminar la entrada menos recientemente usada (la primera)
-                    const firstKey = cache.current.keys().next().value;
-                    cache.current.delete( firstKey );
+                if( !cancelled ) {
+                    // Solo actualiza si no hubo cleanup
+                    setSvg( svgText );
+                    // Guarda en caché
+                    cache.current.set( key, svgText );
+                    // Aplica LRU
+                    if( cache.current.size > MAX_CACHE_ENTRIES ) {
+                        const firstKey = cache.current.keys().next().value;
+                        cache.current.delete( firstKey );
+                    }
                 }
             } catch( e ) {
                 console.error( 'Error al renderizar con D2:', e );
             } finally {
-                setLoading( false );
+                if( !cancelled ) {
+                    setLoading( false );
+                }
             }
         } )();
+
+        // Cleanup para ignorar respuestas tardías
+        return () => {
+            cancelled = true;
+        };
     }, [ isOpen, d2Source ] );
 
     const onDownloadSVG = () => {
