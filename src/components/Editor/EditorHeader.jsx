@@ -4,10 +4,10 @@ import EditMenu from './menus/EditMenu';
 
 function formatElapsed( ms ) {
     const sec = Math.floor( ms / 1000 );
-    if( sec < 60 ) return `${sec}s`;
+    if( sec < 60 ) return `${sec} sec`;
     const min = Math.floor( sec / 60 );
-    if( min < 60 ) return `${min}m`;
-    return `${Math.floor( min / 60 )}h`;
+    if( min < 60 ) return `${min} min`;
+    return `${Math.floor( min / 60 )} hrs`;
 }
 
 const EditorHeader = ( {
@@ -40,7 +40,7 @@ const EditorHeader = ( {
         setElapsed( formatElapsed( Date.now() - lastSaved ) );
         const iv = setInterval( () => {
             setElapsed( formatElapsed( Date.now() - lastSaved ) );
-        }, 30_000 );
+        }, 5_000 );
         return () => clearInterval( iv );
     }, [ lastSaved ] );
 
@@ -91,7 +91,7 @@ const EditorHeader = ( {
     return (
         <div>
             <div className="renderer-header">
-                <div className="title">
+                <div className="title blinking">
                     { isModified && elapsed }
                 </div>
 

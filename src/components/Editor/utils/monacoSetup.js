@@ -108,8 +108,8 @@ export const setupMonaco = ( monacoInstance ) => {
             // …tus otros token-rules…
         ],
         colors: {
+            // text color
             'editor.foreground': '#F8F8F8',
-            'editor.background': '#000000',
         }
     } );
 

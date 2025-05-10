@@ -197,6 +197,7 @@ button {
 
 .renderer-container {
   flex: 1;
+  opacity: 0.97 !important
 }
 
 .editor-container,
@@ -228,6 +229,20 @@ button {
 .renderer-header .title {
   /* un poco de padding o margin si quieres más separación */
   margin-right: 1rem;
+}
+
+.blinking {
+  animation: mymove 2s infinite alternate;
+}
+
+@keyframes mymove {
+  from {
+    opacity: 0.1;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .renderer-header div {
@@ -301,6 +316,11 @@ button {
   overflow-y: auto;
   /* el scroll irá aquí dentro */
   opacity: 0.97;
+}
+
+/* Force every Monaco layer to respect transparency */
+.monaco-editor {
+  opacity: 0.97 !important;
 }
 
 /* ===== Modal ===== */

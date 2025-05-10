@@ -233,7 +233,7 @@ UITD "TOP-Racing" {
     TRANSITION from 8 to 7 if user clicks "Return";
     TRANSITION from 9 to 10 if user clicks "View Drivers" AND "is Registration creator";
     TRANSITION from 9 to 11 if user clicks "View Vehicles" AND "is Registration creator";
-    TRANSITION from 9 to 9 if user clicks "Save Data" AND "is Registration cretaor";
+    TRANSITION from 9 to 9 if user clicks "Save Data" AND "is Registration creator";
     TRANSITION from 9 to 8 if user clicks "Return";
     TRANSITION from 10 to 9 if user selects "Driver";
     TRANSITION from 10 to 9 if user clicks "Return";
