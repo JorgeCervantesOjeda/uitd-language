@@ -9,7 +9,7 @@ const CodeViewer = ( { code, onChange } ) => {
     }, [] );
 
     return (
-        <div style={ { position: 'relative', zIndex: 0 } }>
+        <div style={ { position: 'relative' } }>
             <MonacoEditor
                 beforeMount={ handleBeforeMount }
                 width="100%"

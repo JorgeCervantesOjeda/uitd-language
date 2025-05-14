@@ -1,66 +1,148 @@
-/* Add this CSS to App.css or a separate CSS file */
+/* 1) Make sure html/body/root fill the viewport and never overflow horizontally */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  /* prevent any horizontal scrollbars */
+}
 
-* {
+/* Global box-sizing */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-
+/* App layout */
 .app-container {
   display: flex;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
+  /* allow overlays */
 }
 
-
-
-
-
-
-
-.error-list-container {
+/* Shared panel layout */
+.panel-container {
+  /* NEW */
   display: flex;
   flex-direction: column;
-  position: absolute;
-  top: 70px;
+  position: relative;
+  overflow: visible;
+  height: 100%;
+}
+
+/* Background wrapper */
+.space-screen {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/Correcaminos-removebg-preview.png') no-repeat center center fixed;
+  background-size: contain;
+  display: block;
+}
+
+/* Sizing of each half */
+.editor-container {
+  flex: 2;
+}
+
+.renderer-container {
+  flex: 1;
+}
+
+/* 4) Ensure each panel’s flex child also stays within 100% */
+.editor-container,
+.renderer-container {
+  display: flex;
+  flex-direction: column;
+  /* or flex:1 for renderer-container */
+  min-width: 0;
+  /* allows flex children to shrink */
+  overflow: hidden;
+  /* no extra spill */
+}
+
+/* Sticky wrapper */
+.sticky-area {
+  position: sticky;
+  top: 0;
+  background: black;
+  z-index: 2;
+  /* sit above scroll area */
+}
+
+/* RendererHeader / EditorHeader top row */
+.renderer-header {
+  display: flex;
+  padding: 10px;
+  background-color: black;
+  border-bottom: 1px solid #444;
+  justify-content: center;
+  align-items: center;
+}
+
+.renderer-header .title {
+  margin-right: 1rem;
+}
+
+/* Message bar below header */
+.alert-message {
+  position: sticky;
+  top: var(--header-height, 3.5rem);
+  min-height: 20px;
+  padding: 5px;
+  color: yellow;
+  background-color: var(--message-bg, black);
+  z-index: 1;
+  /* NEW: ensure dropdown z-index lifts above this */
+}
+
+/* Scrollable content */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  opacity: 0.97;
+  z-index: 0;
+}
+
+/* ❖ Error overlay ❖ */
+.error-list-container {
+  position: fixed !important;
+  top: var(--header-height, 3.5rem);
   left: 50%;
   right: 0;
-  bottom: auto;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 2000;
-  overflow-y: auto;
-  padding: 0px;
   max-height: 75%;
-  border-radius: 10px;
-}
-
-/* app.css */
-.error-list {
-  padding: 10px;
   overflow-y: auto;
-  border-radius: 10px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 9000;
+  /* lowered beneath dropdown menus */
 }
 
+.error-list {
+  pointer-events: auto;
+  width: 80%;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+/* Errors styling */
 .error {
   background-color: black;
   color: white;
-  padding: 2px 8px;
-  border-radius: 3px;
-  margin-bottom: 5px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
   white-space: pre-wrap;
-  border-radius: 10px;
-}
-
-.error-warning:hover {
-  background-color: rgba(50, 50, 0, 1);
-  color: yellow;
-  font-size: large;
-}
-
-.error-error:hover {
-  background-color: rgba(50, 0, 0, 1);
-  color: yellow;
-  font-size: large;
 }
 
 .error-warning {
@@ -71,83 +153,51 @@
   border: 1px solid red;
 }
 
-.no-errors {
-  background-color: black;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 3px;
+.error-warning:hover,
+.error-error:hover {
+  background-color: #444444;
 }
 
-.language-label {
-  color: lightgreen;
-  width: 100px;
-}
-
-.toggle-errors-button {
-  border: 1px solid red;
-  padding: 5px 10px;
-}
-
-.toggle-errors-button.active {
-  background-color: lightcoral;
-}
-
-/* General styles for the dropdown menu */
+/* ❖ Dropdown menus ❖ */
 .dropdown {
   position: relative;
   display: inline-block;
-  opacity: 1;
-  z-index: 1500 !important;
+  overflow: visible;
 }
 
 .dropdown-menu {
-  display: none;
   position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10000;
+  /* NEW: sits above errors & alerts */
+  display: none;
   background-color: #454545;
   color: white;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1500 !important;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .dropdown.open .dropdown-menu {
   display: block;
-  z-index: 1500 !important;
 }
 
 .dropdown-item {
   padding: 12px 16px;
   cursor: pointer;
   background-color: rgb(108, 108, 108);
-  border: none;
-  text-align: left;
   width: 100%;
+  text-align: left;
   font-weight: bold;
-  z-index: 1500 !important;
+  border: none;
 }
 
 .dropdown-item:hover,
 .dropdown-item:focus {
   background-color: #2cf546;
-  z-index: 1500 !important;
 }
 
-
-
-
-
-
-
-
-
-button:hover {
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5) !important;
-  border-color: black !important;
-  opacity: 1;
-  border-width: 4px;
-  /* Adjust the color and size as needed */
-}
-
+/* Buttons */
 button {
   margin-right: 10px;
   opacity: 0.5;
@@ -155,233 +205,76 @@ button {
   padding: 5px 10px !important;
 }
 
-*:active {
-  border-color: rgb(69, 0, 0) !important;
-}
-
-.view-line:hover {
-  box-shadow: 0 0 15px rgba(0, 0255, 255, 0.5) !important;
-  /* Adjust the color and size as needed */
-}
-
-.space-screen {
-  /* Conserva márgenes y padding si los necesitas */
-  margin: 0;
-  padding: 0;
-
-  /* Ocupa toda la ventana */
-  width: 100vw;
-  height: 100vh;
-
-  /* Fondo: una única imagen, centrada y escalada sin deformar */
-  background: url('/Correcaminos-removebg-preview.png') no-repeat
-    /* no tiling */
-    center center
-    /* posición en centro */
-    fixed;
-  /* si la quieres fija al viewport */
-  ;
-  background-size: contain;
-  /* caber entera manteniendo proporción */
-
-  /* Si necesitas flex para tus hijos, pero sin centrar:
-     simplemente no definas justify-content/align-items aquí */
-  display: block;
-  /* o el valor que necesites para el layout interno */
-}
-
-
-.editor-container {
-  flex: 2;
-}
-
-.renderer-container {
-  flex: 1;
-  opacity: 0.97 !important
-}
-
-.editor-container,
-.renderer-container {
-  margin: 0;
-  padding: 0;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.renderer-header {
-  position: sticky;
-  top: 0;
-  display: flex;
-  /* Change from block to flex */
-  padding: 10px;
-  /* Added padding to match height */
-  background-color: black;
-  /* Added background color to match RendererD2 header */
-  border-bottom: 1px solid #444;
-  /* Added border to match RendererD2 header */
-  z-index: 2000 !important;
-  justify-content: center;
-  align-items: center;
-}
-
-.renderer-header .title {
-  /* un poco de padding o margin si quieres más separación */
-  margin-right: 1rem;
-}
-
-.blinking {
-  animation: mymove 2s infinite alternate;
-}
-
-@keyframes mymove {
-  from {
-    opacity: 0.1;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.renderer-header div {
-  flex: none;
-}
-
-.menu-container {
-  align-items: center;
-  display: flex;
-}
-
-.renderer-button {
-  cursor: pointer;
-  margin-left: 10px;
-  border-width: 4px;
-}
-
-.copy-message {
-  margin-left: 10px;
-  visibility: hidden;
-}
-
-#root {
-  width: 100%;
-  margin-top: 0px;
-}
-
-
-/* height of your header bar: adjust as needed */
-:root {
-  --header-height: 3.5rem;
-}
-
-/* Editor message bar */
-.alert-message {
-  position: sticky;
-  top: var(--header-height);
-  z-index: 1000 !important;
-  min-height: 20px;
-  padding: 5px;
-  color: yellow;
-  background-color: black;
-  /* fallback */
-  background-color: var(--message-bg, black);
+button:hover {
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5) !important;
+  border-color: red !important;
   opacity: 1;
-  transition: background-color 0.3s ease;
 }
 
-
-/* ***************************************** */
-/* 1) Sticky wrapper: fija header + mensaje  */
-/* ***************************************** */
-.sticky-area {
-  position: sticky;
-  top: 0;
-  z-index: 2000;
-  /* por encima del contenido */
-  background: black;
-  /* para tapar el scroll que quede debajo */
-}
-
-/* Mantenemos .renderer-header y .alert-message normales,
-   pero ahora van dentro de .sticky-area y se pegan juntos. */
-
-/* ***************************************** */
-/* 2) Áreas de contenido con scroll interno */
-/* ***************************************** */
-.scroll-area {
-  flex: 1;
-  /* ocupan todo el espacio disponible */
-  overflow-y: auto;
-  /* el scroll irá aquí dentro */
-  opacity: 0.97;
-}
-
-/* Force every Monaco layer to respect transparency */
+/* Monaco editor transparency */
 .monaco-editor {
   opacity: 0.97 !important;
 }
 
-/* ===== Modal ===== */
+/* ❖ Modal (D2) ❖ */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  /* top:0; right:0; bottom:0; left:0 */
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  /* por encima de cualquier dropdown (1500) */
   pointer-events: auto;
+  z-index: 11000;
+  width: 100%;
+  /* above dropdowns & errors */
 }
 
 .modal {
   background: #fff;
   border-radius: 4px;
-  width: 80vw;
-  max-width: none;
-  height: 80vh;
-  max-height: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* scroll sólo dentro de .content */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: width 0.2s, height 0.2s, border-radius 0.2s;
-  z-index: 2001;
-  /* el nivel más alto */
+  transition: width .2s, height .2s, border-radius .2s;
   pointer-events: auto;
+  position: relative;
+  z-index: 11001;
+  width: 80%;
+  height: 80%;
+  /* above its own backdrop */
 }
 
 .modal.fullscreen {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   border-radius: 0;
 }
 
 .modal header {
-  flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: .5rem;
   background: #f7f7f7;
   border-bottom: 1px solid #ddd;
+  height: 50px;
 }
 
 .modal header button {
-  background: none;
-  border: none;
-  margin-right: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.9rem;
+  margin-right: .5rem;
+  padding: .25rem .5rem;
+  font-size: .9rem;
   cursor: pointer;
-  opacity: 0.7;
+  opacity: .7;
+  border-width: 5;
+  border-color: #444444;
+  background-color: #bdffc6;
 }
 
 .modal header button:hover {
   opacity: 1;
+  filter: invert(1);
 }
 
 .modal header .close-btn {
@@ -391,6 +284,20 @@ button {
 .modal .content {
   flex-grow: 1;
   overflow: auto;
-  /* si el SVG es grande, scroll interno */
   padding: 1rem;
+}
+
+/* Keyframes etc. (unchanged) */
+.blinking {
+  animation: mymove 2s infinite alternate;
+}
+
+@keyframes mymove {
+  from {
+    opacity: .1
+  }
+
+  to {
+    opacity: 1
+  }
 }

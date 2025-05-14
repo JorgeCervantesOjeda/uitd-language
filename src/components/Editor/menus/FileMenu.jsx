@@ -1,3 +1,4 @@
+// src/components/Editor/menus/FileMenu.jsx
 import React from 'react';
 import DropdownMenu from './DropdownMenu';
 

@@ -1,3 +1,4 @@
+// src/components/Editor/ErrorList.jsx
 import React from 'react';
 import '../../App.css';
 import ErrorItem from './ErrorItem';
@@ -10,12 +11,11 @@ const ErrorList = ( { errors, onErrorHover, onErrorClick } ) => {
             </div>
         );
     }
-
     return (
         <div className="error-list">
-            { errors.map( ( err, index ) => (
+            { errors.map( ( err, i ) => (
                 <ErrorItem
-                    key={ index }
+                    key={ i }
                     messages={ err.messages }
                     severity={ err.severity }
                     lineNumber={ err.lineNumber || err.startLineNumber }

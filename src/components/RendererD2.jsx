@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+// src/components/RendererD2.jsx
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CodeViewer from './CodeViewer';
-import '../App.css';  // Ensure this import is present
+import '../App.css';
 import RenderModal from './RenderModal';
 
 // Helper functions (formatTransitionUIRef, formatString, translateToD2, buildUIHierarchy) remain unchanged
@@ -93,11 +94,9 @@ const translateToD2 = ( parsedData ) => {
         `  label_bg: {\n` +
         `    shape: text\n` +
         `    style: {\n` +
-        `      fill: \"#f9f9f9\"\n` +
-        `      stroke-width: 0\n` +
-        `      border-radius: 4\n` +
-        `      font-color: \"#333333\"\n` +
-        `      font-size: 12\n` +
+        `      stroke-width: 015\n` +
+        `      font-color: \"#003311\"\n` +
+        `      font-size: 14\n` +
         `    }\n` +
         `  }\n` +
         `}\n\n` +
@@ -185,8 +184,8 @@ const RendererD2 = ( { data } ) => {
     const alertBg = message || needsUpdate ? 'darkred' : 'black';
 
     return (
-        <div className="renderer-container">
-            <div className='sticky-area'>
+        <div className="renderer-container panel-container">
+            <div className="sticky-area">
                 <div className="renderer-header">
                     <div style={ { color: 'lightgreen', whiteSpace: 'nowrap' } }>
                         D2 Translation
@@ -210,6 +209,7 @@ const RendererD2 = ( { data } ) => {
                         Playground
                     </a>
                 </div>
+
                 <div
                     className="alert-message"
                     style={ { '--message-bg': alertBg } }
@@ -217,12 +217,14 @@ const RendererD2 = ( { data } ) => {
                     { alertText }
                 </div>
             </div>
-            <div className='scroll-area'>
+
+            <div className="scroll-area">
                 <CodeViewer
                     code={ renderCode }
-                    onChange={ ( value ) => setRenderCode( value ) }
+                    onChange={ value => setRenderCode( value ) }
                 />
             </div>
+
             <RenderModal
                 d2Source={ renderCode }
                 isOpen={ modalOpen }

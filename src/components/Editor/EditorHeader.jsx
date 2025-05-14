@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+// src/components/Editor/EditorHeader.jsx
+import React, { useState, useEffect, useCallback } from 'react';
 import FileMenu from './menus/FileMenu';
 import EditMenu from './menus/EditMenu';
 
@@ -20,101 +21,81 @@ const EditorHeader = ( {
     onFormat,
     onLoadExample,
     showErrors,
-    setShowErrors,
+    setShowErrors
 } ) => {
     const [ message, setMessage ] = useState( '' );
-    const timer = useRef( null );
+    const displayMsg = useCallback( msg => setMessage( msg ), [] );
 
-    const displayMsg = useCallback( ( msg, duration = 5000 ) => {
-        setMessage( msg );
-        if( timer.current ) clearTimeout( timer.current );
-        timer.current = setTimeout( () => setMessage( '' ), duration );
-    }, [] );
-
-    useEffect( () => () => {
-        if( timer.current ) clearTimeout( timer.current );
-    }, [] );
+    useEffect( () => {
+        if( isModified ) setMessage( '' );
+    }, [ isModified ] );
 
     const [ elapsed, setElapsed ] = useState( formatElapsed( Date.now() - lastSaved ) );
     useEffect( () => {
         setElapsed( formatElapsed( Date.now() - lastSaved ) );
         const iv = setInterval( () => {
             setElapsed( formatElapsed( Date.now() - lastSaved ) );
-        }, 5_000 );
+        }, 5000 );
         return () => clearInterval( iv );
     }, [ lastSaved ] );
 
     const handleOpenFile = useCallback( async () => {
-        displayMsg( 'Open File...' )
+        displayMsg( 'Open File...' );
         const name = await onOpen();
-        if( name )
-            displayMsg( `Loaded: "${name}".` );
-        else
-            displayMsg( '' );
+        if( name ) displayMsg( `Loaded: "${name}".` );
+        else displayMsg( '' );
     }, [ onOpen, displayMsg ] );
 
-    // dentro de EditorHeader.jsx
     const handleSaveFile = useCallback( async () => {
         displayMsg( 'Save File...' );
-        // ¿estamos en el flujo nativo?
-        const isNative = !!window.showSaveFilePicker;
-
         const ok = await onSave();
-        // sólo para el caso nativo mostramos éxito
-        if( ok && isNative ) 
-            displayMsg( 'File Saved.' );
-        else
-            displayMsg( '' );
+        if( ok ) displayMsg( 'File Saved.' );
+        else displayMsg( '' );
     }, [ onSave, displayMsg ] );
 
-    // Si también quieres mover Load Example aquí (FileMenu):
     const handleLoadExampleFile = useCallback( async () => {
         displayMsg( 'Loading…' );
-        await onLoadExample();
-        displayMsg( 'Loaded example.' )
-    }, [ onLoadExample ] );
+        const name = await onLoadExample();
+        if( name ) displayMsg( `Loaded: "${name}".` );
+        else displayMsg( '' );
+    }, [ onLoadExample, displayMsg ] );
 
-    // Envuelve onCopyAll para disparar tu displayMsg
     const handleCopy = useCallback( async () => {
-        await onCopyAll();
-        displayMsg( 'Copied to clipboard!' );
-    }, [ onCopyAll ] );
+        const ok = await onCopyAll();
+        if( ok ) displayMsg( 'Copied to clipboard!' );
+        else displayMsg( '' );
+    }, [ onCopyAll, displayMsg ] );
 
-    // Envuelve onPaste
     const handlePaste = useCallback( async () => {
-        await onPaste( );
-        displayMsg( 'Clipboard pasted.' );
-    }, [ onPaste ] );
+        const ok = await onPaste();
+        if( ok ) displayMsg( 'Clipboard pasted.' );
+        else displayMsg( '' );
+    }, [ onPaste, displayMsg ] );
 
-    const toggleErrors = useCallback( () => setShowErrors( v => !v ), [] );
+    const handleFormat = useCallback( async () => {
+        displayMsg( 'Formatting...' );
+        const ok = await onFormat();
+        if( ok ) displayMsg( 'Formatted.' );
+        else displayMsg( '' );
+    }, [ onFormat, displayMsg ] );
+
+    const toggleErrors = useCallback( () => {
+        setShowErrors( v => !v );
+    }, [ setShowErrors ] );
 
     return (
         <div>
             <div className="renderer-header">
-                <div className="title blinking">
-                    { isModified && elapsed }
-                </div>
-
+                <div className="title blinking">{ isModified && elapsed }</div>
                 <div className="menu-container">
-                    <FileMenu
-                        onOpen={ handleOpenFile }
-                        onSave={ handleSaveFile }
-                        onLoadExample={ handleLoadExampleFile }
-                    />
-                    <EditMenu
-                        onCopyAll={ handleCopy }
-                        onPaste={ handlePaste }
-                        onFormat={ onFormat }
-                    />
+                    <FileMenu onOpen={ handleOpenFile } onSave={ handleSaveFile } onLoadExample={ handleLoadExampleFile } />
+                    <EditMenu onCopyAll={ handleCopy } onPaste={ handlePaste } onFormat={ handleFormat } />
                     <button className="renderer-button" onClick={ toggleErrors }>
                         { showErrors ? 'Hide' : 'Show' } Errors
                     </button>
                 </div>
             </div>
-            <div
-                className="alert-message"
-                style={ { '--message-bg': message ? 'darkred' : 'black' } }
-            >
+            <div className="alert-message" style={ { '--message-bg': message ? 'darkred' : 'black' } }>
                 { message || '\u00A0' }
             </div>
         </div>

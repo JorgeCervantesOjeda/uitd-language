@@ -132,14 +132,13 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         img.src = url;
     };
 
+
     if( !isOpen ) return null;
     return (
         <div className="modal-backdrop" onClick={ onClose }>
-            <div
-                className={ `modal${full ? ' fullscreen' : ''}` }
-                onClick={ ( e ) => e.stopPropagation() }
-            >
+            <div className={ `modal${full ? ' fullscreen' : ''}` } onClick={ e => e.stopPropagation() }>
                 <header>
+                    {/* maximize/download/close buttons */ }
                     <button onClick={ () => setFull( ( f ) => !f ) } disabled={ loading }>
                         { full ? 'Restore' : 'Maximize' }
                     </button>
@@ -151,8 +150,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                     </button>
                     <button className="close-btn" onClick={ onClose }>
                         X
-                    </button>
-                </header>
+                    </button>                </header>
                 <div className="content">
                     { loading ? <p>Loading diagram...</p> : <div dangerouslySetInnerHTML={ { __html: svg } } /> }
                 </div>
