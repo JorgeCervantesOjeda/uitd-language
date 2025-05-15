@@ -21,6 +21,11 @@ const CodeViewer = ( { code, onChange } ) => {
                 options={ {
                     readOnly: false,
                     minimap: { enabled: true },
+                    hover: { enabled: false },
+                    folding: true,
+                    foldingStrategy: 'auto',
+                    showFoldingControls: 'always',
+                    automaticLayout: true
                 } }
             />
         </div>

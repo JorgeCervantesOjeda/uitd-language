@@ -1,66 +1,76 @@
+// src/components/RenderModal.jsx
+
 import React, { useState, useRef, useEffect } from 'react';
 import { D2 } from '@terrastruct/d2';
 
 export default function RenderModal( { d2Source, isOpen, onClose } ) {
-
     const [ svg, setSvg ] = useState( '' );
     const [ loading, setLoading ] = useState( false );
     const [ full, setFull ] = useState( false );
-    const d2 = useRef( new D2() );
 
-    // Cache LRU simple para SVG compilados, máximo 2 entradas
+    // 1) Layout engine persistido en localStorage
+    const [ layoutEngine, setLayoutEngine ] = useState( () => {
+        return localStorage.getItem( 'layoutEngine' ) || 'dagre';
+    } );
+    useEffect( () => {
+        localStorage.setItem( 'layoutEngine', layoutEngine );
+    }, [ layoutEngine ] );
+
+    // 2) Instancia única de D2
+    const d2 = useRef( null );
+    useEffect( () => {
+        d2.current = new D2();
+    }, [] );
+
+    // 3) Caché LRU para SVG (máx. 2 entradas)
     const cache = useRef( new Map() );
-
     const MAX_CACHE_ENTRIES = 2;
+    const currentKeyRef = useRef( '' );
 
+    // 4) Cada vez que cambian isOpen, d2Source o layoutEngine, compilamos/renders
     useEffect( () => {
         if( !isOpen ) return;
 
-        const key = d2Source;
-        // Indicador para ignorar resultados antiguos
-        let cancelled = false;
+        const sourceKey = d2Source;
+        const cacheKey = `${layoutEngine}::${sourceKey}`;
+        currentKeyRef.current = cacheKey;
 
-        // Primero comprueba caché
-        if( cache.current.has( key ) ) {
-            setSvg( cache.current.get( key ) );
+        // Si está en caché, lo devolvemos
+        if( cache.current.has( cacheKey ) ) {
+            setSvg( cache.current.get( cacheKey ) );
             setLoading( false );
             return;
         }
 
-        // Si no estaba en caché, compila
+        // Si no, compilamos y renderizamos con D2
         setSvg( '' );
         setLoading( true );
 
         ( async () => {
             try {
-                const { diagram, renderOptions } = await d2.current.compile( key, { layout: 'elk' } );
+                const { diagram, renderOptions } = await d2.current.compile( sourceKey, { layout: layoutEngine } );
                 const svgText = await d2.current.render( diagram, renderOptions );
-                if( !cancelled ) {
-                    // Solo actualiza si no hubo cleanup
-                    setSvg( svgText );
-                    // Guarda en caché
-                    cache.current.set( key, svgText );
-                    // Aplica LRU
-                    if( cache.current.size > MAX_CACHE_ENTRIES ) {
-                        const firstKey = cache.current.keys().next().value;
-                        cache.current.delete( firstKey );
-                    }
+
+                // Ignoramos respuestas si ya cambió la clave
+                if( currentKeyRef.current !== cacheKey ) return;
+
+                setSvg( svgText );
+                cache.current.set( cacheKey, svgText );
+                if( cache.current.size > MAX_CACHE_ENTRIES ) {
+                    const firstKey = cache.current.keys().next().value;
+                    cache.current.delete( firstKey );
                 }
             } catch( e ) {
                 console.error( 'Error al renderizar con D2:', e );
             } finally {
-                if( !cancelled ) {
+                if( currentKeyRef.current === cacheKey ) {
                     setLoading( false );
                 }
             }
         } )();
+    }, [ isOpen, d2Source, layoutEngine ] );
 
-        // Cleanup para ignorar respuestas tardías
-        return () => {
-            cancelled = true;
-        };
-    }, [ isOpen, d2Source ] );
-
+    // 5) Descarga SVG
     const onDownloadSVG = () => {
         const blob = new Blob( [ svg ], { type: 'image/svg+xml' } );
         const url = URL.createObjectURL( blob );
@@ -71,6 +81,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         URL.revokeObjectURL( url );
     };
 
+    // 6) Convierte SVG a JPG y descarga
     const onDownloadJPG = () => {
         if( !svg ) return;
         const parser = new DOMParser();
@@ -105,6 +116,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
             ctx.fillRect( 0, 0, width, height );
             ctx.drawImage( img, 0, 0, width, height );
             URL.revokeObjectURL( url );
+
             canvas.toBlob(
                 ( blobJpg ) => {
                     if( !blobJpg ) {
@@ -132,27 +144,45 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         img.src = url;
     };
 
-
     if( !isOpen ) return null;
+
     return (
         <div className="modal-backdrop" onClick={ onClose }>
-            <div className={ `modal${full ? ' fullscreen' : ''}` } onClick={ e => e.stopPropagation() }>
-                <header>
-                    {/* maximize/download/close buttons */ }
-                    <button onClick={ () => setFull( ( f ) => !f ) } disabled={ loading }>
-                        { full ? 'Restore' : 'Maximize' }
-                    </button>
-                    <button onClick={ onDownloadSVG } disabled={ !svg || loading }>
-                        SVG
-                    </button>
-                    <button onClick={ onDownloadJPG } disabled={ !svg || loading }>
-                        JPG
-                    </button>
-                    <button className="close-btn" onClick={ onClose }>
-                        X
-                    </button>                </header>
+            <div
+                className={ full ? 'modal fullscreen' : 'modal' }
+                onClick={ e => e.stopPropagation() }
+            >
+                <header style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } }>
+                    <div style={ { display: 'flex', alignItems: 'center' } }>
+                        <div style={ { display: 'flex', alignItems: 'center', marginRight: '2rem', gap: '0.5rem' } }>
+                            <label htmlFor="engine-select">Layout:</label>
+                            <select
+                                id="engine-select"
+                                value={ layoutEngine }
+                                onChange={ e => setLayoutEngine( e.target.value ) }
+                                disabled={ loading }
+                            >
+                                <option value="dagre">Dagre</option>
+                                <option value="elk">ELK</option>
+                            </select>
+                        </div>
+                        <button onClick={ () => setFull( f => !f ) } disabled={ loading }>
+                            { full ? 'Restore' : 'Maximize' }
+                        </button>
+                        <button onClick={ onDownloadSVG } disabled={ !svg || loading }>
+                            SVG
+                        </button>
+                        <button onClick={ onDownloadJPG } disabled={ !svg || loading }>
+                            JPG
+                        </button>
+                    </div>
+                    <button className="close-btn" onClick={ onClose }>X</button>
+                </header>
                 <div className="content">
-                    { loading ? <p>Loading diagram...</p> : <div dangerouslySetInnerHTML={ { __html: svg } } /> }
+                    { loading
+                        ? <p>Loading diagram...</p>
+                        : <div dangerouslySetInnerHTML={ { __html: svg } } />
+                    }
                 </div>
             </div>
         </div>

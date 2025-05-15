@@ -1,10 +1,8 @@
-// Editor.jsx
-
 // src/components/Editor/Editor.jsx
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import EditorHeader from './EditorHeader';
-import ErrorListPortal from './ErrorListPortal';    // ← New import
+import ErrorListPortal from './ErrorListPortal';
 import handleFormatCode from './utils/formatCode';
 import setErrors from './utils/setErrors';
 import { setupMonaco } from './utils/monacoSetup';
@@ -15,18 +13,17 @@ import { saveAs } from 'file-saver';
 const STORAGE_KEY = 'uitdlContent';
 
 const Editor = ( { uitdlText, onChange, markers } ) => {
-
     // Referencias
     const editorRef = useRef( null );
     const markersRef = useRef( markers );
 
     // Estados principales
-    const [ lastSaved, setLastSaved ] = useState( Date.now() );        // marca de tiempo de último guardado
-    const [ firstModifiedAt, setFirstModifiedAt ] = useState( null );  // ← nuevo
-    const [ isModified, setIsModified ] = useState( false );           // si hay cambios sin guardar
-    const [ errors, setErrorsState ] = useState( [] );                 // lista de errores de sintaxis
-    const [ showErrors, setShowErrors ] = useState( false );           // si mostrar la lista de errores
-    const [ localText, setLocalText ] = useState( uitdlText );         // texto actual del editor
+    const [ lastSaved, setLastSaved ] = useState( Date.now() );
+    const [ firstModifiedAt, setFirstModifiedAt ] = useState( null );
+    const [ isModified, setIsModified ] = useState( false );
+    const [ errors, setErrorsState ] = useState( [] );
+    const [ showErrors, setShowErrors ] = useState( false );
+    const [ localText, setLocalText ] = useState( uitdlText );
 
     // ─── Función centralizada para actualizar el contenido ───
     // text: nuevo contenido
@@ -45,28 +42,36 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 // en la primera edición, fijamos el timestamp
                 setFirstModifiedAt( prev => prev ?? Date.now() );
             }
-            // 4) Persistir en localStorage y notificar cambio
-            localStorage.setItem( STORAGE_KEY, text );
+            // 4) Notificar cambio al padre
             onChange( text );
+            // —– Se ha eliminado la escritura directa a localStorage aquí —–
         },
         [ onChange ]
     );
 
-    // Debounce para cambios manuales (tecleo)
+    // Debounce SOLO para persistencia en localStorage (antes hacía doble persistencia)
     const debouncedOnChange = useCallback(
         debounce( ( value ) => {
-            updateContent( value );
+            localStorage.setItem( STORAGE_KEY, value );
         }, 500 ),
-        [ updateContent ]
+        []
     );
+
+    // ─── Cancelar debounce al desmontar ───
+    useEffect( () => {
+        return () => {
+            debouncedOnChange.cancel();
+        };
+    }, [ debouncedOnChange ] );
 
     const handleEditorChange = useCallback(
         ( value ) => {
-            // Cada vez que el usuario escribe:
+            // 1) Estado inmediato y notificación
             updateContent( value );
+            // 2) Persistencia diferida (debounced)
             debouncedOnChange( value );
         },
-        [ debouncedOnChange, updateContent ]
+        [ updateContent, debouncedOnChange ]
     );
 
     // Al montar, cargar desde localStorage si existe
@@ -131,11 +136,11 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     } );
     const wrapLoading = useCallback( ( key, fn ) => {
         return async ( ...args ) => {
-            setLoading( ( l ) => ( { ...l, [ key ]: true } ) );
+            setLoading( l => ( { ...l, [ key ]: true } ) );
             try {
                 return await fn( ...args );
             } finally {
-                setLoading( ( l ) => ( { ...l, [ key ]: false } ) );
+                setLoading( l => ( { ...l, [ key ]: false } ) );
             }
         };
     }, [] );
@@ -159,8 +164,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 } else {
                     const blob = new Blob( [ localText ], { type: 'text/plain;charset=utf-8' } );
                     saveAs( blob, '_.uitd' );
-                    // Esperar a que el usuario regrese foco
-                    await new Promise( ( resolve ) => {
+                    await new Promise( resolve => {
                         const onFocus = () => {
                             window.removeEventListener( 'focus', onFocus );
                             resolve();
@@ -170,7 +174,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     ok = true;
                 }
                 if( ok ) {
-                    // Marca como guardado
                     updateContent( localText, true );
                 }
                 return ok;
@@ -183,23 +186,15 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     );
 
     // Abrir archivo
-    // Abrir archivo
     const handleOpen = useCallback(
         wrapLoading( 'open', async () => {
-            // Si hay cambios no guardados, confirmar descarte
             if( isModified ) {
-                const discard = window.confirm(
-                    'Tienes cambios sin guardar. ¿Descartar y abrir otro archivo?'
-                );
+                const discard = window.confirm( 'Tienes cambios sin guardar. ¿Descartar y abrir otro archivo?' );
                 if( !discard ) return null;
             }
-
             try {
-                let fileName;
-                let text;
-
+                let fileName, text;
                 if( window.showOpenFilePicker ) {
-                    // flujo nativo
                     const [ handle ] = await window.showOpenFilePicker( {
                         types: [ { description: 'UITD files', accept: { 'text/plain': [ '.uitd' ] } } ],
                         multiple: false,
@@ -208,22 +203,20 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     fileName = file.name;
                     text = await file.text();
                 } else {
-                    // fallback con <input type="file">
                     text = await new Promise( ( resolve, reject ) => {
                         const input = document.createElement( 'input' );
                         input.type = 'file';
                         input.accept = '.uitd,text/plain';
                         input.style.display = 'none';
                         document.body.appendChild( input );
-
-                        input.onchange = async ( e ) => {
+                        input.onchange = async e => {
                             try {
                                 const chosen = e.target.files[ 0 ];
                                 if( !chosen ) {
                                     reject( new Error( 'No file selected' ) );
                                     return;
                                 }
-                                fileName = chosen.name;               // ← aquí capturamos el nombre real
+                                fileName = chosen.name;
                                 const content = await chosen.text();
                                 resolve( content );
                             } catch( err ) {
@@ -232,16 +225,12 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                                 document.body.removeChild( input );
                             }
                         };
-
                         input.click();
                     } );
                 }
-
-                // Actualizar contenido y resetear estado a “guardado”
                 updateContent( text, true );
                 collapseAll();
-
-                return fileName;  // ahora devuelve el nombre correcto
+                return fileName;
             } catch( err ) {
                 if( err.name !== 'AbortError' ) console.error( err );
                 return null;
@@ -254,9 +243,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const handleLoadExample = useCallback(
         wrapLoading( 'example', async () => {
             if( isModified ) {
-                const discard = window.confirm(
-                    'Tienes cambios sin guardar. ¿Descartar y cargar el ejemplo?'
-                );
+                const discard = window.confirm( 'Tienes cambios sin guardar. ¿Descartar y cargar el ejemplo?' );
                 if( !discard ) return null;
             }
             const { ExampleUITD } = await import( './utils/ExampleUITD' );
@@ -296,9 +283,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const handlePaste = useCallback(
         wrapLoading( 'paste', async () => {
             if( isModified ) {
-                const discard = window.confirm(
-                    'Tienes cambios sin guardar. ¿Descartar y pegar el portapapeles?'
-                );
+                const discard = window.confirm( 'Tienes cambios sin guardar. ¿Descartar y pegar el portapapeles?' );
                 if( !discard ) return false;
             }
             try {
@@ -314,7 +299,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     );
 
     return (
-        <div className="editor-container panel-container"> {/* use panel-container */ }
+        <div className="editor-container panel-container">
             <div className="sticky-area">
                 <EditorHeader
                     isModified={ isModified }
@@ -347,7 +332,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                         folding: true,
                         foldingStrategy: 'auto',
                         showFoldingControls: 'always',
-                        automaticLayout: true
+                        automaticLayout: true,
                     } }
                 />
             </div>

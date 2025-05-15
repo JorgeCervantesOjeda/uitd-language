@@ -43,25 +43,28 @@ const formatCode = ( code ) => {
     return formattedLines.join( '\n' ).trim();
 };
 
-const handleFormatCode = ( editorRef, onChange, setIsModified ) => {
+// src/components/Editor/utils/formatCode.js
+
+export const handleFormatCode = ( editorRef, updateContent ) => {
     const editor = editorRef.current;
     const model = editor.getModel();
     const position = editor.getPosition();
-
     const currentValue = model.getValue();
+
+    // 1) Formatear la cadena (igual que antes)…
     const formattedValue = formatCode( currentValue );
 
-    editor.executeEdits( '', [
-        {
-            range: model.getFullModelRange(),
-            text: formattedValue,
-            forceMoveMarkers: true,
-        },
-    ] );
+    // 2) Aplicar ediciones en el editor
+    editor.executeEdits( '', [ {
+        range: model.getFullModelRange(),
+        text: formattedValue,
+        forceMoveMarkers: true,
+    } ] );
     editor.setPosition( position );
-    onChange( formattedValue );
-    localStorage.setItem( 'uitdlContent', formattedValue );
-    setIsModified( true );
+
+    // 3) Notificar al componente padre para que actualice estado,
+    // marque como modificado y programe el guardado debounced:
+    updateContent( formattedValue );
 };
 
 export default handleFormatCode;

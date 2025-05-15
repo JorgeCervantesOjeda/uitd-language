@@ -4,13 +4,24 @@ import CodeViewer from './CodeViewer';
 import '../App.css';
 import RenderModal from './RenderModal';
 
-// Helper functions (formatTransitionUIRef, formatString, translateToD2, buildUIHierarchy) remain unchanged
+// Helper functions (formatTransitionUIRef, formatString, buildUIHierarchy) remain unchanged
 const formatTransitionUIRef = ( uiRef ) => {
     if( !uiRef.nested || uiRef.nested.length === 0 ) {
         return uiRef.id;
     }
     const nestedRefs = uiRef.nested.map( nestedRef => formatTransitionUIRef( nestedRef ) ).join( '.' );
     return `${uiRef.id}.${nestedRefs}`;
+};
+
+const flattenUIRefs = ( ref, parentKey = '' ) => {
+    const key = parentKey ? `${parentKey}.${ref.id}` : ref.id;
+    let keys = [ key ];
+    if( ref.nested && ref.nested.length > 0 ) {
+        ref.nested.forEach( nr => {
+            keys = keys.concat( flattenUIRefs( nr, key ) );
+        } );
+    }
+    return keys;
 };
 
 const formatString = ( name, maxLength = 15 ) => {
@@ -32,7 +43,52 @@ const formatString = ( name, maxLength = 15 ) => {
     return formattedName;
 };
 
-// Al inicio de tu módulo, justo donde defines otras funciones:
+// Función recursiva para ordenar transiciones según especificación
+const ordenarTransiciones = ( transitions, uiOrder ) => {
+    const usadas = Array( transitions.length ).fill( false );
+    const resultado = [];
+
+    const dfs = ( actual ) => {
+        // 1) self-transitions
+        transitions.forEach( ( t, i ) => {
+            const fromKey = formatTransitionUIRef( t.from );
+            const toKey = formatTransitionUIRef( t.to );
+            if( !usadas[ i ] && fromKey === actual && toKey === actual ) {
+                resultado.push( t );
+                usadas[ i ] = true;
+            }
+        } );
+
+        // 2) vecinos ordenados según uiOrder
+        const uniqueUiOrder = uiOrder.filter( ( v, i, a ) => a.indexOf( v ) === i );
+        const vecinos = uniqueUiOrder.filter( key => {
+            if( key === actual ) return false;
+            return transitions.some( ( t, i ) => {
+                if( usadas[ i ] ) return false;
+                const fromKey = formatTransitionUIRef( t.from );
+                const toKey = formatTransitionUIRef( t.to );
+                return fromKey === actual && toKey === key;
+            } );
+        } );
+
+        // 3) para cada vecino B: A→B, B→A, recursión
+        vecinos.forEach( ( b ) => {
+            transitions.forEach( ( t, i ) => {
+                const fromKey = formatTransitionUIRef( t.from );
+                const toKey = formatTransitionUIRef( t.to );
+                if( !usadas[ i ] && (fromKey === actual && toKey === b || fromKey == b && toKey === actual )) {
+                    resultado.push( t );
+                    usadas[ i ] = true;
+                }
+            } );
+            dfs( b );
+        } );
+    };
+
+    // Arranca DFS en cada IU según el orden de dibujo (uiOrder)
+    uiOrder.forEach( id => dfs( id ) );
+    return resultado;
+};
 
 // Generar un color aleatorio claro en hex
 const randomColor = () => {
@@ -83,57 +139,75 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
     return out;
 };
 
+// Función principal de traducción a D2
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 
     const uiColorMap = generateUIColorMap( parsedData.uis );
 
-    let d2 = `direction: right\n\n` +
+    let d2 =
+        `direction: right\n\n` +
         `# Clase para nodos fantasma de etiquetas\n` +
         `classes: {\n` +
         `  label_bg: {\n` +
         `    shape: text\n` +
         `    style: {\n` +
         `      stroke-width: 015\n` +
-        `      font-color: \"#003311\"\n` +
-        `      font-size: 14\n` +
+        `      font-color: "#003311"\n` +
+        `      font-size: 18\n` +
         `    }\n` +
         `  }\n` +
         `}\n\n` +
         `# Contenedor principal\n` +
-        `UITD.style.fill: \"#ffffff\"\n` +
+        `UITD.style.fill: "#ffffff"\n` +
         `UITD.style.stroke-width: 0\n` +
         `UITD: ${parsedData.name} {\n`;
 
     parsedData.fragments.forEach( ( fragment, fIdx ) => {
         const fragLetter = String.fromCharCode( 65 + fIdx );
         const bgColor = fragment.color || '#eeeeee';
-        d2 += `  ${fragLetter}.style.fill: \"${bgColor}\"\n`;
+        const defaultWidth = fragment.width ?? 15;
+
+        // 1) extraemos el orden de UIs (incluye nested) en cada draw
+        const uiOrder = fragment.draws
+            .flatMap( draw => draw.uiRefs.flatMap( ref => flattenUIRefs( ref ) ) )
+            .filter( ( v, i, a ) => a.indexOf( v ) === i );
+
+        // 2) ordenamos transiciones usando ese orden
+        const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
+
+        d2 += `  ${fragLetter}.style.fill: "${bgColor}"\n`;
         d2 += `  ${fragLetter}.style.stroke-dash: 1\n`;
         d2 += `  ${fragLetter}: ${formatString( fragment.name, 20 )} {\n`;
 
+        // 1) Definiciones de labels (clase y texto)
+        const labelClassDefs = [];
+        const labelTextDefs = [];
+        sortedTransitions.forEach( ( t, tIdx ) => {
+            const fromId = formatTransitionUIRef( t.from );
+            const toId = formatTransitionUIRef( t.to );
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+
+            labelClassDefs.push( `    ${lblId}.class: label_bg\n` );
+            let action = `${t.action} "${t.target}"`;
+            if( t.condition ) action += ` AND (${t.condition})`;
+            labelTextDefs.push( `    ${lblId}: ${formatString( action, t.width ?? defaultWidth )}\n` );
+        } );
+        d2 += labelClassDefs.join( '' );
+        d2 += labelTextDefs.join( '' );
+
+        // 2) Jerarquía de UIs
         fragment.draws.forEach( draw => {
             draw.uiRefs.forEach( ref => {
                 d2 += buildUIHierarchy( ref, 2, parsedData.uis, '', uiColorMap );
             } );
         } );
 
-        const defaultWidth = fragment.width ?? 15;
-        let labelCounter = 0;
-        fragment.transitions.forEach( transition => {
-            const fromId = formatTransitionUIRef( transition.from );
-            const toId = formatTransitionUIRef( transition.to );
-            let rawAction = `${transition.action} \"${transition.target}\"`;
-            if( transition.condition ) {
-                rawAction += ` AND (${transition.condition})`;
-            }
-            const useWidth = ( transition.width != null ) ? transition.width : defaultWidth;
-            const formattedAction = formatString( rawAction, useWidth );
-            labelCounter += 1;
-            const lblId = `lbl${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}_${labelCounter}`;
-
-            d2 += `    ${lblId}.class: label_bg\n`;
-            d2 += `    ${lblId}: ${formattedAction}\n`;
+        // 3) Flechas de transición
+        sortedTransitions.forEach( ( t, tIdx ) => {
+            const fromId = formatTransitionUIRef( t.from );
+            const toId = formatTransitionUIRef( t.to );
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
             d2 += `    ${fromId} -> ${lblId}\n`;
             d2 += `    ${lblId} -> ${toId}\n`;
         } );
@@ -154,12 +228,12 @@ const RendererD2 = ( { data } ) => {
     const timer = useRef( null );
 
     useEffect( () => () => { if( timer.current ) clearTimeout( timer.current ); }, [] );
-
     const displayMsg = useCallback( ( msg, duration = 3000 ) => {
         setMessage( msg );
         if( timer.current ) clearTimeout( timer.current );
         timer.current = setTimeout( () => setMessage( '' ), duration );
     }, [] );
+
 
     useEffect( () => {
         const updated = translateToD2( data );
@@ -172,7 +246,7 @@ const RendererD2 = ( { data } ) => {
     };
 
     const handleCopy = () => {
-        navigator.clipboard.writeText( draftCode )
+        navigator.clipboard.writeText( renderCode )
             .then( () => displayMsg( 'Copied to clipboard!' ) )
             .catch( console.error );
     };
@@ -187,7 +261,7 @@ const RendererD2 = ( { data } ) => {
         <div className="renderer-container panel-container">
             <div className="sticky-area">
                 <div className="renderer-header">
-                    <div style={ { color: 'lightgreen', whiteSpace: 'nowrap' } }>
+                    <div style={ { color: 'lightgreen', whiteSpace: 'nowrap', marginRight: '12px' } }>
                         D2 Translation
                     </div>
                     <div className="flex space-x-2">
@@ -204,8 +278,7 @@ const RendererD2 = ( { data } ) => {
                     <a
                         href="#"
                         onClick={ e => { e.preventDefault(); openInPlayground(); } }
-                        className="mt-2 renderer-button block text-center"
-                    >
+                        className="mt-2 renderer-button block text-center">
                         Playground
                     </a>
                 </div>

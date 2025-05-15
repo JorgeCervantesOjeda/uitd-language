@@ -82,7 +82,6 @@ class TokenParser {
     }
 
     handleParsingError( e ) {
-        console.error( 'Error:', e );
         const token = this.currentToken;
         this.result.errors.push( {
             severity: 8,
