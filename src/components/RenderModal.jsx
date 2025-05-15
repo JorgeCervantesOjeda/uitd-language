@@ -1,7 +1,6 @@
-// src/components/RenderModal.jsx
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { D2 } from '@terrastruct/d2';
+import svgPanZoom from 'svg-pan-zoom';
 
 export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const [ svg, setSvg ] = useState( '' );
@@ -27,7 +26,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const MAX_CACHE_ENTRIES = 2;
     const currentKeyRef = useRef( '' );
 
-    // 4) Cada vez que cambian isOpen, d2Source o layoutEngine, compilamos/renders
+    // 4) Renderizado cuando cambian isOpen, d2Source o layoutEngine
     useEffect( () => {
         if( !isOpen ) return;
 
@@ -35,14 +34,12 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         const cacheKey = `${layoutEngine}::${sourceKey}`;
         currentKeyRef.current = cacheKey;
 
-        // Si está en caché, lo devolvemos
         if( cache.current.has( cacheKey ) ) {
             setSvg( cache.current.get( cacheKey ) );
             setLoading( false );
             return;
         }
 
-        // Si no, compilamos y renderizamos con D2
         setSvg( '' );
         setLoading( true );
 
@@ -50,10 +47,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
             try {
                 const { diagram, renderOptions } = await d2.current.compile( sourceKey, { layout: layoutEngine } );
                 const svgText = await d2.current.render( diagram, renderOptions );
-
-                // Ignoramos respuestas si ya cambió la clave
                 if( currentKeyRef.current !== cacheKey ) return;
-
                 setSvg( svgText );
                 cache.current.set( cacheKey, svgText );
                 if( cache.current.size > MAX_CACHE_ENTRIES ) {
@@ -63,14 +57,48 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
             } catch( e ) {
                 console.error( 'Error al renderizar con D2:', e );
             } finally {
-                if( currentKeyRef.current === cacheKey ) {
-                    setLoading( false );
-                }
+                if( currentKeyRef.current === cacheKey ) setLoading( false );
             }
         } )();
     }, [ isOpen, d2Source, layoutEngine ] );
 
-    // 5) Descarga SVG
+    // refs para zoom
+    const containerRef = useRef( null );
+    const panZoomRef = useRef( null );
+
+    // 5) Zoom y pan con ajuste al contenedor
+    useLayoutEffect( () => {
+        if( !svg || !containerRef.current ) return;
+        const svgElem = containerRef.current.querySelector( 'svg' );
+        if( !svgElem ) return;
+
+        // Ajustar para ocupar todo el contenedor
+        svgElem.setAttribute( 'width', '100%' );
+        svgElem.setAttribute( 'height', '100%' );
+        svgElem.style.width = '100%';
+        svgElem.style.height = '100%';
+
+        // Destruir instancia previa
+        panZoomRef.current?.destroy();
+        // Inicializar con fit/center manual
+        panZoomRef.current = svgPanZoom( svgElem, {
+            zoomEnabled: true,
+            controlIconsEnabled: false,
+            mouseWheelZoomEnabled: true,
+            minZoom: 0.5,
+            maxZoom: 10,
+            fit: false,
+            center: false,
+        } );
+        // Ajustar al tamaño del contenedor y centrar
+        panZoomRef.current.resize();
+        panZoomRef.current.fit();
+        panZoomRef.current.center();
+
+        return () => panZoomRef.current?.destroy();
+    }, [ svg ] );
+
+    // 6) Descargar SVG
     const onDownloadSVG = () => {
         const blob = new Blob( [ svg ], { type: 'image/svg+xml' } );
         const url = URL.createObjectURL( blob );
@@ -81,7 +109,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         URL.revokeObjectURL( url );
     };
 
-    // 6) Convierte SVG a JPG y descarga
+    // 7) Convertir SVG a JPG y descargar
     const onDownloadJPG = () => {
         if( !svg ) return;
         const parser = new DOMParser();
@@ -178,10 +206,16 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                     </div>
                     <button className="close-btn" onClick={ onClose }>X</button>
                 </header>
-                <div className="content">
+                <div className="content" style={ { width: '100%', height: '100%' } }>
                     { loading
                         ? <p>Loading diagram...</p>
-                        : <div dangerouslySetInnerHTML={ { __html: svg } } />
+                        : (
+                            <div
+                                ref={ containerRef }
+                                style={ { width: '100%', height: '100%', overflow: 'hidden' } }
+                                dangerouslySetInnerHTML={ { __html: svg } }
+                            />
+                        )
                     }
                 </div>
             </div>
