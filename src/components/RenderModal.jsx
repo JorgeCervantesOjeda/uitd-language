@@ -7,98 +7,112 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const [ loading, setLoading ] = useState( false );
     const [ full, setFull ] = useState( false );
 
-    // 1) Layout engine persistido en localStorage
-    const [ layoutEngine, setLayoutEngine ] = useState( () => {
-        return localStorage.getItem( 'layoutEngine' ) || 'dagre';
-    } );
+    // Persist layout engine choice
+    const [ layoutEngine, setLayoutEngine ] = useState(
+        () => localStorage.getItem( 'layoutEngine' ) || 'dagre'
+    );
     useEffect( () => {
         localStorage.setItem( 'layoutEngine', layoutEngine );
     }, [ layoutEngine ] );
 
-    // 2) Instancia única de D2
+    // Single D2 instance
     const d2 = useRef( null );
     useEffect( () => {
         d2.current = new D2();
     }, [] );
 
-    // 3) Caché LRU para SVG (máx. 2 entradas)
+    // LRU cache
     const cache = useRef( new Map() );
-    const MAX_CACHE_ENTRIES = 2;
-    const currentKeyRef = useRef( '' );
+    const MAX_ENTRIES = 2;
+    const currentKey = useRef( '' );
 
-    // 4) Renderizado cuando cambian isOpen, d2Source o layoutEngine
+    // Clean up panZoom on engine switch
+    const panZoomRef = useRef( null );
+    const handleEngineChange = ( engine ) => {
+        // destroy any existing pan/zoom instance
+        panZoomRef.current?.destroy();
+        panZoomRef.current = null;
+        setLayoutEngine( engine );
+    };
+
+    // Render diagram when props change
     useEffect( () => {
         if( !isOpen ) return;
+        const key = `${layoutEngine}::${d2Source}`;
+        currentKey.current = key;
 
-        const sourceKey = d2Source;
-        const cacheKey = `${layoutEngine}::${sourceKey}`;
-        currentKeyRef.current = cacheKey;
-
-        if( cache.current.has( cacheKey ) ) {
-            setSvg( cache.current.get( cacheKey ) );
+        if( cache.current.has( key ) ) {
+            setSvg( cache.current.get( key ) );
             setLoading( false );
             return;
         }
 
         setSvg( '' );
         setLoading( true );
-
         ( async () => {
             try {
-                const { diagram, renderOptions } = await d2.current.compile( sourceKey, { layout: layoutEngine } );
+                const { diagram, renderOptions } = await d2.current.compile(
+                    d2Source,
+                    { layout: layoutEngine }
+                );
                 const svgText = await d2.current.render( diagram, renderOptions );
-                if( currentKeyRef.current !== cacheKey ) return;
-                setSvg( svgText );
-                cache.current.set( cacheKey, svgText );
-                if( cache.current.size > MAX_CACHE_ENTRIES ) {
+                if( currentKey.current !== key ) return;
+                cache.current.set( key, svgText );
+                if( cache.current.size > MAX_ENTRIES ) {
                     const firstKey = cache.current.keys().next().value;
                     cache.current.delete( firstKey );
                 }
+                setSvg( svgText );
             } catch( e ) {
-                console.error( 'Error al renderizar con D2:', e );
+                console.error( 'Error rendering with D2:', e );
             } finally {
-                if( currentKeyRef.current === cacheKey ) setLoading( false );
+                if( currentKey.current === key ) setLoading( false );
             }
         } )();
     }, [ isOpen, d2Source, layoutEngine ] );
 
-    // refs para zoom
+    // Container ref
     const containerRef = useRef( null );
-    const panZoomRef = useRef( null );
 
-    // 5) Zoom y pan con ajuste al contenedor
+    // Initialize svg-pan-zoom on each new SVG
     useLayoutEffect( () => {
         if( !svg || !containerRef.current ) return;
         const svgElem = containerRef.current.querySelector( 'svg' );
         if( !svgElem ) return;
 
-        // Ajustar para ocupar todo el contenedor
-        svgElem.setAttribute( 'width', '100%' );
-        svgElem.setAttribute( 'height', '100%' );
+        // Remove fixed attrs, allow CSS sizing
+        svgElem.removeAttribute( 'width' );
+        svgElem.removeAttribute( 'height' );
         svgElem.style.width = '100%';
         svgElem.style.height = '100%';
 
-        // Destruir instancia previa
-        panZoomRef.current?.destroy();
-        // Inicializar con fit/center manual
-        panZoomRef.current = svgPanZoom( svgElem, {
-            zoomEnabled: true,
-            controlIconsEnabled: false,
-            mouseWheelZoomEnabled: true,
-            minZoom: 0.5,
-            maxZoom: 10,
-            fit: false,
-            center: false,
+        // Initialize pan/zoom
+        try {
+            panZoomRef.current = svgPanZoom( svgElem, {
+                zoomEnabled: true,
+                controlIconsEnabled: false,
+                mouseWheelZoomEnabled: true,
+                minZoom: 0.5,
+                maxZoom: 10,
+                fit: true,
+                center: true,
+            } );
+        } catch( err ) {
+            console.error( 'svg-pan-zoom init failed:', err );
+            return;
+        }
+
+        // Fit/center after layout
+        requestAnimationFrame( () => {
+            panZoomRef.current.resize();
+            panZoomRef.current.fit();
+            panZoomRef.current.center();
         } );
-        // Ajustar al tamaño del contenedor y centrar
-        panZoomRef.current.resize();
-        panZoomRef.current.fit();
-        panZoomRef.current.center();
 
         return () => panZoomRef.current?.destroy();
     }, [ svg ] );
 
-    // 6) Descargar SVG
+    // Download handlers
     const onDownloadSVG = () => {
         const blob = new Blob( [ svg ], { type: 'image/svg+xml' } );
         const url = URL.createObjectURL( blob );
@@ -109,66 +123,53 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         URL.revokeObjectURL( url );
     };
 
-    // 7) Convertir SVG a JPG y descargar
     const onDownloadJPG = () => {
         if( !svg ) return;
         const parser = new DOMParser();
         const doc = parser.parseFromString( svg, 'image/svg+xml' );
         const svgElem = doc.documentElement;
-        let width = parseFloat( svgElem.getAttribute( 'width' ) || '0' );
-        let height = parseFloat( svgElem.getAttribute( 'height' ) || '0' );
-
-        if( !( width > 0 && height > 0 ) ) {
+        let w = parseFloat( svgElem.getAttribute( 'width' ) || '0' );
+        let h = parseFloat( svgElem.getAttribute( 'height' ) || '0' );
+        if( !( w > 0 && h > 0 ) ) {
             const viewBox = svgElem.getAttribute( 'viewBox' );
             if( viewBox ) {
-                const parts = viewBox.trim().split( /[\s,]+/ ).map( Number );
-                width = parts[ 2 ];
-                height = parts[ 3 ];
+                const parts = viewBox.trim().split( /[,\s]+/ ).map( Number );
+                w = parts[ 2 ];
+                h = parts[ 3 ];
             } else {
-                console.warn( 'SVG sin width/height ni viewBox, usando 800×600 por defecto' );
-                width = 800;
-                height = 600;
+                w = 800;
+                h = 600;
             }
         }
-
         const svgBlob = new Blob( [ svg ], { type: 'image/svg+xml;charset=utf-8' } );
         const url = URL.createObjectURL( svgBlob );
         const img = new Image();
-
         img.onload = () => {
             const canvas = document.createElement( 'canvas' );
-            canvas.width = width;
-            canvas.height = height;
+            canvas.width = w;
+            canvas.height = h;
             const ctx = canvas.getContext( '2d' );
             ctx.fillStyle = '#fff';
-            ctx.fillRect( 0, 0, width, height );
-            ctx.drawImage( img, 0, 0, width, height );
+            ctx.fillRect( 0, 0, w, h );
+            ctx.drawImage( img, 0, 0, w, h );
             URL.revokeObjectURL( url );
-
             canvas.toBlob(
-                ( blobJpg ) => {
-                    if( !blobJpg ) {
-                        console.error( 'No se pudo generar el blob JPEG' );
-                        return;
-                    }
+                blob => {
+                    if( !blob ) return console.error( 'JPEG generation failed' );
                     const link = document.createElement( 'a' );
-                    link.href = URL.createObjectURL( blobJpg );
+                    link.href = URL.createObjectURL( blob );
                     link.download = 'diagram.jpg';
-                    document.body.appendChild( link );
                     link.click();
-                    document.body.removeChild( link );
                     URL.revokeObjectURL( link.href );
                 },
                 'image/jpeg',
                 0.92
             );
         };
-
-        img.onerror = ( e ) => {
-            console.error( 'Error al cargar la imagen SVG:', e );
+        img.onerror = e => {
+            console.error( 'Error loading SVG image:', e );
             URL.revokeObjectURL( url );
         };
-
         img.src = url;
     };
 
@@ -178,45 +179,40 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         <div className="modal-backdrop" onClick={ onClose }>
             <div
                 className={ full ? 'modal fullscreen' : 'modal' }
+                style={ { display: 'flex', flexDirection: 'column', height: '100%' } }
                 onClick={ e => e.stopPropagation() }
             >
-                <header style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } }>
-                    <div style={ { display: 'flex', alignItems: 'center' } }>
-                        <div style={ { display: 'flex', alignItems: 'center', marginRight: '2rem', gap: '0.5rem' } }>
-                            <label htmlFor="engine-select">Layout:</label>
-                            <select
-                                id="engine-select"
-                                value={ layoutEngine }
-                                onChange={ e => setLayoutEngine( e.target.value ) }
-                                disabled={ loading }
-                            >
-                                <option value="dagre">Dagre</option>
-                                <option value="elk">ELK</option>
-                            </select>
-                        </div>
+                <header style={ { flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }>
+                    <div style={ { display: 'flex', alignItems: 'center', gap: '0.5rem' } }>
+                        <label htmlFor="engine-select">Layout:</label>
+                        <select
+                            id="engine-select"
+                            value={ layoutEngine }
+                            onChange={ e => handleEngineChange( e.target.value ) }
+                            disabled={ loading }
+                        >
+                            <option value="dagre">Dagre</option>
+                            <option value="elk">ELK</option>
+                        </select>
                         <button onClick={ () => setFull( f => !f ) } disabled={ loading }>
                             { full ? 'Restore' : 'Maximize' }
                         </button>
-                        <button onClick={ onDownloadSVG } disabled={ !svg || loading }>
-                            SVG
-                        </button>
-                        <button onClick={ onDownloadJPG } disabled={ !svg || loading }>
-                            JPG
-                        </button>
+                        <button onClick={ onDownloadSVG } disabled={ !svg || loading }>SVG</button>
+                        <button onClick={ onDownloadJPG } disabled={ !svg || loading }>JPG</button>
                     </div>
                     <button className="close-btn" onClick={ onClose }>X</button>
                 </header>
-                <div className="content" style={ { width: '100%', height: '100%' } }>
-                    { loading
-                        ? <p>Loading diagram...</p>
-                        : (
-                            <div
-                                ref={ containerRef }
-                                style={ { width: '100%', height: '100%', overflow: 'hidden' } }
-                                dangerouslySetInnerHTML={ { __html: svg } }
-                            />
-                        )
-                    }
+                <div className="content" style={ { flex: 1, overflow: 'hidden', position: 'relative' } }>
+                    { loading ? (
+                        <p>Loading diagram...</p>
+                    ) : (
+                        <div
+                            key={ currentKey.current }
+                            ref={ containerRef }
+                            style={ { width: '100%', height: '100%' } }
+                            dangerouslySetInnerHTML={ { __html: svg } }
+                        />
+                    ) }
                 </div>
             </div>
         </div>
