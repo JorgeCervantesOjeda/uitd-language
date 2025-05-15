@@ -1,109 +1,316 @@
 direction: down
-index_html: "index_html\n(20 lines)" { style: { stroke-width: 1 }
+
+classes: {
+  label_bg: {
+    shape: text
+    style: {
+      stroke-width: 015
+      font-color: "#003311"
+      font-size: 18
+    }
+  }
+}
+app_jsx -> label_0 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_0 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_codeviewer_jsx -> label_6 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_6 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_codeviewer_jsx -> label_7 { style: { stroke: "#808080" } }
+label_7 -> monaco-editor_react   { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> label_10 { style: { stroke: "#808080" } }
+label_10 -> monaco-editor_react   { style: { stroke: "#808080" } }
+app_jsx -> label_2 { style: { stroke: "#808080" } }
+label_2 -> components_editor_editor_jsx   { style: { stroke: "#808080" } }
+app_jsx -> label_1 { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
+label_1 -> lodash   { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
+components_editor_editor_jsx -> label_17 { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
+label_17 -> lodash   { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
+components_editor_editor_jsx -> label_9 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_9 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_editorheader_jsx -> label_19 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_19 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_editor_jsx -> label_11 { style: { stroke: "#808080" } }
+label_11 -> components_editor_editorheader_jsx   { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> label_12 { style: { stroke: "#808080" } }
+label_12 -> components_editor_errorlistportal_jsx   { style: { stroke: "#808080" } }
+components_editor_errorlistportal_jsx -> label_27 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_27 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_erroritem_jsx -> label_22 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_22 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_erroritem_jsx -> label_23 { style: { stroke: "#808080" } }
+label_23 -> app_css   { style: { stroke: "#808080" } }
+app_jsx -> label_5 { style: { stroke: "#808080" } }
+label_5 -> app_css   { style: { stroke: "#808080" } }
+app_jsx -> label_3 { style: { stroke: "#808080" } }
+label_3 -> components_rendererd2_jsx   { style: { stroke: "#808080" } }
+components_rendererd2_jsx -> label_36 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_36 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_errorlist_jsx -> label_24 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_24 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_errorlist_jsx -> label_25 { style: { stroke: "#808080" } }
+label_25 -> app_css   { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> label_16 { style: { stroke: "#808080" } }
+label_16 -> app_css   { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> label_13 { style: { stroke: "#808080" } }
+label_13 -> components_editor_utils_formatcode_js   { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> label_14 { style: { stroke: "#808080" } }
+label_14 -> components_editor_utils_seterrors_js   { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> label_15 { style: { stroke: "#808080" } }
+label_15 -> components_editor_utils_monacosetup_js   { style: { stroke: "#808080" } }
+components_codeviewer_jsx -> label_8 { style: { stroke: "#808080" } }
+label_8 -> components_editor_utils_monacosetup_js   { style: { stroke: "#808080" } }
+components_rendererd2_jsx -> label_37 { style: { stroke: "#808080" } }
+label_37 -> components_codeviewer_jsx   { style: { stroke: "#808080" } }
+components_rendererd2_jsx -> label_38 { style: { stroke: "#808080" } }
+label_38 -> app_css   { style: { stroke: "#808080" } }
+components_rendererd2_jsx -> label_39 { style: { stroke: "#808080" } }
+label_39 -> components_rendermodal_jsx   { style: { stroke: "#808080" } }
+components_rendermodal_jsx -> label_40 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_40 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_menus_dropdownmenu_jsx -> label_30 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_30 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_menus_editmenu_jsx -> label_32 { style: { stroke: "#808080" } }
+label_32 -> components_editor_menus_dropdownmenu_jsx   { style: { stroke: "#808080" } }
+components_editor_editorheader_jsx -> label_21 { style: { stroke: "#808080" } }
+label_21 -> components_editor_menus_editmenu_jsx   { style: { stroke: "#808080" } }
+components_editor_editorheader_jsx -> label_20 { style: { stroke: "#808080" } }
+label_20 -> components_editor_menus_filemenu_jsx   { style: { stroke: "#808080" } }
+components_editor_menus_filemenu_jsx -> label_33 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_33 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+components_editor_menus_editmenu_jsx -> label_31 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_31 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+main_jsx -> label_42 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_42 -> react   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+main_jsx -> label_43 { style: { stroke: "#808080" } }
+label_43 -> react-dom_client   { style: { stroke: "#808080" } }
+main_jsx -> label_44 { style: { stroke: "#808080" } }
+label_44 -> app_jsx   { style: { stroke: "#808080" } }
+app_jsx -> label_4 { style: { stroke: "#808080" } }
+label_4 -> utils_tokenparser_js   { style: { stroke: "#808080" } }
+components_editor_utils_monacosetup_js -> label_35 { style: { stroke: "#808080" } }
+label_35 -> utils_tokenparser_js   { style: { stroke: "#808080" } }
+utils_tokenparser_js -> label_47 { style: { stroke: "#808080" } }
+label_47 -> utils_lexer_js   { style: { stroke: "#808080" } }
+utils_lexer_js -> label_46 { style: { stroke: "#808080" } }
+label_46 -> utils_tokens_js   { style: { stroke: "#808080" } }
+utils_tokenparser_js -> label_48 { style: { stroke: "#808080" } }
+label_48 -> utils_tokens_js   { style: { stroke: "#808080" } }
+utils_tokenparser_js -> label_49 { style: { stroke: "#808080" } }
+label_49 -> utils_utils_js   { style: { stroke: "#808080" } }
+utils_validation_js -> label_51 { style: { stroke: "#808080" } }
+label_51 -> utils_utils_js   { style: { stroke: "#808080" } }
+utils_tokenparser_js -> label_50 { style: { stroke: "#808080" } }
+label_50 -> utils_validation_js   { style: { stroke: "#808080" } }
+main_jsx -> label_45 { style: { stroke: "#808080" } }
+label_45 -> index_css   { style: { stroke: "#808080" } }
+components_editor_menus_filemenu_jsx -> label_34 { style: { stroke: "#808080" } }
+label_34 -> components_editor_menus_dropdownmenu_jsx   { style: { stroke: "#808080" } }
+components_rendermodal_jsx -> label_41 { style: { stroke: "#808080" } }
+label_41 -> terrastruct_d2   { style: { stroke: "#808080" } }
+components_editor_editor_jsx -> label_18 { style: { stroke: "lightgreen"
+    stroke-dash: 5 } }
+label_18 -> file-saver   { style: { stroke: "lightgreen"
+    stroke-dash: 5 } }
+components_editor_errorlist_jsx -> label_26 { style: { stroke: "#808080" } }
+label_26 -> components_editor_erroritem_jsx   { style: { stroke: "#808080" } }
+components_editor_errorlistportal_jsx -> label_29 { style: { stroke: "#808080" } }
+label_29 -> components_editor_errorlist_jsx   { style: { stroke: "#808080" } }
+components_editor_errorlistportal_jsx -> label_28 { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+label_28 -> react-dom   { style: { stroke: "#61DAFB"
+    stroke-dash: 5 } }
+app_css: "app_css\n(304 lines)" { style: { stroke-width: 11 }
  shape: "rectangle" }
-src_app_jsx: "src_app_jsx\n(46 lines)" { style: { stroke-width: 2
-    stroke-dash: 2 }
+app_jsx: "app_jsx\n(46 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_codeviewer_jsx: "src_components_codeviewer_jsx\n(24 lines)" { style: { stroke-width: 1 }
+components_codeviewer_jsx: "components_codeviewer_jsx\n(36 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_editor_editor_jsx: "src_components_editor_editor_jsx\n(116 lines)" { style: { stroke-width: 5
-    stroke-dash: 2 }
+components_editor_editor_jsx: "components_editor_editor_jsx\n(352 lines)" { style: { stroke-width: 13 }
  shape: "rectangle" }
-src_components_editor_editorheader_jsx: "src_components_editor_editorheader_jsx\n(44 lines)" { style: { stroke-width: 2 }
+components_editor_editorheader_jsx: "components_editor_editorheader_jsx\n(106 lines)" { style: { stroke-width: 4 }
  shape: "rectangle" }
-src_components_editor_errorlist_jsx: "src_components_editor_errorlist_jsx\n(35 lines)" { style: { stroke-width: 2
-    stroke-dash: 2 }
+components_editor_erroritem_jsx: "components_editor_erroritem_jsx\n(45 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_editor_menus_dropdownmenu_jsx: "src_components_editor_menus_dropdownmenu_jsx\n(40 lines)" { style: { stroke-width: 2 }
+components_editor_errorlist_jsx: "components_editor_errorlist_jsx\n(32 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_editor_menus_editmenu_jsx: "src_components_editor_menus_editmenu_jsx\n(47 lines)" { style: { stroke-width: 2 }
+components_editor_errorlistportal_jsx: "components_editor_errorlistportal_jsx\n(14 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_components_editor_menus_filemenu_jsx: "src_components_editor_menus_filemenu_jsx\n(58 lines)" { style: { stroke-width: 3 }
+components_editor_menus_dropdownmenu_jsx: "components_editor_menus_dropdownmenu_jsx\n(46 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_editor_utils_exampleuitd_js: "src_components_editor_utils_exampleuitd_js\n(45 lines)" { style: { stroke-width: 2 }
+components_editor_menus_editmenu_jsx: "components_editor_menus_editmenu_jsx\n(15 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_components_editor_utils_formatcode_js: "src_components_editor_utils_formatcode_js\n(68 lines)" { style: { stroke-width: 3 }
+components_editor_menus_filemenu_jsx: "components_editor_menus_filemenu_jsx\n(15 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_components_editor_utils_monacosetup_js: "src_components_editor_utils_monacosetup_js\n(91 lines)" { style: { stroke-width: 4 }
+components_editor_utils_exampleuitd_js: "components_editor_utils_exampleuitd_js\n(46 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_editor_utils_seterrors_js: "src_components_editor_utils_seterrors_js\n(24 lines)" { style: { stroke-width: 1 }
+components_editor_utils_formatcode_js: "components_editor_utils_formatcode_js\n(71 lines)" { style: { stroke-width: 3 }
  shape: "rectangle" }
-src_components_rendererd2_jsx: "src_components_rendererd2_jsx\n(153 lines)" { style: { stroke-width: 6
-    stroke-dash: 2 }
+components_editor_utils_monacosetup_js: "components_editor_utils_monacosetup_js\n(175 lines)" { style: { stroke-width: 7 }
  shape: "rectangle" }
-src_components_rendermodal_jsx: "src_components_rendermodal_jsx\n(163 lines)" { style: { stroke-width: 7 }
+components_editor_utils_seterrors_js: "components_editor_utils_seterrors_js\n(26 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_main_jsx: "src_main_jsx\n(11 lines)" { style: { stroke-width: 1
-    stroke-dash: 2 }
+components_rendererd2_jsx: "components_rendererd2_jsx\n(311 lines)" { style: { stroke-width: 12 }
  shape: "rectangle" }
-src_utils_lexer_js: "src_utils_lexer_js\n(100 lines)" { style: { stroke-width: 4 }
+components_rendermodal_jsx: "components_rendermodal_jsx\n(191 lines)" { style: { stroke-width: 7 }
  shape: "rectangle" }
-src_utils_tokenparser_js: "src_utils_tokenparser_js\n(392 lines)" { style: { stroke-width: 15 }
+index_css: "index_css\n(75 lines)" { style: { stroke-width: 3 }
  shape: "rectangle" }
-src_utils_tokens_js: "src_utils_tokens_js\n(48 lines)" { style: { stroke-width: 2 }
+main_jsx: "main_jsx\n(11 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_utils_utils_js: "src_utils_utils_js\n(34 lines)" { style: { stroke-width: 2 }
+utils_lexer_js: "utils_lexer_js\n(100 lines)" { style: { stroke-width: 4 }
  shape: "rectangle" }
-src_utils_validation_js: "src_utils_validation_js\n(268 lines)" { style: { stroke-width: 10 }
+utils_tokenparser_js: "utils_tokenparser_js\n(404 lines)" { style: { stroke-width: 15 }
+ shape: "rectangle" }
+utils_tokens_js: "utils_tokens_js\n(48 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+utils_utils_js: "utils_utils_js\n(34 lines)" { style: { stroke-width: 2 }
+ shape: "rectangle" }
+utils_validation_js: "utils_validation_js\n(268 lines)" { style: { stroke-width: 10 }
  shape: "rectangle" }
 react: "react" { style: { stroke-width: 1 }
  shape: "hexagon" }
+lodash: "lodash" { style: { stroke-width: 1 }
+ shape: "oval" }
 monaco-editor_react: "@monaco-editor_react" { style: { stroke-width: 1 }
  shape: "oval" }
 file-saver: "file-saver" { style: { stroke-width: 1 }
  shape: "oval" }
+react-dom: "react-dom" { style: { stroke-width: 1 }
+ shape: "hexagon" }
 terrastruct_d2: "@terrastruct_d2" { style: { stroke-width: 1 }
  shape: "oval" }
 react-dom_client: "react-dom_client" { style: { stroke-width: 1 }
  shape: "oval" }
-src_app_jsx -> react: "React,\nuseState,\nuseEffect" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_app_jsx -> src_components_editor_editor_jsx: "Editor" { style: { stroke: "#808080" } }
-src_app_jsx -> src_components_rendererd2_jsx: "RendererD2" { style: { stroke: "#808080" } }
-src_app_jsx -> src_utils_tokenparser_js: "parseUITDL" { style: { stroke: "#808080" } }
-src_components_codeviewer_jsx -> react: "React" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_codeviewer_jsx -> monaco-editor_react: "MonacoEditor" { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> react: "React,\nuseRef,\nuseState,\nuseEffect" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_editor_editor_jsx -> monaco-editor_react: "MonacoEditor" { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> src_components_editor_errorlist_jsx: "ErrorList" { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> src_components_editor_editorheader_jsx: "EditorHeader" { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> src_components_editor_utils_formatcode_js: "handleFormatCode" { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> src_components_editor_utils_seterrors_js: "setErrors" { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> src_components_editor_utils_monacosetup_js: "setupMonaco" { style: { stroke: "#808080" } }
-src_components_editor_editorheader_jsx -> react: "React" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_editor_editorheader_jsx -> src_components_editor_menus_filemenu_jsx: "FileMenu" { style: { stroke: "#808080" } }
-src_components_editor_editorheader_jsx -> src_components_editor_menus_editmenu_jsx: "EditMenu" { style: { stroke: "#808080" } }
-src_components_editor_errorlist_jsx -> react: "React" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_editor_menus_dropdownmenu_jsx -> react: "React,\nuseState" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_editor_menus_editmenu_jsx -> react: "React" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_editor_menus_editmenu_jsx -> src_components_editor_menus_dropdownmenu_jsx: "DropdownMenu" { style: { stroke: "#808080" } }
-src_components_editor_menus_editmenu_jsx -> src_components_editor_utils_exampleuitd_js: "ExampleUITD" { style: { stroke: "#808080" } }
-src_components_editor_menus_filemenu_jsx -> react: "React,\nuseRef" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_editor_menus_filemenu_jsx -> file-saver: "saveAs" { style: { stroke: "lightgreen"
-    stroke-dash: 5 } }
-src_components_editor_menus_filemenu_jsx -> src_components_editor_menus_dropdownmenu_jsx: "DropdownMenu" { style: { stroke: "#808080" } }
-src_components_editor_utils_monacosetup_js -> src_utils_tokenparser_js: "validVerbs" { style: { stroke: "#808080" } }
-src_components_rendererd2_jsx -> react: "React,\nuseEffect,\nuseState" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_rendererd2_jsx -> src_components_codeviewer_jsx: "CodeViewer" { style: { stroke: "#808080" } }
-src_components_rendererd2_jsx -> src_components_rendermodal_jsx: "RenderModal" { style: { stroke: "#808080" } }
-src_components_rendermodal_jsx -> react: "React,\nuseState,\nuseRef,\nuseEffect" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_components_rendermodal_jsx -> terrastruct_d2: "D2" { style: { stroke: "#808080" } }
-src_main_jsx -> react: "React" { style: { stroke: "#61DAFB"
-    stroke-dash: 5 } }
-src_main_jsx -> react-dom_client: "ReactDOM" { style: { stroke: "#808080" } }
-src_main_jsx -> src_app_jsx: "App" { style: { stroke: "#808080" } }
-src_utils_lexer_js -> src_utils_tokens_js: "Token,\nTokenType,\nTokens" { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> src_utils_lexer_js: "tokenize" { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> src_utils_tokens_js: "TokenType" { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> src_utils_utils_js: "getInnermostUIStr,\ngetInnermostUIRef,\nformatUIRef" { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> src_utils_validation_js: "validateData" { style: { stroke: "#808080" } }
-src_utils_validation_js -> src_utils_utils_js: "getInnermostUIRef,\nformatUIRef" { style: { stroke: "#808080" } }
+label_0: "React,\nuseState,\nuseEffect,\nuseMemo" 
+label_0.class: label_bg
+label_1: "debounce" 
+label_1.class: label_bg
+label_2: "Editor" 
+label_2.class: label_bg
+label_3: "RendererD2" 
+label_3.class: label_bg
+label_4: "parseUITDL" 
+label_4.class: label_bg
+label_5: "_" 
+label_5.class: label_bg
+label_6: "React,\nuseCallback,\nuseRef" 
+label_6.class: label_bg
+label_7: "MonacoEditor" 
+label_7.class: label_bg
+label_8: "setupD2" 
+label_8.class: label_bg
+label_9: "React,\nuseRef,\nuseState,\nuseEffect,\nuseCallback" 
+label_9.class: label_bg
+label_10: "MonacoEditor" 
+label_10.class: label_bg
+label_11: "EditorHeader" 
+label_11.class: label_bg
+label_12: "ErrorListPortal" 
+label_12.class: label_bg
+label_13: "handleFormatCode" 
+label_13.class: label_bg
+label_14: "setErrors" 
+label_14.class: label_bg
+label_15: "setupMonaco" 
+label_15.class: label_bg
+label_16: "_" 
+label_16.class: label_bg
+label_17: "debounce" 
+label_17.class: label_bg
+label_18: "saveAs" 
+label_18.class: label_bg
+label_19: "React,\nuseState,\nuseEffect,\nuseCallback" 
+label_19.class: label_bg
+label_20: "FileMenu" 
+label_20.class: label_bg
+label_21: "EditMenu" 
+label_21.class: label_bg
+label_22: "React" 
+label_22.class: label_bg
+label_23: "_" 
+label_23.class: label_bg
+label_24: "React" 
+label_24.class: label_bg
+label_25: "_" 
+label_25.class: label_bg
+label_26: "ErrorItem" 
+label_26.class: label_bg
+label_27: "React" 
+label_27.class: label_bg
+label_28: "createPortal" 
+label_28.class: label_bg
+label_29: "ErrorList" 
+label_29.class: label_bg
+label_30: "React,\nuseState,\nuseRef,\nuseEffect" 
+label_30.class: label_bg
+label_31: "React" 
+label_31.class: label_bg
+label_32: "DropdownMenu" 
+label_32.class: label_bg
+label_33: "React" 
+label_33.class: label_bg
+label_34: "DropdownMenu" 
+label_34.class: label_bg
+label_35: "validVerbs" 
+label_35.class: label_bg
+label_36: "React,\nuseState,\nuseRef,\nuseEffect,\nuseCallback" 
+label_36.class: label_bg
+label_37: "CodeViewer" 
+label_37.class: label_bg
+label_38: "_" 
+label_38.class: label_bg
+label_39: "RenderModal" 
+label_39.class: label_bg
+label_40: "React,\nuseState,\nuseRef,\nuseEffect" 
+label_40.class: label_bg
+label_41: "D2" 
+label_41.class: label_bg
+label_42: "React" 
+label_42.class: label_bg
+label_43: "ReactDOM" 
+label_43.class: label_bg
+label_44: "App" 
+label_44.class: label_bg
+label_45: "_" 
+label_45.class: label_bg
+label_46: "Token,\nTokenType,\nTokens" 
+label_46.class: label_bg
+label_47: "tokenize" 
+label_47.class: label_bg
+label_48: "TokenType" 
+label_48.class: label_bg
+label_49: "getInnermostUIStr,\ngetInnermostUIRef,\nformatUIRef" 
+label_49.class: label_bg
+label_50: "validateData" 
+label_50.class: label_bg
+label_51: "getInnermostUIRef,\nformatUIRef" 
+label_51.class: label_bg

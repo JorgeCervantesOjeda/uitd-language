@@ -43,8 +43,44 @@ const formatString = ( name, maxLength = 15 ) => {
     return formattedName;
 };
 
-// Función recursiva para ordenar transiciones según especificación
+// Función recursiva para ordenar transiciones según especificación,
+// primero midiendo profundidades, luego volviendo a ordenar según ellas
 const ordenarTransiciones = ( transitions, uiOrder ) => {
+    // --- Primer pase: calcular profundidad máxima por nodo ---
+    const maxDepths = {};
+    const usedForDepth = Array( transitions.length ).fill( false );
+
+    const dfsDepth = ( actual, depth ) => {
+        maxDepths[ actual ] = Math.max( maxDepths[ actual ] || 0, depth );
+
+        transitions.forEach( ( t, i ) => {
+            if( usedForDepth[ i ] ) return;
+            const fromKey = formatTransitionUIRef( t.from );
+            const toKey = formatTransitionUIRef( t.to );
+
+            if( fromKey === actual || toKey === actual ) {
+                usedForDepth[ i ] = true;
+                const vecino = ( fromKey === actual ? toKey : fromKey );
+                dfsDepth( vecino, depth + 1 );
+            }
+        } );
+    };
+
+    uiOrder.forEach( id => dfsDepth( id, 0 ) );
+
+    // crear nuevo orden de nodos:
+    // - primero por profundidad (descendente)
+    // - si igual, por posición en uiOrder (ascendente)
+    const sortedOrder = [ ...new Set( uiOrder ) ].sort( ( a, b ) => {
+        const depthA = maxDepths[ a ] || 0;
+        const depthB = maxDepths[ b ] || 0;
+        if( depthA !== depthB ) {
+            return depthB - depthA;
+        }
+        return uiOrder.indexOf( a ) - uiOrder.indexOf( b );
+    } );
+
+    // --- Segundo pase: reconstruir 'resultado' usando sortedOrder ---
     const usadas = Array( transitions.length ).fill( false );
     const resultado = [];
 
@@ -59,24 +95,28 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
             }
         } );
 
-        // 2) vecinos ordenados según uiOrder
-        const uniqueUiOrder = uiOrder.filter( ( v, i, a ) => a.indexOf( v ) === i );
-        const vecinos = uniqueUiOrder.filter( key => {
+        // 2) vecinos en el orden dado por sortedOrder
+        const uniqueOrder = sortedOrder.filter( ( v, i, a ) => a.indexOf( v ) === i );
+        const vecinos = uniqueOrder.filter( key => {
             if( key === actual ) return false;
             return transitions.some( ( t, i ) => {
                 if( usadas[ i ] ) return false;
                 const fromKey = formatTransitionUIRef( t.from );
                 const toKey = formatTransitionUIRef( t.to );
-                return fromKey === actual && toKey === key;
+                return ( fromKey === actual && toKey === key )
+                    || ( fromKey === key && toKey === actual );
             } );
         } );
 
         // 3) para cada vecino B: A→B, B→A, recursión
-        vecinos.forEach( ( b ) => {
+        vecinos.forEach( b => {
             transitions.forEach( ( t, i ) => {
                 const fromKey = formatTransitionUIRef( t.from );
                 const toKey = formatTransitionUIRef( t.to );
-                if( !usadas[ i ] && (fromKey === actual && toKey === b || fromKey == b && toKey === actual )) {
+                if( !usadas[ i ] && (
+                    ( fromKey === actual && toKey === b ) ||
+                    ( fromKey === b && toKey === actual )
+                ) ) {
                     resultado.push( t );
                     usadas[ i ] = true;
                 }
@@ -85,8 +125,9 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
         } );
     };
 
-    // Arranca DFS en cada IU según el orden de dibujo (uiOrder)
-    uiOrder.forEach( id => dfs( id ) );
+    // arrancar DFS con el orden basado en profundidad
+    sortedOrder.forEach( id => dfs( id ) );
+
     return resultado;
 };
 
@@ -140,11 +181,13 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
 };
 
 // Función principal de traducción a D2
+// Función principal de traducción a D2
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 
     const uiColorMap = generateUIColorMap( parsedData.uis );
 
+    // Cabecera y bloque classes (las primeras 15 líneas)
     let d2 =
         `direction: right\n\n` +
         `# Clase para nodos fantasma de etiquetas\n` +
@@ -168,42 +211,18 @@ const translateToD2 = ( parsedData ) => {
         const bgColor = fragment.color || '#eeeeee';
         const defaultWidth = fragment.width ?? 15;
 
-        // 1) extraemos el orden de UIs (incluye nested) en cada draw
+        // Extraemos y ordenamos transiciones
         const uiOrder = fragment.draws
             .flatMap( draw => draw.uiRefs.flatMap( ref => flattenUIRefs( ref ) ) )
             .filter( ( v, i, a ) => a.indexOf( v ) === i );
-
-        // 2) ordenamos transiciones usando ese orden
         const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
 
+        // 1) Inicio del fragmento
         d2 += `  ${fragLetter}.style.fill: "${bgColor}"\n`;
         d2 += `  ${fragLetter}.style.stroke-dash: 1\n`;
         d2 += `  ${fragLetter}: ${formatString( fragment.name, 20 )} {\n`;
 
-        // 1) Definiciones de labels (clase y texto)
-        const labelClassDefs = [];
-        const labelTextDefs = [];
-        sortedTransitions.forEach( ( t, tIdx ) => {
-            const fromId = formatTransitionUIRef( t.from );
-            const toId = formatTransitionUIRef( t.to );
-            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
-
-            labelClassDefs.push( `    ${lblId}.class: label_bg\n` );
-            let action = `${t.action} "${t.target}"`;
-            if( t.condition ) action += ` AND (${t.condition})`;
-            labelTextDefs.push( `    ${lblId}: ${formatString( action, t.width ?? defaultWidth )}\n` );
-        } );
-        d2 += labelClassDefs.join( '' );
-        d2 += labelTextDefs.join( '' );
-
-        // 2) Jerarquía de UIs
-        fragment.draws.forEach( draw => {
-            draw.uiRefs.forEach( ref => {
-                d2 += buildUIHierarchy( ref, 2, parsedData.uis, '', uiColorMap );
-            } );
-        } );
-
-        // 3) Flechas de transición
+        // 2) Flechas de transición al inicio del fragmento
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
@@ -212,12 +231,33 @@ const translateToD2 = ( parsedData ) => {
             d2 += `    ${lblId} -> ${toId}\n`;
         } );
 
+        // 3) Definiciones de labels (clase y texto)
+        sortedTransitions.forEach( ( t, tIdx ) => {
+            const fromId = formatTransitionUIRef( t.from );
+            const toId = formatTransitionUIRef( t.to );
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+
+            d2 += `    ${lblId}.class: label_bg\n`;
+            let action = `${t.action} "${t.target}"`;
+            if( t.condition ) action += ` AND (${t.condition})`;
+            d2 += `    ${lblId}: ${formatString( action, t.width ?? defaultWidth )}\n`;
+        } );
+
+        // 4) Jerarquía de UIs y resto de definiciones
+        fragment.draws.forEach( draw => {
+            draw.uiRefs.forEach( ref => {
+                d2 += buildUIHierarchy( ref, 2, parsedData.uis, '', uiColorMap );
+            } );
+        } );
+
+        // Cierre del bloque de fragmento
         d2 += `  }\n`;
     } );
 
     d2 += `}\n`;
     return d2;
 };
+
 
 const RendererD2 = ( { data } ) => {
     const initialD2 = translateToD2( data );
