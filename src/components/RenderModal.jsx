@@ -26,10 +26,9 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const MAX_ENTRIES = 2;
     const currentKey = useRef( '' );
 
-    // Clean up panZoom on engine switch
+    // Pan/zoom instance ref
     const panZoomRef = useRef( null );
     const handleEngineChange = ( engine ) => {
-        // destroy any existing pan/zoom instance
         panZoomRef.current?.destroy();
         panZoomRef.current = null;
         setLayoutEngine( engine );
@@ -74,9 +73,9 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
     // Container ref
     const containerRef = useRef( null );
 
-    // Initialize svg-pan-zoom on each new SVG
+    // Initialize and clean up svg-pan-zoom on each open or SVG update
     useLayoutEffect( () => {
-        if( !svg || !containerRef.current ) return;
+        if( !svg || !isOpen || !containerRef.current ) return;
         const svgElem = containerRef.current.querySelector( 'svg' );
         if( !svgElem ) return;
 
@@ -109,8 +108,12 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
             panZoomRef.current.center();
         } );
 
-        return () => panZoomRef.current?.destroy();
-    }, [ svg ] );
+        // Cleanup on SVG change or modal close
+        return () => {
+            panZoomRef.current?.destroy();
+            panZoomRef.current = null;
+        };
+    }, [ svg, isOpen ] );
 
     // Download handlers
     const onDownloadSVG = () => {
@@ -154,7 +157,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
             ctx.drawImage( img, 0, 0, w, h );
             URL.revokeObjectURL( url );
             canvas.toBlob(
-                blob => {
+                ( blob ) => {
                     if( !blob ) return console.error( 'JPEG generation failed' );
                     const link = document.createElement( 'a' );
                     link.href = URL.createObjectURL( blob );
@@ -166,7 +169,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                 0.92
             );
         };
-        img.onerror = e => {
+        img.onerror = ( e ) => {
             console.error( 'Error loading SVG image:', e );
             URL.revokeObjectURL( url );
         };
@@ -180,7 +183,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
             <div
                 className={ full ? 'modal fullscreen' : 'modal' }
                 style={ { display: 'flex', flexDirection: 'column', height: '100%' } }
-                onClick={ e => e.stopPropagation() }
+                onClick={ ( e ) => e.stopPropagation() }
             >
                 <header style={ { flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }>
                     <div style={ { display: 'flex', alignItems: 'center', gap: '0.5rem' } }>
@@ -188,13 +191,13 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                         <select
                             id="engine-select"
                             value={ layoutEngine }
-                            onChange={ e => handleEngineChange( e.target.value ) }
+                            onChange={ ( e ) => handleEngineChange( e.target.value ) }
                             disabled={ loading }
                         >
                             <option value="dagre">Dagre</option>
                             <option value="elk">ELK</option>
                         </select>
-                        <button onClick={ () => setFull( f => !f ) } disabled={ loading }>
+                        <button onClick={ () => setFull( ( f ) => !f ) } disabled={ loading }>
                             { full ? 'Restore' : 'Maximize' }
                         </button>
                         <button onClick={ onDownloadSVG } disabled={ !svg || loading }>SVG</button>

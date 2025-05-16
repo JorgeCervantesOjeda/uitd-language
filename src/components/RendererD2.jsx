@@ -44,43 +44,7 @@ const formatString = ( name, maxLength = 15 ) => {
 };
 
 // Función recursiva para ordenar transiciones según especificación,
-// primero midiendo profundidades, luego volviendo a ordenar según ellas
 const ordenarTransiciones = ( transitions, uiOrder ) => {
-    // --- Primer pase: calcular profundidad máxima por nodo ---
-    const maxDepths = {};
-    const usedForDepth = Array( transitions.length ).fill( false );
-
-    const dfsDepth = ( actual, depth ) => {
-        maxDepths[ actual ] = Math.max( maxDepths[ actual ] || 0, depth );
-
-        transitions.forEach( ( t, i ) => {
-            if( usedForDepth[ i ] ) return;
-            const fromKey = formatTransitionUIRef( t.from );
-            const toKey = formatTransitionUIRef( t.to );
-
-            if( fromKey === actual || toKey === actual ) {
-                usedForDepth[ i ] = true;
-                const vecino = ( fromKey === actual ? toKey : fromKey );
-                dfsDepth( vecino, depth + 1 );
-            }
-        } );
-    };
-
-    uiOrder.forEach( id => dfsDepth( id, 0 ) );
-
-    // crear nuevo orden de nodos:
-    // - primero por profundidad (descendente)
-    // - si igual, por posición en uiOrder (ascendente)
-    const sortedOrder = [ ...new Set( uiOrder ) ].sort( ( a, b ) => {
-        const depthA = maxDepths[ a ] || 0;
-        const depthB = maxDepths[ b ] || 0;
-        if( depthA !== depthB ) {
-            return depthB - depthA;
-        }
-        return uiOrder.indexOf( a ) - uiOrder.indexOf( b );
-    } );
-
-    // --- Segundo pase: reconstruir 'resultado' usando sortedOrder ---
     const usadas = Array( transitions.length ).fill( false );
     const resultado = [];
 
@@ -95,8 +59,8 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
             }
         } );
 
-        // 2) vecinos en el orden dado por sortedOrder
-        const uniqueOrder = sortedOrder.filter( ( v, i, a ) => a.indexOf( v ) === i );
+        // 2) vecinos en el orden dado por uiOrder
+        const uniqueOrder = uiOrder.filter( ( v, i, a ) => a.indexOf( v ) === i );
         const vecinos = uniqueOrder.filter( key => {
             if( key === actual ) return false;
             return transitions.some( ( t, i ) => {
@@ -126,7 +90,7 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
     };
 
     // arrancar DFS con el orden basado en profundidad
-    sortedOrder.forEach( id => dfs( id ) );
+    uiOrder.forEach( id => dfs( id ) );
 
     return resultado;
 };
