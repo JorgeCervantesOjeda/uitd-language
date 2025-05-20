@@ -157,11 +157,12 @@ const translateToD2 = ( parsedData ) => {
         `# Clase para nodos fantasma de etiquetas\n` +
         `classes: {\n` +
         `  label_bg: {\n` +
-        `    shape: text\n` +
+        `    shape: rectangle\n` +
         `    style: {\n` +
-        `      stroke-width: 015\n` +
+        `      stroke-width: 01\n` +
         `      font-color: "#003311"\n` +
         `      font-size: 18\n` +
+        `      3d: true\n` +
         `    }\n` +
         `  }\n` +
         `}\n\n` +
@@ -200,6 +201,10 @@ const translateToD2 = ( parsedData ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
             const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+
+            // 1) Color de fondo de la etiqueta igual al color del nodo origen
+            const fillColor = uiColorMap[ t.from.id ] || '#eeeeee';
+            d2 += `    ${lblId}.style.fill: "${fillColor}"\n`;
 
             d2 += `    ${lblId}.class: label_bg\n`;
             let action = `${t.action} "${t.target}"`;
