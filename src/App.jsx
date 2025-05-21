@@ -7,7 +7,7 @@ import { parseUITDL } from './utils/TokenParser';
 import './App.css';
 
 const App = () => {
-  const [ uitdlText, setUitdlText ] = useState( 'UITD "X" {}' );
+  const [ uitdlText, setUitdlText ] = useState( 'UITD "Empty" {}' );
   const [ parsedData, setParsedData ] = useState( () => parseUITDL( uitdlText ) );
 
   // 1) Creamos una función debounced para el parseo

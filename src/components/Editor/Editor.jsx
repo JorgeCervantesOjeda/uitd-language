@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 const STORAGE_KEY = 'uitdlContent';
 
 const Editor = ( { uitdlText, onChange, markers } ) => {
+
     // Referencias
     const editorRef = useRef( null );
     const markersRef = useRef( markers );
@@ -24,6 +25,25 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ errors, setErrorsState ] = useState( [] );
     const [ showErrors, setShowErrors ] = useState( false );
     const [ localText, setLocalText ] = useState( uitdlText );
+
+    // Devuelve “1 day 2 hours 3 minutes 4 seconds” según ms
+    const formatElapsed = () => {
+        const ms = firstModifiedAt
+            ? Date.now() - firstModifiedAt
+            : '0 seconds';
+
+        const secsTotal = Math.floor( ms / 1000 );
+        const days = Math.floor( secsTotal / 86400 );
+        const hours = Math.floor( ( secsTotal % 86400 ) / 3600 );
+        const minutes = Math.floor( ( secsTotal % 3600 ) / 60 );
+        const seconds = secsTotal % 60;
+        const parts = [];
+        if( days ) parts.push( `${days} day${days > 1 ? 's' : ''}` );
+        if( hours ) parts.push( `${hours} hour${hours > 1 ? 's' : ''}` );
+        if( minutes ) parts.push( `${minutes} minute${minutes > 1 ? 's' : ''}` );
+        if( seconds ) parts.push( `${seconds} second${seconds > 1 ? 's' : ''}` );
+        return parts.join( ' ' );
+    };
 
     // ─── Función centralizada para actualizar el contenido ───
     // text: nuevo contenido
@@ -189,7 +209,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const handleOpen = useCallback(
         wrapLoading( 'open', async () => {
             if( isModified ) {
-                const discard = window.confirm( 'Tienes cambios sin guardar. ¿Descartar y abrir otro archivo?' );
+                const discard = window.confirm( `You have unsaved changes (elapsed: ${formatElapsed()}).\n\nDiscard and open another file?` );
                 if( !discard ) return null;
             }
             try {
@@ -243,7 +263,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const handleLoadExample = useCallback(
         wrapLoading( 'example', async () => {
             if( isModified ) {
-                const discard = window.confirm( 'Tienes cambios sin guardar. ¿Descartar y cargar el ejemplo?' );
+                const discard = window.confirm( `You have unsaved changes (elapsed: ${formatElapsed()}).\n\nDiscard and load the example?` );
                 if( !discard ) return null;
             }
             const { ExampleUITD } = await import( './utils/ExampleUITD' );
@@ -283,7 +303,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const handlePaste = useCallback(
         wrapLoading( 'paste', async () => {
             if( isModified ) {
-                const discard = window.confirm( 'Tienes cambios sin guardar. ¿Descartar y pegar el portapapeles?' );
+                const discard = window.confirm( `You have unsaved changes (elapsed: ${formatElapsed()}).\n\nDiscard and paste from clipboard?` );
                 if( !discard ) return false;
             }
             try {

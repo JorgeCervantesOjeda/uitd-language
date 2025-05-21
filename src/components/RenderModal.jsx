@@ -209,7 +209,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                         <button onClick={ onDownloadSVG } disabled={ !svg || status !== '' }>SVG</button>
                         <button onClick={ onDownloadJPG } disabled={ !svg || status !== '' }>JPG</button>
                     </div>
-                    <button className="close-btn" onClick={ onClose }>X</button>
+                    <button className="close-btn" onClick={ onClose }>Close</button>
                 </header>
                 <div className="content" style={ { flex: 1, overflow: 'hidden', position: 'relative' } }>
                     { status !== '' ? (
