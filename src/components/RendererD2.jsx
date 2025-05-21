@@ -4,6 +4,21 @@ import CodeViewer from './CodeViewer';
 import '../App.css';
 import RenderModal from './RenderModal';
 
+// Recibe "#rrggbb", devuelve un hex oscurecido un x% (0–1)
+function darkenHex( hex, factor = 0.01 ) {
+    const n = hex.replace( '#', '' );
+    const num = parseInt( n, 16 );
+    let r = ( num >> 16 ) & 0xFF;
+    let g = ( num >> 8 ) & 0xFF;
+    let b = num & 0xFF;
+    // Reducimos cada canal
+    r = Math.max( 0, Math.floor( r * ( 1 - factor ) ) );
+    g = Math.max( 0, Math.floor( g * ( 1 - factor ) ) );
+    b = Math.max( 0, Math.floor( b * ( 1 - factor ) ) );
+    const color = `#${r.toString( 16 ).padStart( 2, '0' )}${g.toString( 16 ).padStart( 2, '0' )}${b.toString( 16 ).padStart( 2, '0' )}`;
+    return color;
+}
+
 // Helper functions (formatTransitionUIRef, formatString, buildUIHierarchy) remain unchanged
 const formatTransitionUIRef = ( uiRef ) => {
     if( !uiRef.nested || uiRef.nested.length === 0 ) {
@@ -124,9 +139,13 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
     }
     const indent = '  '.repeat( indentLevel );
     const fillColor = uiColorMap[ ui.id ] || '#eeeeee';
+    const strokeColor = darkenHex( fillColor, 0.5 );
     let out = `${indent}${ref.id}.style.fill: "${fillColor}"\n`;
+    out += `${indent}${ref.id}.style.stroke: "${strokeColor}"\n`;
+    out += `${indent}${ref.id}.shape: rectangle\n`;
+    out += `${indent}${ref.id}.style.3d: true\n`;
     out += ref.full
-        ? `${indent}${ref.id}.style.stroke-width: 6\n`
+        ? `${indent}${ref.id}.style.stroke-width: 2\n`
         : `${indent}${ref.id}.style.stroke-dash: 5\n`;
 
     if( ref.nested.length > 0 ) {
@@ -157,12 +176,11 @@ const translateToD2 = ( parsedData ) => {
         `# Clase para nodos fantasma de etiquetas\n` +
         `classes: {\n` +
         `  label_bg: {\n` +
-        `    shape: rectangle\n` +
+        `    shape: oval\n` +
         `    style: {\n` +
-        `      stroke-width: 01\n` +
+        `      stroke-width: 1\n` +
         `      font-color: "#003311"\n` +
         `      font-size: 18\n` +
-        `      3d: true\n` +
         `    }\n` +
         `  }\n` +
         `}\n\n` +
@@ -204,8 +222,10 @@ const translateToD2 = ( parsedData ) => {
 
             // 1) Color de fondo de la etiqueta igual al color del nodo origen
             const fillColor = uiColorMap[ t.from.id ] || '#eeeeee';
+            const labelStroke = darkenHex( fillColor );
             d2 += `    ${lblId}.style.fill: "${fillColor}"\n`;
-
+            d2 += `    ${lblId}.style.stroke: "${labelStroke}"\n`;
+            d2 += `    ${lblId}.style.stroke-width: 2\n`;
             d2 += `    ${lblId}.class: label_bg\n`;
             let action = `${t.action} "${t.target}"`;
             if( t.condition ) action += ` AND (${t.condition})`;
@@ -250,7 +270,11 @@ const RendererD2 = ( { data } ) => {
     }, [ data ] );
 
     const handleUpdate = () => {
-        setRenderCode( draftCode );
+        // Regeneramos completamente, con nuevos colores aleatorios
+        const updated = translateToD2( data );
+        // Actualizamos ambos estados para reflejar el nuevo código
+        setDraftCode( updated );
+        setRenderCode( updated );
         displayMsg( 'D2 updated.' );
     };
 

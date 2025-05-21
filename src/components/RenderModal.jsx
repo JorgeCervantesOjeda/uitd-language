@@ -4,7 +4,7 @@ import svgPanZoom from 'svg-pan-zoom';
 
 export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const [ svg, setSvg ] = useState( '' );
-    const [ loading, setLoading ] = useState( false );
+    const [ status, setStatus ] = useState( '' );
     const [ full, setFull ] = useState( false );
 
     // Persist layout engine choice
@@ -34,6 +34,10 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         setLayoutEngine( engine );
     };
 
+    useEffect( () => {
+        if( !isOpen ) setStatus( '' );
+    }, [ isOpen ] );
+
     // Render diagram when props change
     useEffect( () => {
         if( !isOpen ) return;
@@ -42,18 +46,19 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
 
         if( cache.current.has( key ) ) {
             setSvg( cache.current.get( key ) );
-            setLoading( false );
+            setStatus( '' );
             return;
         }
 
         setSvg( '' );
-        setLoading( true );
+        setStatus( 'Compiling ...' );
         ( async () => {
             try {
                 const { diagram, renderOptions } = await d2.current.compile(
                     d2Source,
                     { layout: layoutEngine }
                 );
+                setStatus('Loading ...' );
                 const svgText = await d2.current.render( diagram, renderOptions );
                 if( currentKey.current !== key ) return;
                 cache.current.set( key, svgText );
@@ -64,8 +69,9 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                 setSvg( svgText );
             } catch( e ) {
                 console.error( 'Error rendering with D2:', e );
+                setStatus( 'Error rendering with D2:' );
             } finally {
-                if( currentKey.current === key ) setLoading( false );
+                if( currentKey.current === key ) setStatus( '' );
             }
         } )();
     }, [ isOpen, d2Source, layoutEngine ] );
@@ -192,22 +198,22 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                             id="engine-select"
                             value={ layoutEngine }
                             onChange={ ( e ) => handleEngineChange( e.target.value ) }
-                            disabled={ loading }
+                            disabled={ status !== '' }
                         >
                             <option value="dagre">Dagre</option>
                             <option value="elk">ELK</option>
                         </select>
-                        <button onClick={ () => setFull( ( f ) => !f ) } disabled={ loading }>
+                        <button onClick={ () => setFull( ( f ) => !f ) } disabled={ status !== '' }>
                             { full ? 'Restore' : 'Maximize' }
                         </button>
-                        <button onClick={ onDownloadSVG } disabled={ !svg || loading }>SVG</button>
-                        <button onClick={ onDownloadJPG } disabled={ !svg || loading }>JPG</button>
+                        <button onClick={ onDownloadSVG } disabled={ !svg || status !== '' }>SVG</button>
+                        <button onClick={ onDownloadJPG } disabled={ !svg || status !== '' }>JPG</button>
                     </div>
                     <button className="close-btn" onClick={ onClose }>X</button>
                 </header>
                 <div className="content" style={ { flex: 1, overflow: 'hidden', position: 'relative' } }>
-                    { loading ? (
-                        <p>Loading diagram...</p>
+                    { status !== '' ? (
+                        <p>{status}</p>
                     ) : (
                         <div
                             key={ currentKey.current }
