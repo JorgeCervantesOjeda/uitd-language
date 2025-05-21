@@ -163,8 +163,13 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
     return out;
 };
 
-// Función principal de traducción a D2
-// Función principal de traducción a D2
+// Devuelve recursivamente el uiRef más profundo
+const getDeepestRef = ( ref ) =>
+    ref.nested && ref.nested.length > 0
+        ? getDeepestRef( ref.nested[ ref.nested.length - 1 ] )
+        : ref;
+
+        // Función principal de traducción a D2
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 
@@ -221,7 +226,10 @@ const translateToD2 = ( parsedData ) => {
             const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
 
             // 1) Color de fondo de la etiqueta igual al color del nodo origen
-            const fillColor = uiColorMap[ t.from.id ] || '#eeeeee';
+            // 1) Encuentra la UI anidada más profunda
+            const originRef = getDeepestRef( t.from );
+            // 2) Usa su id para el color
+            const fillColor = uiColorMap[ originRef.id ] || '#eeeeee';
             const labelStroke = darkenHex( fillColor );
             d2 += `    ${lblId}.style.fill: "${fillColor}"\n`;
             d2 += `    ${lblId}.style.stroke: "${labelStroke}"\n`;
