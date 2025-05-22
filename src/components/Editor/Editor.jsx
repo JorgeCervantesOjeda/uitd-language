@@ -348,7 +348,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     options={ {
                         readOnly: false,
                         minimap: { enabled: true },
-                        hover: { enabled: false },
+                        hover: { enabled: true },
                         folding: true,
                         foldingStrategy: 'auto',
                         showFoldingControls: 'always',
