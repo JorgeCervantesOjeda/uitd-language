@@ -184,7 +184,7 @@ UITD "TOP-Racing" {
   }
   FRAGMENT "Navigation" {
     DRAW {
-      3(0), 6(0), 0
+      0
     };
     DRAW {
       1(0), 2(0), 3(0), 4(0), 5(0), 6(0)
@@ -204,6 +204,8 @@ UITD "TOP-Racing" {
     TRANSITION from 0 to 6 if user clicks "Past Registrations";
     TRANSITION from 6 to 6 if user types "in a search field";
     TRANSITION from 0 to 27 if user clicks "Edit Profile" AND "has an open session";
+  }
+  FRAGMENT "Login" {
     DRAW {
       1, 31, 33
     };
@@ -219,8 +221,10 @@ UITD "TOP-Racing" {
     TRANSITION from 27 to 32 if user clicks "Save Data" AND "Creation fails";
     TRANSITION from 32 to 1 if user clicks "OK";
     TRANSITION from 27 to 3 if user clicks "Save Data" AND "Data is saved";
+  }
+  FRAGMENT "Edit results" {
     DRAW {
-      34, 7, 8, 9, 10, 11, 12
+      7, 8, 9, 10, 11, 12
     };
     TRANSITION from 7 to 8 if user clicks "View/Edit Event registrations" AND "is logged in";
     TRANSITION from 8 to 7 if user clicks "Return";
@@ -238,6 +242,8 @@ UITD "TOP-Racing" {
     TRANSITION from 11 to 12 if user clicks "on a Vehicle";
     TRANSITION from 12 to 11 if user clicks "Return";
     TRANSITION from 12 to 12 if user clicks "Save Data";
+  }
+  FRAGMENT "Priorities" {
     DRAW {
       1, 5, 7, 34, 13 
     };
@@ -257,6 +263,8 @@ UITD "TOP-Racing" {
     TRANSITION from 13 to 7 if user clicks "Select" AND "is Event creator";
     TRANSITION from 13 to 7 if user clicks "Return";
     TRANSITION from 13 to 13 if user types "in a search field";
+  }
+  FRAGMENT "description" {
     DRAW {
       13, 14
     };

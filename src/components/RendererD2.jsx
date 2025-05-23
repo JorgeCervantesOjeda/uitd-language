@@ -169,7 +169,7 @@ const getDeepestRef = ( ref ) =>
         ? getDeepestRef( ref.nested[ ref.nested.length - 1 ] )
         : ref;
 
-        // Función principal de traducción a D2
+// Función principal de traducción a D2
 const translateToD2 = ( parsedData ) => {
     if( !parsedData || !parsedData.name ) return '';
 

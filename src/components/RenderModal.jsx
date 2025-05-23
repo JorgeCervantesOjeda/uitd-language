@@ -7,6 +7,13 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const [ status, setStatus ] = useState( '' );
     const [ full, setFull ] = useState( false );
 
+    // Configurable padding in pixels
+    const PADDING = ( -100 ); // reducido para espacio mínimo
+    // Border style
+    const BORDER_DASH = '4';
+    const BORDER_COLOR = 'black';
+    const BORDER_WIDTH = 1;
+
     // Persist layout engine choice
     const [ layoutEngine, setLayoutEngine ] = useState(
         () => localStorage.getItem( 'layoutEngine' ) || 'dagre'
@@ -26,7 +33,6 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const MAX_ENTRIES = 2;
     const currentKey = useRef( '' );
 
-    // Pan/zoom instance ref
     const panZoomRef = useRef( null );
     const handleEngineChange = ( engine ) => {
         panZoomRef.current?.destroy();
@@ -38,7 +44,6 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         if( !isOpen ) setStatus( '' );
     }, [ isOpen ] );
 
-    // Render diagram when props change
     useEffect( () => {
         if( !isOpen ) return;
         const key = `${layoutEngine}::${d2Source}`;
@@ -54,12 +59,41 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         setStatus( 'Compiling ...' );
         ( async () => {
             try {
+                // Pasar paddingX/Y para D2
                 const { diagram, renderOptions } = await d2.current.compile(
                     d2Source,
                     { layout: layoutEngine }
                 );
-                setStatus('Loading ...' );
-                const svgText = await d2.current.render( diagram, renderOptions );
+                setStatus( 'Loading ...' );
+                let svgText = await d2.current.render( diagram, renderOptions );
+
+                // Ajustar viewBox para incluir padding pequeño
+                svgText = svgText.replace(
+                    /viewBox="([^\"]+)"/, ( match, vb ) => {
+                        const parts = vb.split( /[\s,]+/ ).map( Number );
+                        const [ x, y, w, h ] = parts;
+                        const nx = x - PADDING - BORDER_WIDTH;
+                        const ny = y - PADDING - BORDER_WIDTH;
+                        const nw = w + PADDING * 2 + BORDER_WIDTH * 2;
+                        const nh = h + PADDING * 2 + BORDER_WIDTH * 2;
+                        return `viewBox=\"${nx} ${ny} ${nw} ${nh}\"`;
+                    }
+                );
+
+                // Insert dashed border rect inside SVG
+                const vbMatch = svgText.match( /viewBox="([^\"]+)"/ );
+                if( vbMatch ) {
+                    const [ ex, ey, ew, eh ] = vbMatch[ 1 ].split( /[\s,]+/ ).map( Number );
+                    console.log( 'Crop rect dimensions → x:', ex, 'y:', ey, 'width:', ew, 'height:', eh );
+
+                    const rect = `<rect x=\"09\" y=\"09\" width=\"${ew + 3}\" height=\"${eh + 3}\" fill=\"none\" stroke=\"${BORDER_COLOR}\" stroke-width=\"${BORDER_WIDTH}\" stroke-dasharray=\"${BORDER_DASH}\" />`;
+                    // Inserta el rectángulo justo antes de </svg>, para que pinte encima
+                    svgText = svgText.replace(
+                        /<\/svg>/,
+                        `  ${rect}\n</svg>`
+                    );
+                }
+
                 if( currentKey.current !== key ) return;
                 cache.current.set( key, svgText );
                 if( cache.current.size > MAX_ENTRIES ) {
@@ -76,22 +110,17 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         } )();
     }, [ isOpen, d2Source, layoutEngine ] );
 
-    // Container ref
     const containerRef = useRef( null );
 
-    // Initialize and clean up svg-pan-zoom on each open or SVG update
     useLayoutEffect( () => {
         if( !svg || !isOpen || !containerRef.current ) return;
         const svgElem = containerRef.current.querySelector( 'svg' );
         if( !svgElem ) return;
-
-        // Remove fixed attrs, allow CSS sizing
         svgElem.removeAttribute( 'width' );
         svgElem.removeAttribute( 'height' );
         svgElem.style.width = '100%';
         svgElem.style.height = '100%';
 
-        // Initialize pan/zoom
         try {
             panZoomRef.current = svgPanZoom( svgElem, {
                 zoomEnabled: true,
@@ -102,26 +131,20 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                 fit: true,
                 center: true,
             } );
-        } catch( err ) {
-            console.error( 'svg-pan-zoom init failed:', err );
-            return;
-        }
+        } catch { }
 
-        // Fit/center after layout
         requestAnimationFrame( () => {
             panZoomRef.current.resize();
             panZoomRef.current.fit();
             panZoomRef.current.center();
         } );
 
-        // Cleanup on SVG change or modal close
         return () => {
             panZoomRef.current?.destroy();
             panZoomRef.current = null;
         };
     }, [ svg, isOpen ] );
 
-    // Download handlers
     const onDownloadSVG = () => {
         const blob = new Blob( [ svg ], { type: 'image/svg+xml' } );
         const url = URL.createObjectURL( blob );
@@ -132,53 +155,35 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         URL.revokeObjectURL( url );
     };
 
+    // Genera JPG usando el viewBox completo (incluyendo padding y borde)
     const onDownloadJPG = () => {
         if( !svg ) return;
         const parser = new DOMParser();
         const doc = parser.parseFromString( svg, 'image/svg+xml' );
         const svgElem = doc.documentElement;
-        let w = parseFloat( svgElem.getAttribute( 'width' ) || '0' );
-        let h = parseFloat( svgElem.getAttribute( 'height' ) || '0' );
-        if( !( w > 0 && h > 0 ) ) {
-            const viewBox = svgElem.getAttribute( 'viewBox' );
-            if( viewBox ) {
-                const parts = viewBox.trim().split( /[,\s]+/ ).map( Number );
-                w = parts[ 2 ];
-                h = parts[ 3 ];
-            } else {
-                w = 800;
-                h = 600;
-            }
-        }
+        const [ , , w, h ] = svgElem.getAttribute( 'viewBox' ).split( /[\s,]+/ ).map( Number );
+        const canvas = document.createElement( 'canvas' );
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext( '2d' );
+        ctx.fillStyle = '#fff';
+        ctx.fillRect( 0, 0, w, h );
+        const img = new Image();
         const svgBlob = new Blob( [ svg ], { type: 'image/svg+xml;charset=utf-8' } );
         const url = URL.createObjectURL( svgBlob );
-        const img = new Image();
         img.onload = () => {
-            const canvas = document.createElement( 'canvas' );
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext( '2d' );
-            ctx.fillStyle = '#fff';
-            ctx.fillRect( 0, 0, w, h );
             ctx.drawImage( img, 0, 0, w, h );
             URL.revokeObjectURL( url );
-            canvas.toBlob(
-                ( blob ) => {
-                    if( !blob ) return console.error( 'JPEG generation failed' );
-                    const link = document.createElement( 'a' );
-                    link.href = URL.createObjectURL( blob );
-                    link.download = 'diagram.jpg';
-                    link.click();
-                    URL.revokeObjectURL( link.href );
-                },
-                'image/jpeg',
-                0.92
-            );
+            canvas.toBlob( ( blob ) => {
+                if( !blob ) return;
+                const link = document.createElement( 'a' );
+                link.href = URL.createObjectURL( blob );
+                link.download = 'diagram.jpg';
+                link.click();
+                URL.revokeObjectURL( link.href );
+            }, 'image/jpeg', 0.92 );
         };
-        img.onerror = ( e ) => {
-            console.error( 'Error loading SVG image:', e );
-            URL.revokeObjectURL( url );
-        };
+        img.onerror = () => URL.revokeObjectURL( url );
         img.src = url;
     };
 
@@ -191,7 +196,14 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                 style={ { display: 'flex', flexDirection: 'column', height: '100%' } }
                 onClick={ ( e ) => e.stopPropagation() }
             >
-                <header style={ { flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }>
+                <header
+                    style={ {
+                        flexShrink: 0,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    } }
+                >
                     <div style={ { display: 'flex', alignItems: 'center', gap: '0.5rem' } }>
                         <label htmlFor="engine-select">Layout:</label>
                         <select
@@ -206,14 +218,23 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                         <button onClick={ () => setFull( ( f ) => !f ) } disabled={ status !== '' }>
                             { full ? 'Restore' : 'Maximize' }
                         </button>
-                        <button onClick={ onDownloadSVG } disabled={ !svg || status !== '' }>SVG</button>
-                        <button onClick={ onDownloadJPG } disabled={ !svg || status !== '' }>JPG</button>
+                        <button onClick={ onDownloadSVG } disabled={ !svg || status !== '' }>
+                            SVG
+                        </button>
+                        <button onClick={ onDownloadJPG } disabled={ !svg || status !== '' }>
+                            JPG
+                        </button>
                     </div>
-                    <button className="close-btn" onClick={ onClose }>Close</button>
+                    <button className="close-btn" onClick={ onClose }>
+                        Close
+                    </button>
                 </header>
-                <div className="content" style={ { flex: 1, overflow: 'hidden', position: 'relative' } }>
-                    { status !== '' ? (
-                        <p>{status}</p>
+                <div
+                    className="content"
+                    style={ { flex: 1, overflow: 'hidden', position: 'relative' } }
+                >
+                    { status ? (
+                        <p>{ status }</p>
                     ) : (
                         <div
                             key={ currentKey.current }
