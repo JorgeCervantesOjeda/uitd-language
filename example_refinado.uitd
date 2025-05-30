@@ -24,8 +24,8 @@ UITD "System Title" {
 
     }
     FRAGMENT "Menu Navigation and Login" {
-      WIDTH 40;
-      DRAW { 0, 2(3(0)), 1, 4(0), 5(0) };
+      WIDTH 20;
+      DRAW { 2(3(0)), 1, 4(0), 5(0), 0 };
       TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin";
       TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal" WIDTH 15;
       TRANSITION from 0 to 4 if user clicks "Standings";

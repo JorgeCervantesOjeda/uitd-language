@@ -59,7 +59,6 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         setStatus( 'Compiling ...' );
         ( async () => {
             try {
-                // Pasar paddingX/Y para D2
                 const { diagram, renderOptions } = await d2.current.compile(
                     d2Source,
                     { layout: layoutEngine }
@@ -67,7 +66,7 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                 setStatus( 'Loading ...' );
                 let svgText = await d2.current.render( diagram, renderOptions );
 
-                // Ajustar viewBox para incluir padding pequeño
+                // Ajustar viewBox para modificar el PADDING
                 svgText = svgText.replace(
                     /viewBox="([^\"]+)"/, ( match, vb ) => {
                         const parts = vb.split( /[\s,]+/ ).map( Number );

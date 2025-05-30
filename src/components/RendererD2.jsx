@@ -4,20 +4,6 @@ import CodeViewer from './CodeViewer';
 import '../App.css';
 import RenderModal from './RenderModal';
 
-// Recibe "#rrggbb", devuelve un hex oscurecido un x% (0–1)
-function darkenHex( hex, factor = 0.01 ) {
-    const n = hex.replace( '#', '' );
-    const num = parseInt( n, 16 );
-    let r = ( num >> 16 ) & 0xFF;
-    let g = ( num >> 8 ) & 0xFF;
-    let b = num & 0xFF;
-    // Reducimos cada canal
-    r = Math.max( 0, Math.floor( r * ( 1 - factor ) ) );
-    g = Math.max( 0, Math.floor( g * ( 1 - factor ) ) );
-    b = Math.max( 0, Math.floor( b * ( 1 - factor ) ) );
-    const color = `#${r.toString( 16 ).padStart( 2, '0' )}${g.toString( 16 ).padStart( 2, '0' )}${b.toString( 16 ).padStart( 2, '0' )}`;
-    return color;
-}
 
 // Helper functions (formatTransitionUIRef, formatString, buildUIHierarchy) remain unchanged
 const formatTransitionUIRef = ( uiRef ) => {
@@ -111,24 +97,27 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
 };
 
 // Generar un color aleatorio claro en hex
-const randomColor = () => {
-    const r = Math.floor( 200 + Math.random() * 55 );
-    const g = Math.floor( 200 + Math.random() * 55 );
-    const b = Math.floor( 200 + Math.random() * 55 );
+const randomColor = ( base, range ) => {
+    const r = Math.floor( base + Math.random() * range );
+    const g = Math.floor( base + Math.random() * range );
+    const b = Math.floor( base + Math.random() * range );
     const hr = r.toString( 16 ).padStart( 2, '0' );
     const hg = g.toString( 16 ).padStart( 2, '0' );
     const hb = b.toString( 16 ).padStart( 2, '0' );
     return `#${hr}${hg}${hb}`;
 };
 
-// Asignar un color único por cada UI id
 const generateUIColorMap = ( uis ) => {
     const map = {};
     uis.forEach( ui => {
-        map[ ui.id ] = randomColor();
+        map[ ui.id ] = {
+            fill: randomColor( 155, 100 ),
+            stroke: randomColor( 0, 255 ),
+        };
     } );
     return map;
 };
+
 
 // Ajustamos buildUIHierarchy para usar el color asignado
 const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
@@ -138,14 +127,15 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
         return '';
     }
     const indent = '  '.repeat( indentLevel );
-    const fillColor = uiColorMap[ ui.id ] || '#eeeeee';
-    const strokeColor = darkenHex( fillColor, 0.5 );
+    const fillColor = ( uiColorMap[ ui.id ] && uiColorMap[ ui.id ].fill ) || '#eeeeee';
+    const strokeColor = ( uiColorMap[ ui.id ] && uiColorMap[ ui.id ].stroke ) || '#cccccc';
     let out = `${indent}${ref.id}.style.fill: "${fillColor}"\n`;
     out += `${indent}${ref.id}.style.stroke: "${strokeColor}"\n`;
     out += `${indent}${ref.id}.shape: rectangle\n`;
     out += `${indent}${ref.id}.style.3d: true\n`;
+    out += `${indent}${ref.id}.style.stroke-width: 4\n`;
     out += ref.full
-        ? `${indent}${ref.id}.style.stroke-width: 2\n`
+        ? ''
         : `${indent}${ref.id}.style.stroke-dash: 5\n`;
 
     if( ref.nested.length > 0 ) {
@@ -229,11 +219,11 @@ const translateToD2 = ( parsedData ) => {
             // 1) Encuentra la UI anidada más profunda
             const originRef = getDeepestRef( t.from );
             // 2) Usa su id para el color
-            const fillColor = uiColorMap[ originRef.id ] || '#eeeeee';
-            const labelStroke = darkenHex( fillColor );
+            const fillColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].fill ) || '#eeeeee';
+            const strokeColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].stroke ) || '#cccccc';
             d2 += `    ${lblId}.style.fill: "${fillColor}"\n`;
-            d2 += `    ${lblId}.style.stroke: "${labelStroke}"\n`;
-            d2 += `    ${lblId}.style.stroke-width: 2\n`;
+            d2 += `    ${lblId}.style.stroke: "${strokeColor}"\n`;
+            d2 += `    ${lblId}.style.stroke-width: 4\n`;
             d2 += `    ${lblId}.class: label_bg\n`;
             let action = `${t.action} "${t.target}"`;
             if( t.condition ) action += ` AND (${t.condition})`;
