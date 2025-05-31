@@ -133,10 +133,10 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
     out += `${indent}${ref.id}.style.stroke: "${strokeColor}"\n`;
     out += `${indent}${ref.id}.shape: rectangle\n`;
     out += `${indent}${ref.id}.style.3d: true\n`;
-    out += `${indent}${ref.id}.style.stroke-width: 4\n`;
+    out += `${indent}${ref.id}.style.stroke-width: 6\n`;
     out += ref.full
         ? ''
-        : `${indent}${ref.id}.style.stroke-dash: 5\n`;
+        : `${indent}${ref.id}.style.stroke-dash: 2\n`;
 
     if( ref.nested.length > 0 ) {
         const formattedName = formatString( ui.name, 20 );
@@ -168,12 +168,12 @@ const translateToD2 = ( parsedData ) => {
     // Cabecera y bloque classes (las primeras 15 líneas)
     let d2 =
         `direction: right\n\n` +
-        `# Clase para nodos fantasma de etiquetas\n` +
+        `# Clase para etiquetas de transición\n` +
         `classes: {\n` +
         `  label_bg: {\n` +
         `    shape: oval\n` +
         `    style: {\n` +
-        `      stroke-width: 1\n` +
+        `      stroke-width: 6\n` +
         `      font-color: "#003311"\n` +
         `      font-size: 18\n` +
         `    }\n` +
@@ -206,7 +206,7 @@ const translateToD2 = ( parsedData ) => {
             const toId = formatTransitionUIRef( t.to );
             const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
             d2 += `    ${fromId} -> ${lblId}\n`;
-            d2 += `    ${lblId} -> ${toId}\n`;
+            d2 += `    ${lblId} -> ${toId}:{style.stroke-dash:5}\n`;
         } );
 
         // 3) Definiciones de labels (clase y texto)
@@ -223,7 +223,7 @@ const translateToD2 = ( parsedData ) => {
             const strokeColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].stroke ) || '#cccccc';
             d2 += `    ${lblId}.style.fill: "${fillColor}"\n`;
             d2 += `    ${lblId}.style.stroke: "${strokeColor}"\n`;
-            d2 += `    ${lblId}.style.stroke-width: 4\n`;
+            d2 += `    ${lblId}\n`;
             d2 += `    ${lblId}.class: label_bg\n`;
             let action = `${t.action} "${t.target}"`;
             if( t.condition ) action += ` AND (${t.condition})`;

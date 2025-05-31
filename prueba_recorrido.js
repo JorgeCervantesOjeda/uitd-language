@@ -73,7 +73,7 @@ function posorderWithDepthConstraint( graph ) {
     // Iniciar el recorrido en posorden desde el nodo inicial
     dfsPosorder( startNode );
 
-    console.log( "Recorrido en posorden:", posorder ); // Debug: Verifica el recorrido en posorden
+    console.log( "Recorrido en posorden :", posorder ); // Debug: Verifica el recorrido en posorden
 
     return posorder;
 }

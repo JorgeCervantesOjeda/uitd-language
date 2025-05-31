@@ -79,19 +79,6 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                     }
                 );
 
-                // Insert dashed border rect inside SVG
-                const vbMatch = svgText.match( /viewBox="([^\"]+)"/ );
-                if( vbMatch ) {
-                    const [ ex, ey, ew, eh ] = vbMatch[ 1 ].split( /[\s,]+/ ).map( Number );
-                    console.log( 'Crop rect dimensions → x:', ex, 'y:', ey, 'width:', ew, 'height:', eh );
-
-                    const rect = `<rect x=\"09\" y=\"09\" width=\"${ew + 3}\" height=\"${eh + 3}\" fill=\"none\" stroke=\"${BORDER_COLOR}\" stroke-width=\"${BORDER_WIDTH}\" stroke-dasharray=\"${BORDER_DASH}\" />`;
-                    // Inserta el rectángulo justo antes de </svg>, para que pinte encima
-                    svgText = svgText.replace(
-                        /<\/svg>/,
-                        `  ${rect}\n</svg>`
-                    );
-                }
 
                 if( currentKey.current !== key ) return;
                 cache.current.set( key, svgText );
