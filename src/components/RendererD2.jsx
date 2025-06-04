@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CodeViewer from './CodeViewer';
 import '../App.css';
 import RenderModal from './RenderModal';
-
+import { asignarColores } from './color-assignment'
 
 // Helper functions (formatTransitionUIRef, formatString, buildUIHierarchy) remain unchanged
 const formatTransitionUIRef = ( uiRef ) => {
@@ -96,28 +96,15 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
     return resultado;
 };
 
-// Generar un color aleatorio claro en hex
-const randomColor = ( base, range ) => {
-    const r = Math.floor( base + Math.random() * range );
-    const g = Math.floor( base + Math.random() * range );
-    const b = Math.floor( base + Math.random() * range );
-    const hr = r.toString( 16 ).padStart( 2, '0' );
-    const hg = g.toString( 16 ).padStart( 2, '0' );
-    const hb = b.toString( 16 ).padStart( 2, '0' );
-    return `#${hr}${hg}${hb}`;
-};
-
 const generateUIColorMap = ( uis ) => {
-    const map = {};
+    // Construye el objeto tipo folderToNodes, donde cada clave es el id de la UI
+    // y el valor es un array con ese mismo id (puede extenderse a más nodos si se desea)
+    const folderToNodes = {};
     uis.forEach( ui => {
-        map[ ui.id ] = {
-            fill: randomColor( 155, 100 ),
-            stroke: randomColor( 0, 255 ),
-        };
+        folderToNodes[ ui.id ] = [ ui.id ];
     } );
-    return map;
+    return asignarColores( folderToNodes );
 };
-
 
 // Ajustamos buildUIHierarchy para usar el color asignado
 const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
