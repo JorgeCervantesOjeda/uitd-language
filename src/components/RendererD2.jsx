@@ -123,7 +123,7 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
     out += `${indent}${ref.id}.style.stroke-width: 6\n`;
     out += ref.full
         ? ''
-        : `${indent}${ref.id}.style.stroke-dash: 2\n`;
+        : `${indent}${ref.id}.style.stroke-dash: 5\n`;
 
     if( ref.nested.length > 0 ) {
         const formattedName = formatString( ui.name, 20 );

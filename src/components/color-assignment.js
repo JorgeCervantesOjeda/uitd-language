@@ -79,6 +79,7 @@ const strokeColors = [
 const combinacionesDisonantes = new Set( [
     "rojo|verde", "verde|rojo",
     "azul|verde", "verde|azul",
+    "cian|verde", "verde|cian",
     "naranja|verde", "verde|naranja",
     "rojo|azul", "azul|rojo",
     "naranja|rosa", "rosa|naranja",
