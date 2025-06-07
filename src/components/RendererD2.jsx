@@ -148,20 +148,20 @@ const translateToD2 = ( parsedData ) => {
 
     const uiColorMap = generateUIColorMap( parsedData.uis );
 
-    // 1. Bloque vars
+    // 1. Vars block (already in English)
     let varsBlock = 'vars: {\n';
-    parsedData.uis.forEach(ui => {
+    parsedData.uis.forEach( ui => {
         varsBlock += `  ui${ui.id}: {\n`;
-        varsBlock += `    fill: "${uiColorMap[ui.id]?.fill || '#eeeeee'}"\n`;
-        varsBlock += `    stroke: "${uiColorMap[ui.id]?.stroke || '#cccccc'}"\n`;
+        varsBlock += `    fill: "${uiColorMap[ ui.id ]?.fill || '#eeeeee'}"\n`;
+        varsBlock += `    stroke: "${uiColorMap[ ui.id ]?.stroke || '#cccccc'}"\n`;
         varsBlock += `  }\n`;
-    });
+    } );
     varsBlock += '}\n\n';
 
-    // 2. Bloque classes
+    // 2. Classes block (already in English)
     let uiClasses = '';
     let labelUiClasses = '';
-    parsedData.uis.forEach(ui => {
+    parsedData.uis.forEach( ui => {
         uiClasses += `  ui${ui.id}: {\n`;
         uiClasses += `    shape: rectangle\n`;
         uiClasses += `    style: {\n`;
@@ -178,21 +178,20 @@ const translateToD2 = ( parsedData ) => {
         labelUiClasses += `      stroke: \${ui${ui.id}.stroke}\n`;
         labelUiClasses += `      stroke-width: 6\n`;
         labelUiClasses += `      font-color: "#003311"\n`;
-        labelUiClasses += `      font-size: 18\n`;
         labelUiClasses += `    }\n`;
         labelUiClasses += `  }\n`;
-    });
+    } );
 
-    // 3. Inserta en tu D2
+    // 3. Insert in your D2 (change comments and block names to English)
     let d2 =
-        varsBlock +
         `direction: right\n\n` +
-        `# Clases generadas para cada UI\n` +
+        varsBlock +
+        `# Classes generated for each UI\n` +
         `classes: {\n` +
         uiClasses +
         labelUiClasses +
         `}\n\n` +
-        `# Contenedor principal\n` +
+        `# Main container\n` +
         `UITD.style.fill: "#ffffff"\n` +
         `UITD.style.stroke-width: 0\n` +
         `UITD: ${parsedData.name} {\n`;
@@ -202,18 +201,18 @@ const translateToD2 = ( parsedData ) => {
         const bgColor = fragment.color || '#eeeeee';
         const defaultWidth = fragment.width ?? 15;
 
-        // Extraemos y ordenamos transiciones
+        // Extract and sort transitions
         const uiOrder = fragment.draws
             .flatMap( draw => draw.uiRefs.flatMap( ref => flattenUIRefs( ref ) ) )
             .filter( ( v, i, a ) => a.indexOf( v ) === i );
         const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
 
-        // 1) Inicio del fragmento
+        // 1) Fragment start
         d2 += `  ${fragLetter}.style.fill: "${bgColor}"\n`;
         d2 += `  ${fragLetter}.style.stroke-dash: 1\n`;
         d2 += `  ${fragLetter}: ${formatString( fragment.name, 20 )} {\n`;
 
-        // 2) Flechas de transición al inicio del fragmento
+        // 2) Transition arrows at the start of the fragment
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
@@ -222,33 +221,30 @@ const translateToD2 = ( parsedData ) => {
             d2 += `    ${lblId} -> ${toId}:{style.stroke-dash:5}\n`;
         } );
 
-        // 3) Definiciones de labels (clase y texto)
+        // 3) Label definitions (class and text)
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
             const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
 
-            // 1) Color de fondo de la etiqueta igual al color del nodo origen
-            // 1) Encuentra la UI anidada más profunda
+            // 1) Background color of the label is the same as the origin node color
+            // 1) Find the deepest nested UI reference
             const originRef = getDeepestRef( t.from );
-            // 2) Usa su id para el color
-            const fillColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].fill ) || '#eeeeee';
-            const strokeColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].stroke ) || '#cccccc';
-            d2 += `    ${lblId}\n`;
+            // 2) Use its id for the color
             d2 += `    ${lblId}.class: label_ui${originRef.id}\n`;
             let action = `${t.action} "${t.target}"`;
             if( t.condition ) action += ` AND (${t.condition})`;
             d2 += `    ${lblId}: ${formatString( action, t.width ?? defaultWidth )}\n`;
         } );
 
-        // 4) Jerarquía de UIs y resto de definiciones
+        // 4) UI hierarchy and other definitions
         fragment.draws.forEach( draw => {
             draw.uiRefs.forEach( ref => {
                 d2 += buildUIHierarchy( ref, 2, parsedData.uis, '', uiColorMap );
             } );
         } );
 
-        // Cierre del bloque de fragmento
+        // End of fragment block
         d2 += `  }\n`;
     } );
 
