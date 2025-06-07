@@ -10,6 +10,7 @@ classes: {
     }
   }
 }
+# -utils:
 src_components_editor_menus_dropdownmenu_jsx: "src_components_editor_menus_dropdownmenu_jsx\n(46 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
 src_components_editor_menus_dropdownmenu_jsx -> label_0 { style: { stroke: "#61DAFB"
@@ -60,28 +61,14 @@ src_components_editor_erroritem_jsx -> label_20 { style: { stroke: "#808080" } }
 label_20 -> src_app_css   { style: { stroke: "#808080" } }
 src_components_editor_editor_jsx -> label_13 { style: { stroke: "#808080" } }
 label_13 -> src_app_css   { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> label_10 { style: { stroke: "#808080" } }
-label_10 -> src_components_editor_utils_formatcode_js   { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> label_11 { style: { stroke: "#808080" } }
-label_11 -> src_components_editor_utils_seterrors_js   { style: { stroke: "#808080" } }
-src_components_editor_editor_jsx -> label_12 { style: { stroke: "#808080" } }
-label_12 -> src_components_editor_utils_monacosetup_js   { style: { stroke: "#808080" } }
-src_components_editor_utils_monacosetup_js -> label_5 { style: { stroke: "#808080" } }
-label_5 -> src_utils_tokenparser_js   { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> label_39 { style: { stroke: "#808080" } }
-label_39 -> src_utils_lexer_js   { style: { stroke: "#808080" } }
-src_utils_lexer_js -> label_38 { style: { stroke: "#808080" } }
-label_38 -> src_utils_tokens_js   { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> label_40 { style: { stroke: "#808080" } }
-label_40 -> src_utils_tokens_js   { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> label_41 { style: { stroke: "#808080" } }
-label_41 -> src_utils_utils_js   { style: { stroke: "#808080" } }
-src_utils_validation_js -> label_43 { style: { stroke: "#808080" } }
-label_43 -> src_utils_utils_js   { style: { stroke: "#808080" } }
-src_utils_tokenparser_js -> label_42 { style: { stroke: "#808080" } }
-label_42 -> src_utils_validation_js   { style: { stroke: "#808080" } }
-src_app_jsx -> label_48 { style: { stroke: "#808080" } }
-label_48 -> src_utils_tokenparser_js   { style: { stroke: "#808080" } }
+src_components_editor_editor_jsx -> label_14 { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
+label_14 -> lodash   { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
+src_app_jsx -> label_45 { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
+label_45 -> lodash   { style: { stroke: "#4F8A10"
+    stroke-dash: 5 } }
 src_app_jsx -> label_44 { style: { stroke: "#61DAFB"
     stroke-dash: 5 } }
 label_44 -> react   { style: { stroke: "#61DAFB"
@@ -106,26 +93,16 @@ src_components_rendererd2_jsx -> label_33 { style: { stroke: "#808080" } }
 label_33 -> src_components_rendermodal_jsx   { style: { stroke: "#808080" } }
 src_components_rendererd2_jsx -> label_31 { style: { stroke: "#808080" } }
 label_31 -> src_components_codeviewer_jsx   { style: { stroke: "#808080" } }
-src_components_codeviewer_jsx -> label_29 { style: { stroke: "#808080" } }
-label_29 -> src_components_editor_utils_monacosetup_js   { style: { stroke: "#808080" } }
 src_components_rendererd2_jsx -> label_34 { style: { stroke: "#808080" } }
 label_34 -> src_components_color-assignment_js   { style: { stroke: "#808080" } }
 src_app_jsx -> label_47 { style: { stroke: "#808080" } }
 label_47 -> src_components_rendererd2_jsx   { style: { stroke: "#808080" } }
-src_app_jsx -> label_45 { style: { stroke: "#4F8A10"
-    stroke-dash: 5 } }
-label_45 -> lodash   { style: { stroke: "#4F8A10"
-    stroke-dash: 5 } }
-src_components_editor_editor_jsx -> label_14 { style: { stroke: "#4F8A10"
-    stroke-dash: 5 } }
-label_14 -> lodash   { style: { stroke: "#4F8A10"
-    stroke-dash: 5 } }
+src_app_jsx -> label_46 { style: { stroke: "#808080" } }
+label_46 -> src_components_editor_editor_jsx   { style: { stroke: "#808080" } }
 src_components_editor_editor_jsx -> label_15 { style: { stroke: "lightgreen"
     stroke-dash: 5 } }
 label_15 -> file-saver   { style: { stroke: "lightgreen"
     stroke-dash: 5 } }
-src_app_jsx -> label_46 { style: { stroke: "#808080" } }
-label_46 -> src_components_editor_editor_jsx   { style: { stroke: "#808080" } }
 src_app_jsx -> label_49 { style: { stroke: "#808080" } }
 label_49 -> src_app_css   { style: { stroke: "#808080" } }
 src_main_jsx -> label_52 { style: { stroke: "#808080" } }
@@ -160,116 +137,83 @@ vite_config_js -> label_55 { style: { stroke: "#808080" } }
 label_55 -> vite   { style: { stroke: "#808080" } }
 vite_config_js -> label_56 { style: { stroke: "#808080" } }
 label_56 -> vitejs_plugin-react-refresh   { style: { stroke: "#808080" } }
-src_components_editor_menus_dropdownmenu_jsx.style.fill: "#b3ffb3"
-src_components_editor_menus_dropdownmenu_jsx.style.stroke: "#c71585"
+src_components_editor_menus_dropdownmenu_jsx.style.fill: "#e6ccb3"
+src_components_editor_menus_dropdownmenu_jsx.style.stroke: "#174ea6"
 src_components_editor_menus_editmenu_jsx: "src_components_editor_menus_editmenu_jsx\n(15 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_components_editor_menus_editmenu_jsx.style.fill: "#b3ffb3"
-src_components_editor_menus_editmenu_jsx.style.stroke: "#c71585"
+src_components_editor_menus_editmenu_jsx.style.fill: "#e6ccb3"
+src_components_editor_menus_editmenu_jsx.style.stroke: "#174ea6"
 src_components_editor_menus_filemenu_jsx: "src_components_editor_menus_filemenu_jsx\n(15 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_components_editor_menus_filemenu_jsx.style.fill: "#b3ffb3"
-src_components_editor_menus_filemenu_jsx.style.stroke: "#c71585"
-src_components_editor_utils_exampleuitd_js: "src_components_editor_utils_exampleuitd_js\n(46 lines)" { style: { stroke-width: 2 }
+src_components_editor_menus_filemenu_jsx.style.fill: "#e6ccb3"
+src_components_editor_menus_filemenu_jsx.style.stroke: "#174ea6"
+src_components_editor_editor_jsx: "src_components_editor_editor_jsx\n(372 lines)" { style: { stroke-width: 14
+    stroke-dash: 2 }
  shape: "rectangle" }
-src_components_editor_utils_exampleuitd_js.style.fill: "#cce0ff"
-src_components_editor_utils_exampleuitd_js.style.stroke: "#3cb44b"
-src_components_editor_utils_formatcode_js: "src_components_editor_utils_formatcode_js\n(71 lines)" { style: { stroke-width: 3 }
- shape: "rectangle" }
-src_components_editor_utils_formatcode_js.style.fill: "#cce0ff"
-src_components_editor_utils_formatcode_js.style.stroke: "#3cb44b"
-src_components_editor_utils_monacosetup_js: "src_components_editor_utils_monacosetup_js\n(175 lines)" { style: { stroke-width: 7 }
- shape: "rectangle" }
-src_components_editor_utils_monacosetup_js.style.fill: "#cce0ff"
-src_components_editor_utils_monacosetup_js.style.stroke: "#3cb44b"
-src_components_editor_utils_seterrors_js: "src_components_editor_utils_seterrors_js\n(26 lines)" { style: { stroke-width: 2 }
- shape: "rectangle" }
-src_components_editor_utils_seterrors_js.style.fill: "#cce0ff"
-src_components_editor_utils_seterrors_js.style.stroke: "#3cb44b"
-src_components_editor_editor_jsx: "src_components_editor_editor_jsx\n(372 lines)" { style: { stroke-width: 14 }
- shape: "rectangle" }
-src_components_editor_editor_jsx.style.fill: "#b3fff9"
-src_components_editor_editor_jsx.style.stroke: "#5b3a29"
+src_components_editor_editor_jsx.style.fill: "#ffb3b3"
+src_components_editor_editor_jsx.style.stroke: "#4b2e83"
 src_components_editor_editorheader_jsx: "src_components_editor_editorheader_jsx\n(106 lines)" { style: { stroke-width: 4 }
  shape: "rectangle" }
-src_components_editor_editorheader_jsx.style.fill: "#b3fff9"
-src_components_editor_editorheader_jsx.style.stroke: "#5b3a29"
+src_components_editor_editorheader_jsx.style.fill: "#ffb3b3"
+src_components_editor_editorheader_jsx.style.stroke: "#4b2e83"
 src_components_editor_erroritem_jsx: "src_components_editor_erroritem_jsx\n(45 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_editor_erroritem_jsx.style.fill: "#b3fff9"
-src_components_editor_erroritem_jsx.style.stroke: "#5b3a29"
+src_components_editor_erroritem_jsx.style.fill: "#ffb3b3"
+src_components_editor_erroritem_jsx.style.stroke: "#4b2e83"
 src_components_editor_errorlist_jsx: "src_components_editor_errorlist_jsx\n(32 lines)" { style: { stroke-width: 2 }
  shape: "rectangle" }
-src_components_editor_errorlist_jsx.style.fill: "#b3fff9"
-src_components_editor_errorlist_jsx.style.stroke: "#5b3a29"
+src_components_editor_errorlist_jsx.style.fill: "#ffb3b3"
+src_components_editor_errorlist_jsx.style.stroke: "#4b2e83"
 src_components_editor_errorlistportal_jsx: "src_components_editor_errorlistportal_jsx\n(14 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_components_editor_errorlistportal_jsx.style.fill: "#b3fff9"
-src_components_editor_errorlistportal_jsx.style.stroke: "#5b3a29"
-src_components_codeviewer_jsx: "src_components_codeviewer_jsx\n(36 lines)" { style: { stroke-width: 2 }
+src_components_editor_errorlistportal_jsx.style.fill: "#ffb3b3"
+src_components_editor_errorlistportal_jsx.style.stroke: "#4b2e83"
+src_components_codeviewer_jsx: "src_components_codeviewer_jsx\n(36 lines)" { style: { stroke-width: 2
+    stroke-dash: 2 }
  shape: "rectangle" }
-src_components_codeviewer_jsx.style.fill: "#ffffb3"
-src_components_codeviewer_jsx.style.stroke: "#009999"
-src_components_color-assignment_js: "src_components_color-assignment_js\n(188 lines)" { style: { stroke-width: 7 }
+src_components_codeviewer_jsx.style.fill: "#ffd6e6"
+src_components_codeviewer_jsx.style.stroke: "#5b3a29"
+src_components_color-assignment_js: "src_components_color-assignment_js\n(229 lines)" { style: { stroke-width: 9 }
  shape: "rectangle" }
-src_components_color-assignment_js.style.fill: "#ffffb3"
-src_components_color-assignment_js.style.stroke: "#009999"
-src_components_rendererd2_jsx: "src_components_rendererd2_jsx\n(340 lines)" { style: { stroke-width: 13 }
+src_components_color-assignment_js.style.fill: "#ffd6e6"
+src_components_color-assignment_js.style.stroke: "#5b3a29"
+src_components_rendererd2_jsx: "src_components_rendererd2_jsx\n(329 lines)" { style: { stroke-width: 12 }
  shape: "rectangle" }
-src_components_rendererd2_jsx.style.fill: "#ffffb3"
-src_components_rendererd2_jsx.style.stroke: "#009999"
+src_components_rendererd2_jsx.style.fill: "#ffd6e6"
+src_components_rendererd2_jsx.style.stroke: "#5b3a29"
 src_components_rendermodal_jsx: "src_components_rendermodal_jsx\n(237 lines)" { style: { stroke-width: 9 }
  shape: "rectangle" }
-src_components_rendermodal_jsx.style.fill: "#ffffb3"
-src_components_rendermodal_jsx.style.stroke: "#009999"
-src_utils_lexer_js: "src_utils_lexer_js\n(100 lines)" { style: { stroke-width: 4 }
- shape: "rectangle" }
-src_utils_lexer_js.style.fill: "#e6e6e6"
-src_utils_lexer_js.style.stroke: "#666666"
-src_utils_tokenparser_js: "src_utils_tokenparser_js\n(404 lines)" { style: { stroke-width: 15 }
- shape: "rectangle" }
-src_utils_tokenparser_js.style.fill: "#e6e6e6"
-src_utils_tokenparser_js.style.stroke: "#666666"
-src_utils_tokens_js: "src_utils_tokens_js\n(48 lines)" { style: { stroke-width: 2 }
- shape: "rectangle" }
-src_utils_tokens_js.style.fill: "#e6e6e6"
-src_utils_tokens_js.style.stroke: "#666666"
-src_utils_utils_js: "src_utils_utils_js\n(34 lines)" { style: { stroke-width: 2 }
- shape: "rectangle" }
-src_utils_utils_js.style.fill: "#e6e6e6"
-src_utils_utils_js.style.stroke: "#666666"
-src_utils_validation_js: "src_utils_validation_js\n(268 lines)" { style: { stroke-width: 10 }
- shape: "rectangle" }
-src_utils_validation_js.style.fill: "#e6e6e6"
-src_utils_validation_js.style.stroke: "#666666"
+src_components_rendermodal_jsx.style.fill: "#ffd6e6"
+src_components_rendermodal_jsx.style.stroke: "#5b3a29"
 src_app_css: "src_app_css\n(304 lines)" { style: { stroke-width: 11 }
  shape: "rectangle" }
-src_app_css.style.fill: "#e6ccb3"
-src_app_css.style.stroke: "#4b2e83"
-src_app_jsx: "src_app_jsx\n(46 lines)" { style: { stroke-width: 2 }
+src_app_css.style.fill: "#ffd9b3"
+src_app_css.style.stroke: "#cc7a00"
+src_app_jsx: "src_app_jsx\n(46 lines)" { style: { stroke-width: 2
+    stroke-dash: 2 }
  shape: "rectangle" }
-src_app_jsx.style.fill: "#e6ccb3"
-src_app_jsx.style.stroke: "#4b2e83"
+src_app_jsx.style.fill: "#ffd9b3"
+src_app_jsx.style.stroke: "#cc7a00"
 src_index_css: "src_index_css\n(75 lines)" { style: { stroke-width: 3 }
  shape: "rectangle" }
-src_index_css.style.fill: "#e6ccb3"
-src_index_css.style.stroke: "#4b2e83"
+src_index_css.style.fill: "#ffd9b3"
+src_index_css.style.stroke: "#cc7a00"
 src_main_jsx: "src_main_jsx\n(11 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-src_main_jsx.style.fill: "#e6ccb3"
-src_main_jsx.style.stroke: "#4b2e83"
+src_main_jsx.style.fill: "#ffd9b3"
+src_main_jsx.style.stroke: "#cc7a00"
 index_html: "index_html\n(20 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-index_html.style.fill: "#ffd9b3"
-index_html.style.stroke: "#cc7a00"
+index_html.style.fill: "#b3c6ff"
+index_html.style.stroke: "#b3b300"
 prueba_recorrido_js: "prueba_recorrido_js\n(96 lines)" { style: { stroke-width: 4 }
  shape: "rectangle" }
-prueba_recorrido_js.style.fill: "#ffd9b3"
-prueba_recorrido_js.style.stroke: "#cc7a00"
+prueba_recorrido_js.style.fill: "#b3c6ff"
+prueba_recorrido_js.style.stroke: "#b3b300"
 vite_config_js: "vite_config_js\n(15 lines)" { style: { stroke-width: 1 }
  shape: "rectangle" }
-vite_config_js.style.fill: "#ffd9b3"
-vite_config_js.style.stroke: "#cc7a00"
+vite_config_js.style.fill: "#b3c6ff"
+vite_config_js.style.stroke: "#b3b300"
 react: "react" { style: { stroke-width: 1 }
  shape: "hexagon" }
 monaco-editor_react: "@monaco-editor_react" { style: { stroke-width: 1 }
@@ -300,8 +244,6 @@ label_3: "React"
 label_3.class: label_bg
 label_4: "DropdownMenu" 
 label_4.class: label_bg
-label_5: "validVerbs" 
-label_5.class: label_bg
 label_6: "React,\nuseRef,\nuseState,\nuseEffect,\nuseCallback" 
 label_6.class: label_bg
 label_7: "MonacoEditor" 
@@ -310,12 +252,6 @@ label_8: "EditorHeader"
 label_8.class: label_bg
 label_9: "ErrorListPortal" 
 label_9.class: label_bg
-label_10: "handleFormatCode" 
-label_10.class: label_bg
-label_11: "setErrors" 
-label_11.class: label_bg
-label_12: "setupMonaco" 
-label_12.class: label_bg
 label_13: "_" 
 label_13.class: label_bg
 label_14: "debounce" 
@@ -348,8 +284,6 @@ label_27: "React,\nuseCallback,\nuseRef"
 label_27.class: label_bg
 label_28: "MonacoEditor" 
 label_28.class: label_bg
-label_29: "setupD2" 
-label_29.class: label_bg
 label_30: "React,\nuseState,\nuseRef,\nuseEffect,\nuseCallback" 
 label_30.class: label_bg
 label_31: "CodeViewer" 
@@ -366,18 +300,6 @@ label_36: "D2"
 label_36.class: label_bg
 label_37: "svgPanZoom" 
 label_37.class: label_bg
-label_38: "Token,\nTokenType,\nTokens" 
-label_38.class: label_bg
-label_39: "tokenize" 
-label_39.class: label_bg
-label_40: "TokenType" 
-label_40.class: label_bg
-label_41: "getInnermostUIStr,\ngetInnermostUIRef,\nformatUIRef" 
-label_41.class: label_bg
-label_42: "validateData" 
-label_42.class: label_bg
-label_43: "getInnermostUIRef,\nformatUIRef" 
-label_43.class: label_bg
 label_44: "React,\nuseState,\nuseEffect,\nuseMemo" 
 label_44.class: label_bg
 label_45: "debounce" 
@@ -386,8 +308,6 @@ label_46: "Editor"
 label_46.class: label_bg
 label_47: "RendererD2" 
 label_47.class: label_bg
-label_48: "parseUITDL" 
-label_48.class: label_bg
 label_49: "_" 
 label_49.class: label_bg
 label_50: "React" 

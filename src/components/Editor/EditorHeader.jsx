@@ -1,7 +1,6 @@
 // src/components/Editor/EditorHeader.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import FileMenu from './menus/FileMenu';
-import EditMenu from './menus/EditMenu';
+import DropdownMenu from './menus/DropdownMenu';
 
 function formatElapsed( ms ) {
     const sec = Math.floor( ms / 1000 );
@@ -83,13 +82,25 @@ const EditorHeader = ( {
         setShowErrors( v => !v );
     }, [ setShowErrors ] );
 
+    const itemsFileMenu = [
+        { label: 'Open…', onClick: handleOpenFile },
+        { label: 'Load Example', onClick: handleLoadExampleFile },
+        { label: 'Save as…', onClick: handleSaveFile }
+    ];
+
+    const itemsEditMenu = [
+        { label: 'Copy All', onClick: handleCopy },
+        { label: 'Paste', onClick: handlePaste },
+        { label: 'Format', onClick: handleFormat }
+    ];
+
     return (
         <div>
             <div className="renderer-header">
                 <div className="title blinking">{ isModified && elapsed }</div>
                 <div className="menu-container">
-                    <FileMenu onOpen={ handleOpenFile } onSave={ handleSaveFile } onLoadExample={ handleLoadExampleFile } />
-                    <EditMenu onCopyAll={ handleCopy } onPaste={ handlePaste } onFormat={ handleFormat } />
+                    <DropdownMenu label="File" items={ itemsFileMenu } />
+                    <DropdownMenu label="Edit" items={ itemsEditMenu } />
                     <button className="renderer-button" onClick={ toggleErrors }>
                         { showErrors ? 'Hide' : 'Show' } Errors
                     </button>
