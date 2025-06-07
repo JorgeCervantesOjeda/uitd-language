@@ -114,13 +114,9 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
         return '';
     }
     const indent = '  '.repeat( indentLevel );
-    const fillColor = ( uiColorMap[ ui.id ] && uiColorMap[ ui.id ].fill ) || '#eeeeee';
-    const strokeColor = ( uiColorMap[ ui.id ] && uiColorMap[ ui.id ].stroke ) || '#cccccc';
-    let out = `${indent}${ref.id}.style.fill: "${fillColor}"\n`;
-    out += `${indent}${ref.id}.style.stroke: "${strokeColor}"\n`;
-    out += `${indent}${ref.id}.shape: rectangle\n`;
-    out += `${indent}${ref.id}.style.3d: true\n`;
-    out += `${indent}${ref.id}.style.stroke-width: 6\n`;
+    let out = '';
+    out += `${indent}${ref.id}.class: ui${ui.id}\n`;
+    // Solo pon stroke-dash si aplica a este nodo
     out += ref.full
         ? ''
         : `${indent}${ref.id}.style.stroke-dash: 5\n`;
@@ -152,19 +148,49 @@ const translateToD2 = ( parsedData ) => {
 
     const uiColorMap = generateUIColorMap( parsedData.uis );
 
-    // Cabecera y bloque classes (las primeras 15 líneas)
+    // 1. Bloque vars
+    let varsBlock = 'vars: {\n';
+    parsedData.uis.forEach(ui => {
+        varsBlock += `  ui${ui.id}: {\n`;
+        varsBlock += `    fill: "${uiColorMap[ui.id]?.fill || '#eeeeee'}"\n`;
+        varsBlock += `    stroke: "${uiColorMap[ui.id]?.stroke || '#cccccc'}"\n`;
+        varsBlock += `  }\n`;
+    });
+    varsBlock += '}\n\n';
+
+    // 2. Bloque classes
+    let uiClasses = '';
+    let labelUiClasses = '';
+    parsedData.uis.forEach(ui => {
+        uiClasses += `  ui${ui.id}: {\n`;
+        uiClasses += `    shape: rectangle\n`;
+        uiClasses += `    style: {\n`;
+        uiClasses += `      fill: \${ui${ui.id}.fill}\n`;
+        uiClasses += `      stroke: \${ui${ui.id}.stroke}\n`;
+        uiClasses += `      stroke-width: 6\n`;
+        uiClasses += `      3d: true\n`;
+        uiClasses += `    }\n`;
+        uiClasses += `  }\n`;
+        labelUiClasses += `  label_ui${ui.id}: {\n`;
+        labelUiClasses += `    shape: oval\n`;
+        labelUiClasses += `    style: {\n`;
+        labelUiClasses += `      fill: \${ui${ui.id}.fill}\n`;
+        labelUiClasses += `      stroke: \${ui${ui.id}.stroke}\n`;
+        labelUiClasses += `      stroke-width: 6\n`;
+        labelUiClasses += `      font-color: "#003311"\n`;
+        labelUiClasses += `      font-size: 18\n`;
+        labelUiClasses += `    }\n`;
+        labelUiClasses += `  }\n`;
+    });
+
+    // 3. Inserta en tu D2
     let d2 =
+        varsBlock +
         `direction: right\n\n` +
-        `# Clase para etiquetas de transición\n` +
+        `# Clases generadas para cada UI\n` +
         `classes: {\n` +
-        `  label_bg: {\n` +
-        `    shape: oval\n` +
-        `    style: {\n` +
-        `      stroke-width: 6\n` +
-        `      font-color: "#003311"\n` +
-        `      font-size: 18\n` +
-        `    }\n` +
-        `  }\n` +
+        uiClasses +
+        labelUiClasses +
         `}\n\n` +
         `# Contenedor principal\n` +
         `UITD.style.fill: "#ffffff"\n` +
@@ -208,10 +234,8 @@ const translateToD2 = ( parsedData ) => {
             // 2) Usa su id para el color
             const fillColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].fill ) || '#eeeeee';
             const strokeColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].stroke ) || '#cccccc';
-            d2 += `    ${lblId}.style.fill: "${fillColor}"\n`;
-            d2 += `    ${lblId}.style.stroke: "${strokeColor}"\n`;
             d2 += `    ${lblId}\n`;
-            d2 += `    ${lblId}.class: label_bg\n`;
+            d2 += `    ${lblId}.class: label_ui${originRef.id}\n`;
             let action = `${t.action} "${t.target}"`;
             if( t.condition ) action += ` AND (${t.condition})`;
             d2 += `    ${lblId}: ${formatString( action, t.width ?? defaultWidth )}\n`;
