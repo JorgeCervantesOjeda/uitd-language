@@ -318,6 +318,30 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         [ isModified, updateContent, wrapLoading ]
     );
 
+    const handleCollapseAll = () => {
+        if (editorRef.current) {
+            editorRef.current.getAction('editor.foldAll').run();
+        }
+    };
+
+    const handleExpandAll = () => {
+        if (editorRef.current) {
+            editorRef.current.getAction('editor.unfoldAll').run();
+        }
+    };
+
+    const handleUndo = () => {
+        if (editorRef.current) {
+            editorRef.current.trigger('', 'undo', null);
+        }
+    };
+
+    const handleRedo = () => {
+        if (editorRef.current) {
+            editorRef.current.trigger('', 'redo', null);
+        }
+    };
+
     return (
         <div className="editor-container panel-container">
             <div className="sticky-area">
@@ -332,6 +356,10 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     onLoadExample={ handleLoadExample }
                     showErrors={ showErrors }
                     setShowErrors={ setShowErrors }
+                    onCollapseAll={ handleCollapseAll }
+                    onExpandAll={ handleExpandAll }
+                    onUndo={ handleUndo }
+                    onRedo={ handleRedo }
                 />
             </div>
 
@@ -344,7 +372,6 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     value={ localText }
                     onChange={ handleEditorChange }
                     onMount={ handleEditorDidMount }
-                    theme="vs-dark"
                     options={ {
                         readOnly: false,
                         minimap: { enabled: true },

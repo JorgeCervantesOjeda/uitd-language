@@ -9,6 +9,7 @@ import './App.css';
 const App = () => {
   const [ uitdlText, setUitdlText ] = useState( 'UITD "Empty" {}' );
   const [ parsedData, setParsedData ] = useState( () => parseUITDL( uitdlText ) );
+  const [ theme, setTheme ] = useState( 'uitdlTheme-dark' ); // Puedes cambiar el tema según tus preferencias
 
   // 1) Creamos una función debounced para el parseo
   const debouncedParse = useMemo(
@@ -26,8 +27,18 @@ const App = () => {
     return () => debouncedParse.cancel();
   }, [ uitdlText, debouncedParse ] );
 
+  // Botón para alternar el tema
+  const toggleTheme = () => {
+    setTheme( ( prev ) =>
+      prev === 'uitdlTheme-dark' ? 'uitdlTheme-light' : 'uitdlTheme-dark'
+    );
+  };
+
   return (
     <div className="app-container">
+      <button onClick={ toggleTheme } style={ { position: 'absolute', top: 10, left: 10, zIndex: 10 } }>
+        Toggle theme
+      </button>
       <div className="space-screen editor-container panel-container">
         <Editor
           uitdlText={ uitdlText }
@@ -36,7 +47,7 @@ const App = () => {
         />
       </div>
       <div className="space-screen renderer-container panel-container">
-        <RendererD2 data={ parsedData } />
+        <RendererD2 data={ parsedData } theme={ theme } />
       </div>
     </div>
   );

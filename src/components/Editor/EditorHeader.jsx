@@ -20,7 +20,11 @@ const EditorHeader = ( {
     onFormat,
     onLoadExample,
     showErrors,
-    setShowErrors
+    setShowErrors,
+    onCollapseAll,
+    onExpandAll,
+    onUndo,
+    onRedo
 } ) => {
     const [ message, setMessage ] = useState( '' );
     const displayMsg = useCallback( msg => setMessage( msg ), [] );
@@ -101,8 +105,42 @@ const EditorHeader = ( {
                 <div className="menu-container">
                     <DropdownMenu label="File" items={ itemsFileMenu } />
                     <DropdownMenu label="Edit" items={ itemsEditMenu } />
-                    <button className="renderer-button" onClick={ toggleErrors }>
-                        { showErrors ? 'Hide' : 'Show' } Errors
+                    <button
+                        className="renderer-button"
+                        onClick={ onCollapseAll }
+                        title="Collapse all"
+                    >
+                        <span className="material-icons">unfold_less</span>
+                    </button>
+                    <button
+                        className="renderer-button"
+                        onClick={ onExpandAll }
+                        title="Expand all"
+                    >
+                        <span className="material-icons">unfold_more</span>
+                    </button>
+                    <button
+                        className="renderer-button"
+                        onClick={ onUndo }
+                        title="Undo"
+                    >
+                        <span className="material-icons">undo</span>
+                    </button>
+                    <button
+                        className="renderer-button"
+                        onClick={ onRedo }
+                        title="Redo"
+                    >
+                        <span className="material-icons">redo</span>
+                    </button>
+                    <button
+                        className="renderer-button"
+                        onClick={ toggleErrors }
+                        title={ showErrors ? "Hide errors" : "Show errors" }
+                    >
+                        <span className="material-icons">
+                            { showErrors ? "visibility_off" : "visibility" }
+                        </span>
                     </button>
                 </div>
             </div>

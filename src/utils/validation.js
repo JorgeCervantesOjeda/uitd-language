@@ -6,6 +6,7 @@ export const validateData = ( parsedData ) => {
     const fragmentNames = new Set();
     const uiIds = new Set();
 
+    
     // Check if at least 1 UI is defined
     if( parsedData.uis.length === 0 ) {
         markers.push( {
@@ -161,10 +162,11 @@ export const validateData = ( parsedData ) => {
                 markers.push( {
                     severity: 8,
                     startLineNumber: transition.line,
-                    startColumn: transition.column + 16,
+                    startColumn: transition.verbColumn,
                     endLineNumber: transition.line,
-                    endColumn: transition.column + 16 + uiRefString.length,
+                    endColumn: transition.verbColumn + transition.action.length + 1 + 1 + transition.target.length + 1, // verbo + espacio + comillas + target
                     message: `Action ${transition.action} "${transition.target}" in transition is not defined in UI ${uiRefString}.`,
+                    code: 'invalid-action'
                 } );
             }
         } );

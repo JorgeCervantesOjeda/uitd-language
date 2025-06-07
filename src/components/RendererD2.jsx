@@ -233,7 +233,7 @@ const translateToD2 = ( parsedData ) => {
 };
 
 
-const RendererD2 = ( { data } ) => {
+const RendererD2 = ( { data, theme } ) => {
     const initialD2 = translateToD2( data );
     const [ draftCode, setDraftCode ] = useState( initialD2 );
     const [ renderCode, setRenderCode ] = useState( initialD2 );
@@ -313,6 +313,7 @@ const RendererD2 = ( { data } ) => {
                 <CodeViewer
                     code={ renderCode }
                     onChange={ value => setRenderCode( value ) }
+                    theme={ theme }
                 />
             </div>
 

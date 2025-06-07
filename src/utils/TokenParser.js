@@ -130,7 +130,7 @@ class TokenParser {
         this.processFullField();
 
         // Incorporate validation errors
-        const validationErrors = validateData( this.result );
+        const validationErrors = validateData( this.result, );
         this.result.errors = [ ...this.result.errors, ...validationErrors ];
 
         return this.result;
@@ -309,9 +309,11 @@ class TokenParser {
                 action,
                 target,
                 condition,
-                width,  // Add width to the transition object
+                width,
                 line: startToken.line,
-                column: startToken.column
+                column: startToken.column,
+                verbColumn: actionToken.column,   // columna inicial del verbo
+                // otros campos necesarios
             } );
         } catch( e ) {
             this.handleParsingError( e );

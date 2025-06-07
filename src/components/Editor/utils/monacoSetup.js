@@ -113,6 +113,35 @@ export const setupMonaco = ( monacoInstance ) => {
         }
     } );
 
+    // Tema oscuro personalizado
+    monacoInstance.editor.defineTheme( 'uitdlTheme-dark', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+            { token: 'number', foreground: 'e5eE08' },
+            { token: 'comment', foreground: '6A9955' },
+            // ...otros token-rules...
+        ],
+        colors: {
+            'editor.background': '#1e1e1e',
+            'editor.foreground': '#F8F8F8',
+        }
+    } );
+
+    // Tema claro personalizado
+    monacoInstance.editor.defineTheme( 'uitdlTheme-light', {
+        base: 'vs',
+        inherit: true,
+        rules: [
+            { token: 'number', foreground: 'a57900' },
+            { token: 'comment', foreground: '6A9955' },
+            // ...otros token-rules...
+        ],
+        colors: {
+            'editor.background': '#ffffff',
+            'editor.foreground': '#222222',
+        }
+    } );
 
     monacoInstance.languages.registerFoldingRangeProvider( 'uitdl', {
         provideFoldingRanges( model ) {

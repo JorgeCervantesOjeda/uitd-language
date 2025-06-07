@@ -302,3 +302,9 @@ button:hover {
     opacity: 1
   }
 }
+
+.material-icons {
+  font-size: 12px;
+  /* O el tamaño que prefieras, por ejemplo 18px */
+  vertical-align: middle;
+}
