@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { D2 } from '@terrastruct/d2';
 import svgPanZoom from 'svg-pan-zoom';
+import GenerateHTML from './GenerateHTML'; // Clase encargada de generar el HTML
 
 export default function RenderModal( { d2Source, isOpen, onClose } ) {
     const [ svg, setSvg ] = useState( '' );
     const [ status, setStatus ] = useState( '' );
     const [ full, setFull ] = useState( false );
+    const [showGeneratedHTML, setShowGeneratedHTML] = useState(false); // Estados para mostrar la interfaz generada
+    const [userInputText, setUserInputText] = useState('');
 
     // Configurable padding in pixels
     const PADDING = ( -100 ); // reducido para espacio mínimo
@@ -141,6 +144,10 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
         URL.revokeObjectURL( url );
     };
 
+    const handleGenerateHTML = () => {
+        setShowGeneratedHTML(true);
+    };
+
     // Genera JPG usando el viewBox completo (incluyendo padding y borde)
     const onDownloadJPG = () => {
         if( !svg ) return;
@@ -210,6 +217,12 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                         <button onClick={ onDownloadJPG } disabled={ !svg || status !== '' }>
                             JPG
                         </button>
+                        <button onClick={handleGenerateHTML}>
+                            Generate HTML
+                        </button>
+                        {showGeneratedHTML && (
+                            <GenerateHTML onClose={() => setShowGeneratedHTML(false)} />
+                        )}
                     </div>
                     <button className="close-btn" onClick={ onClose }>
                         Close

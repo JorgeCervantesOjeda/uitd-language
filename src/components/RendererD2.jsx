@@ -97,13 +97,17 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
 };
 
 const generateUIColorMap = ( uis ) => {
+    const existing = localStorage.getItem('uiColors');
+    if (existing) return JSON.parse(existing);
     // Construye el objeto tipo folderToNodes, donde cada clave es el id de la UI
     // y el valor es un array con ese mismo id (puede extenderse a más nodos si se desea)
     const folderToNodes = {};
     uis.forEach( ui => {
         folderToNodes[ ui.id ] = [ ui.id ];
     } );
-    return asignarColores( folderToNodes );
+    const colorMap = asignarColores(folderToNodes);
+    localStorage.setItem('uiColors', JSON.stringify(colorMap));
+    return colorMap;
 };
 
 // Ajustamos buildUIHierarchy para usar el color asignado
@@ -255,6 +259,7 @@ const RendererD2 = ( { data } ) => {
     }, [ data ] );
 
     const handleUpdate = () => {
+        localStorage.removeItem("uiColors");
         // Regeneramos completamente, con nuevos colores aleatorios
         const updated = translateToD2( data );
         // Actualizamos ambos estados para reflejar el nuevo código
