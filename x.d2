@@ -1,0 +1,22 @@
+"title": {
+    1: 1 Login
+    0: 0 Menu
+    2: 2 Admin {
+      3: 3 Normal {
+        0: 0 Menu
+      }
+    }
+    4: 4 Standings {
+      0: 0 Menu
+    }
+    5: 5 Events {
+      0: 0 Menu
+    }
+  0 -> 2: `Clicks "Home" AND\n(is Admin)`
+  0 -> 2.3: `Clicks "Home" AND\n(is Normal)`
+  0 -> 4: `Clicks "Standings"`
+  0 -> 5: `Clicks "Events"`
+  0 -> 1: `Clicks "Logout"`
+  1 -> 2: `Clicks "Login" AND\n(is Admin)`
+  1 -> 2.3: `Clicks "Login" AND\n(is Normal)`
+}

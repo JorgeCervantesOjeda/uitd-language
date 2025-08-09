@@ -1,0 +1,31 @@
+*.uitd
+*.json
+*.xml  
+*.yaml
+*.yml  
+*.md
+*.txt
+*.zip
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependencias
+node_modules/
+
+# Compilados
+dist/
+build/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Configuración de editor
+.vscode/
+.idea/
