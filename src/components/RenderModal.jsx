@@ -221,7 +221,10 @@ export default function RenderModal( { d2Source, isOpen, onClose } ) {
                             Generate HTML
                         </button>
                         {showGeneratedHTML && (
-                            <GenerateHTML onClose={() => setShowGeneratedHTML(false)} />
+                            <GenerateHTML onClose={() => setShowGeneratedHTML(false)}
+                                svg={svg}
+                                panZoomRef={panZoomRef}
+                            />
                         )}
                     </div>
                     <button className="close-btn" onClick={ onClose }>

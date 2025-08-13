@@ -14,7 +14,9 @@ const App = () => {
   const debouncedParse = useMemo(
     () =>
       debounce( ( text ) => {
-        setParsedData( parseUITDL( text ) );
+        const parsedLocalStorage = parseUITDL( text ) ;
+        setParsedData( parsedLocalStorage);
+        localStorage.setItem('parsedData', JSON.stringify(parsedLocalStorage));
       }, 300 ),
     []
   );

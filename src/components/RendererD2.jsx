@@ -97,8 +97,9 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
 };
 
 const generateUIColorMap = ( uis ) => {
+    // Si no retomamos uiColors se desincronizan los colores del DTIU con el HTML
     const existing = localStorage.getItem('uiColors');
-    if (existing) return JSON.parse(existing);
+    if(existing) return JSON.parse(existing);
     // Construye el objeto tipo folderToNodes, donde cada clave es el id de la UI
     // y el valor es un array con ese mismo id (puede extenderse a más nodos si se desea)
     const folderToNodes = {};
@@ -259,6 +260,7 @@ const RendererD2 = ( { data } ) => {
     }, [ data ] );
 
     const handleUpdate = () => {
+        // Borramos uiColors para que se generen nuevos colores cada vez que se actualiza el diagrama
         localStorage.removeItem("uiColors");
         // Regeneramos completamente, con nuevos colores aleatorios
         const updated = translateToD2( data );
