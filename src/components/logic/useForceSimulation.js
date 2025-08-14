@@ -13,18 +13,19 @@ export default function useForceSimulation(
     nodesMap,
     labelMap,
     animTrigger,
-    continueTrigger
+    continueTrigger,
+    hiddenSteps = 10,      // NUEVO: pasos iniciales sin mostrar
+    stepsPerFrame = 5     // NUEVO: pasos por cuadro antes de pintar
 ) {
     const [ tick, setTick ] = useState( 0 );
     const posRef = useRef( {} );
     const velRef = useRef( {} );
-    const prevAnimRef = useRef();  // para detectar reinicio completo
-    const prevContinueRef = useRef();  // para detectar continuaciones
+    const prevAnimRef = useRef();
+    const prevContinueRef = useRef();
 
     useEffect( () => {
         if( continueTrigger === 0 ) return;
 
-        // Detectamos cambios en triggers
         const animChanged = prevAnimRef.current !== animTrigger;
         prevAnimRef.current = animTrigger;
         const continueChanged = prevContinueRef.current !== continueTrigger;
@@ -50,13 +51,11 @@ export default function useForceSimulation(
 
         // 3) Inicializa o reutiliza estado dinámico
         if( animChanged ) {
-            // Reinicio completo: reset pos y vel
             rootIds.forEach( r => {
                 posRef.current[ r ] = { x: 0, y: 0 };
                 velRef.current[ r ] = { x: 0, y: 0 };
             } );
         } else if( continueChanged ) {
-            // Continuación: reset solo offsets para evitar saltos
             rootIds.forEach( r => {
                 posRef.current[ r ] = { x: 0, y: 0 };
             } );
@@ -76,12 +75,13 @@ export default function useForceSimulation(
         let step = 0;
         let rafId = null;
 
-        function stepSimulation() {
+        // --- NUEVO: separar integración y commit para poder "ocultar" pasos ---
+        function integrateOneStep() {
             // a) Fuerzas iniciales a cero
             const force = {};
             allIds.forEach( id => { force[ id ] = { x: 0, y: 0 }; } );
 
-            // b) Fuerzas de resorte
+            // b) Resortes
             edgePairs.forEach( ( [ u, v ] ) => {
                 const rU = u.split( '.' )[ 0 ], rV = v.split( '.' )[ 0 ];
                 const p1 = { x: basePos[ u ].x + posRef.current[ rU ].x, y: basePos[ u ].y + posRef.current[ rU ].y };
@@ -95,7 +95,7 @@ export default function useForceSimulation(
                 force[ v ].x -= fx; force[ v ].y -= fy;
             } );
 
-            // c) Fuerzas de Coulomb
+            // c) Coulomb
             for( let i = 0; i < allIds.length; i++ ) {
                 for( let j = i + 1; j < allIds.length; j++ ) {
                     const a = allIds[ i ], b = allIds[ j ];
@@ -121,7 +121,7 @@ export default function useForceSimulation(
                 rootForce[ root ].y += force[ id ].y;
             } );
 
-            // f) Integración semiexplícita (sin clamp de posiciones negativas)
+            // f) Integración
             let maxDisp = 0;
             rootIds.forEach( r => {
                 const v = velRef.current[ r ];
@@ -146,31 +146,53 @@ export default function useForceSimulation(
                 dt = Math.min( DT_MAX, dt * ( 1 + ADJUST_PERCENT ) );
             }
 
+            step++;
+        }
+
+        function commitPositions() {
             // h) Aplicar posiciones finales (permitir coordenadas negativas)
             allIds.forEach( id => {
                 const root = id.split( '.' )[ 0 ];
                 const rawX = basePos[ id ].x + posRef.current[ root ].x;
                 const rawY = basePos[ id ].y + posRef.current[ root ].y;
-                const x = rawX;
-                const y = rawY;
+                const x = rawX, y = rawY;
                 if( nodesMap[ id ] ) {
                     nodesMap[ id ]._x = x; nodesMap[ id ]._y = y;
                 } else {
                     labelMap[ id ].x = x; labelMap[ id ].y = y;
                 }
             } );
+        }
+        // --- FIN NUEVO ---
 
+        // --- NUEVO: “fast-forward” inicial sin mostrar ---
+        if (hiddenSteps > 0) {
+            const target = Math.min(hiddenSteps, SIMULATION_STEPS);
+            while (step < target) integrateOneStep();
+            commitPositions();         // aplicamos solo una vez
+            setTick(t => t + 1);       // un solo render tras el salto
+        }
+        // --- FIN NUEVO ---
+
+        function frame() {
+            // Hacer varios pasos antes de pintar
+            let count = 0;
+            const toDo = Math.max(1, stepsPerFrame|0);
+            while (count < toDo && step < SIMULATION_STEPS) {
+                integrateOneStep();
+                count++;
+            }
+            commitPositions();
             setTick( t => t + 1 );
-            step++;
+
             if( step < SIMULATION_STEPS ) {
-                rafId = requestAnimationFrame( stepSimulation );
+                rafId = requestAnimationFrame( frame );
             }
         }
 
-        step = 0;
-        stepSimulation();
+        rafId = requestAnimationFrame( frame );
         return () => rafId && cancelAnimationFrame( rafId );
-    }, [ fragment, nodesMap, labelMap, animTrigger, continueTrigger ] );
+    }, [ fragment, nodesMap, labelMap, animTrigger, continueTrigger, hiddenSteps, stepsPerFrame ] );
 
     return tick;
 }

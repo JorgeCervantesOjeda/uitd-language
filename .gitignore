@@ -6,6 +6,13 @@
 *.md
 *.txt
 *.zip
+*.d2
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.pub
+
 
 # Logs
 logs
