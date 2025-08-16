@@ -41,7 +41,25 @@ export default function useUniversalPanZoom(
                 minZoom,
                 maxZoom,
                 fit: true,
-                center: true
+                center: true,
+                // NUEVO: sincronizar estado con svg-pan-zoom para conocer zoom/pan actuales
+                onZoom: ( zoom ) => {
+                    try {
+                        const pan = instance.getPan();
+                        const next = { x: pan.x, y: pan.y, scale: zoom };
+                        stateRef.current = next;
+                        setTransform( next );
+                    } catch { }
+                },
+                onPan: ( pan ) => {
+                    try {
+                        const zoom = instance.getZoom();
+                        const next = { x: pan.x, y: pan.y, scale: zoom };
+                        stateRef.current = next;
+                        setTransform( next );
+                    } catch { }
+                }
+
             } );
             panZoomInst.current = instance;
 
@@ -55,6 +73,18 @@ export default function useUniversalPanZoom(
                 instance.zoomAtPointBy( factor, { x: offsetX, y: offsetY } );
             };
             svgElem.addEventListener( 'wheel', wheelHandler, { passive: false } );
+
+            // NUEVO: inicializar transform con el estado real del viewer
+            try {
+                const initZoom = instance.getZoom();
+                const initPan = instance.getPan();
+                const init = { x: initPan.x, y: initPan.y, scale: initZoom };
+                stateRef.current = init;
+                setTransform( init );
+            } catch { 
+
+            }
+            
         } else {
             // ————— MODO CANVAS —————
             let dragging = false;

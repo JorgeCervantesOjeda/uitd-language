@@ -9,9 +9,10 @@ import { setupMonaco } from './utils/monacoSetup';
 import '../../App.css';
 import { debounce } from 'lodash';
 import { saveAs } from 'file-saver';
-import {ExampleUITD } from './utils/ExampleUITD';
+import { ExampleUITD } from './utils/ExampleUITD';
 
 const STORAGE_KEY = 'uitdlContent';
+const FILENAME_KEY = 'uitdlFileName'; // ⬅️ NUEVO
 
 const Editor = ( { uitdlText, onChange, markers } ) => {
 
@@ -28,6 +29,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ localText, setLocalText ] = useState( uitdlText );
     const [ fileHandle, setFileHandle ] = useState( null ); // NUEVO: guarda el fileHandle del archivo abierto/guardado
     const [ statusMessage, setStatusMessage ] = useState( null ); // antes autosaveMsg
+    const [ fileName, setFileName ] = useState( null ); // ⬅️ NUEVO
 
     // Centraliza la lógica de mostrar mensajes
     const displayMsg = useCallback( ( msg, type = 'info', duration = 2000 ) => {
@@ -105,6 +107,9 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         if( saved ) {
             updateContent( saved, true );
         }
+        const savedName = localStorage.getItem( FILENAME_KEY ); // ⬅️ NUEVO
+        if( savedName )
+            setFileName( savedName );                // ⬅️ NUEVO
     }, [ updateContent ] );
 
     // Cuando cambian los marcadores, actualizar lista de errores
@@ -172,51 +177,66 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
 
     // ─── Handlers de archivo ───
 
-    // Guardar archivo
+    // Guardar archivo (Save as)
     const handleSave = useCallback(
         wrapLoading( 'save', async () => {
             try {
                 let ok = false;
-                let fileName = 'file';
+                let chosenName = null; // ⬅️ solo se llenará con showSaveFilePicker
+
                 if( window.showSaveFilePicker ) {
                     const handle = await window.showSaveFilePicker( {
-                        suggestedName: '_.uitd',
+                        suggestedName: fileName ?? '_.uitd', // ⬅️ usa el nombre actual si existe
                         types: [ { description: 'UITD files', accept: { 'text/plain': [ '.uitd' ] } } ],
                     } );
                     setFileHandle( handle );
-                    fileName = handle.name || 'file';
+
                     const writable = await handle.createWritable();
                     await writable.write( localText );
                     await writable.close();
+
                     ok = true;
+                    chosenName = handle?.name ?? null; // ⬅️ tenemos un nombre real
                 } else {
+                    // Fallback: descarga. No sabemos si el usuario “canceló” y no hay handle.
+                    // ➜ Tratar como “Exportar”: NO cambiar fileName.
+                    const usedName = fileName ?? '_.uitd';
                     const blob = new Blob( [ localText ], { type: 'text/plain;charset=utf-8' } );
-                    saveAs( blob, '_.uitd' );
-                    fileName = '_.uitd';
+                    saveAs( blob, usedName );
+
+                    // Espera a que se cierre el diálogo para no bloquear la UI
                     await new Promise( resolve => {
-                        const onFocus = () => {
-                            window.removeEventListener( 'focus', onFocus );
-                            resolve();
-                        };
+                        const onFocus = () => { window.removeEventListener( 'focus', onFocus ); resolve(); };
                         window.addEventListener( 'focus', onFocus );
                     } );
+
                     setFileHandle( null );
                     ok = true;
+                    // ⚠️ NO asignamos chosenName aquí: mantenemos el nombre actual
                 }
+
                 if( ok ) {
+                    if( chosenName ) {
+                        setFileName( chosenName );
+                        localStorage.setItem( FILENAME_KEY, chosenName );
+                    }
                     updateContent( localText, true );
                     setLastSaved( Date.now() );
-                    setFirstModifiedAt( null ); // <-- borra el contador al guardar
-                    displayMsg( `Saved to local file: ${fileName}`, 'success' );
+                    setFirstModifiedAt( null );
+                    displayMsg( `Saved${chosenName ? ` to local file: ${chosenName}` : ' to your computer'}`, 'success' );
                 }
                 return ok;
             } catch( err ) {
-                if( err.name !== 'AbortError' ) console.error( err );
+                if( err?.name === 'AbortError' || /aborted/i.test( err?.message ) ) {
+                    // Usuario canceló: NO tocar fileName ni mostrar error
+                    return false;
+                }
+                console.error( err );
                 displayMsg( 'Could not save the file.', 'error' );
                 return false;
             }
         } ),
-        [ localText, updateContent, wrapLoading, displayMsg ]
+        [ localText, fileName, updateContent, wrapLoading, displayMsg ]
     );
 
     // Abrir archivo
@@ -227,7 +247,8 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 if( !discard ) return null;
             }
             try {
-                let fileName, text;
+                let chosenName, text;                  // ⬅️ usar chosenName en vez de fileName
+
                 if( window.showOpenFilePicker ) {
                     const [ handle ] = await window.showOpenFilePicker( {
                         types: [ { description: 'UITD files', accept: { 'text/plain': [ '.uitd' ] } } ],
@@ -235,7 +256,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     } );
                     setFileHandle( handle );
                     const file = await handle.getFile();
-                    fileName = file.name;
+                    chosenName = file.name;
                     text = await file.text();
                 } else {
                     text = await new Promise( ( resolve, reject ) => {
@@ -251,7 +272,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                                     reject( new Error( 'No file selected' ) );
                                     return;
                                 }
-                                fileName = chosen.name;
+                                chosenName = chosen.name;
                                 const content = await chosen.text();
                                 resolve( content );
                             } catch( err ) {
@@ -264,10 +285,17 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     } );
                     setFileHandle( null );
                 }
+
                 updateContent( text, true );
+                setFileName( chosenName || null );         // ⬅️ ACTUALIZA EL ESTADO
+                if( chosenName ) {
+                    localStorage.setItem( FILENAME_KEY, chosenName );   // ⬅️ NUEVO
+                } else {
+                    localStorage.removeItem( FILENAME_KEY );            // opcional
+                };
                 collapseAll();
-                if( fileName ) displayMsg( `Opened file: ${fileName}`, 'info' );
-                return fileName;
+                if( chosenName ) displayMsg( `Opened file: ${chosenName}`, 'info' );
+                return chosenName;
             } catch( err ) {
                 if( err.name !== 'AbortError' ) console.error( err );
                 displayMsg( 'Could not open the file.', 'error' );
@@ -285,6 +313,8 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 if( !discard ) return null;
             }
             updateContent( ExampleUITD, true );
+            setFileName( null );
+            localStorage.removeItem( FILENAME_KEY );
             collapseAll();
             displayMsg( 'Example loaded.', 'info' );
             return 'ExampleUITD';
@@ -426,6 +456,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     showErrors={ showErrors }
                     setShowErrors={ setShowErrors }
                     statusMessage={ statusMessage }
+                    fileName={ fileName ? fileName : null }
                 />
             </div>
 

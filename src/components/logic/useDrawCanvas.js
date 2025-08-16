@@ -128,6 +128,7 @@ export default function useDrawCanvas( canvasRef, params ) {
         const onMouseUp = () => {
             dragging = false;
             selected = null;
+            params.onDragEnd();
         };
 
         // 8) Registramos listeners solo en el canvas
@@ -155,6 +156,7 @@ export default function useDrawCanvas( canvasRef, params ) {
         params.lineHeight,
         params.animTrigger,
         params.continueTrigger,
-        params.tick
+        params.tick,
+        params.onDragEnd
     ] );
 }

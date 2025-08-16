@@ -14,7 +14,9 @@ const FragmentCanvas = forwardRef( function FragmentCanvas( {
     animTrigger,
     continueTrigger,
     charLimit,
-    transform
+    transform,
+    onSimFinish,
+    onDragEnd
 }, ref ) {
     const canvasRef = useRef( null );
 
@@ -30,13 +32,34 @@ const FragmentCanvas = forwardRef( function FragmentCanvas( {
         animTrigger,
     );
 
+    // Viewport actual en coordenadas de escena según transform y tamaño visible
+    const getViewportBounds = () => {
+        const canvas = canvasRef.current;
+        const container = canvas?.parentElement;
+        if( !container ) return null;
+        const w = container.clientWidth || 0;
+        const h = container.clientHeight || 0;
+        const s = transform?.scale || 1;
+        const tx = transform?.x || 0;
+        const ty = transform?.y || 0;
+        const minX = ( -tx ) / s;
+        const minY = ( -ty ) / s;
+        const maxX = ( w - tx ) / s;
+        const maxY = ( h - ty ) / s;
+        return { minX, minY, maxX, maxY };
+    };
+
     // 3) Simulación de fuerzas (devuelve un "tick" para disparar redraw)
     const tick = useForceSimulation(
         fragment,
         nodesMap,
         labelMap,
         animTrigger,
-        continueTrigger
+        continueTrigger,
+        undefined,
+        undefined,
+        onSimFinish,
+        getViewportBounds
     );
 
 
@@ -53,7 +76,8 @@ const FragmentCanvas = forwardRef( function FragmentCanvas( {
         tick,
         charLimit,
         charWidth,
-        lineHeight
+        lineHeight,
+        onDragEnd
     } );
 
     useImperativeHandle( ref, () => ( {

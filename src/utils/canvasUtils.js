@@ -192,7 +192,7 @@ function drawAlternatingDashLine(
     ctx,
     x1, y1, x2, y2,
     dash = 5,
-    gap = 5,
+    gap = 0,
     color1,
     color2,
     lineWidth
@@ -239,7 +239,7 @@ export function drawEdge( ctx, e ) {
             arrowLength = 24,
             arrowWidth = 18,
             dash = 5,
-            gap = 5,
+            gap = 0,
             fill = '#fff'
         } = {}
     } = e;

@@ -98,6 +98,17 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
     const trigger = isForces ? animCounter : svg;
     const transform = useUniversalPanZoom( activeRef, trigger );
 
+    // NUEVO: captura inicial/reinicio del SVG en modo "forces"
+    useEffect( () => {
+        if( !isOpen || !isForces ) return;
+        // Espera a que el canvas y params existan (después del primer render)
+        const id = requestAnimationFrame( () => {
+            captureForcesSVG();
+        } );
+        return () => cancelAnimationFrame( id );
+        // Disparamos en open, cambio a forces, y restart animation
+    }, [ isOpen, isForces, animCounter ] );
+
     // Download handlers
     const downloadBlob = ( blob, filename ) => {
         const url = URL.createObjectURL( blob );
@@ -108,49 +119,121 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
         URL.revokeObjectURL( url );
     };
 
+    // Bounding box dinámico de la escena (nodos + labels) en coords de escena
+    // Bounding box completo de la escena (nodos + labels)
+    const computeSceneBounds = ( params ) => {
+        if( !params ) return null;
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for( const n of Object.values( params.nodesMap || {} ) ) {
+            if( !n || !n._size ) continue;
+            const x1 = n._x, y1 = n._y;
+            const x2 = n._x + n._size.width, y2 = n._y + n._size.height;
+            if( x1 < minX ) minX = x1; if( y1 < minY ) minY = y1;
+            if( x2 > maxX ) maxX = x2; if( y2 > maxY ) maxY = y2;
+        }
+        for( const l of Object.values( params.labelMap || {} ) ) {
+            if( !l ) continue;
+            const x1 = l.x, y1 = l.y;
+            const x2 = l.x + l.width, y2 = l.y + l.height;
+            if( x1 < minX ) minX = x1; if( y1 < minY ) minY = y1;
+            if( x2 > maxX ) maxX = x2; if( y2 > maxY ) maxY = y2;
+        }
+        if( !isFinite( minX ) || !isFinite( minY ) || !isFinite( maxX ) || !isFinite( maxY ) ) return null;
+        return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
+    };
+
+
+    // NUEVO: función para capturar el SVG de "forces" que refleje lo que se ve
+    const captureForcesSVG = () => {
+        if( !isForces ) return;
+        const container = forcesCanvasRef.current;
+        const imp = fragmentCanvasRef.current;
+        if( !container || !imp ) return;
+
+        const { params } = imp;
+        const bounds = computeSceneBounds( params );
+        if( !bounds ) return;
+        const { minX, minY, width: sceneW, height: sceneH } = bounds;
+        if( sceneW <= 0 || sceneH <= 0 ) return;
+        // Canvas2SVG con el tamaño de TODA la escena; neutralizamos pan/zoom
+        const c2s = new C2S( sceneW, sceneH );
+        const exportTransform = { x: -minX, y: -minY, scale: 1 };
+        drawDiagram( c2s, { ...params, transform: exportTransform } );
+        const svgContent = c2s.getSerializedSvg( true ); // fix typo c2S -> c2s
+
+        setSvg( svgContent );
+        return svgContent;
+    };
+
     const onDownloadSVG = () => {
-        if( !isForces ) {
+        // Unificado: descargamos siempre desde el estado `svg`
+        if( isForces && !svg ) {
+            // Si aún no fue capturado, lo generamos on-demand
+            const s = captureForcesSVG();
+            if( s ) return downloadBlob( new Blob( [ s ], { type: 'image/svg+xml' } ), 'diagram.svg' );
+        }
+        if( svg ) {
             return downloadBlob( new Blob( [ svg ], { type: 'image/svg+xml' } ), 'diagram.svg' );
         }
-        // Si es forces, usamos canvas2svg para exportar
-        const imp= fragmentCanvasRef.current;
-        if( !imp ) return;
-        const { canvas: realCanvas, params } = imp;
-        if( !realCanvas ) {
-            console.warn( 'No canvas found for forces rendering' );
-            return;
-        }
-        const { width: w, height: h } = realCanvas;
-        const c2s = new C2S( w, h );
-        drawDiagram( c2s, params );
-
-        const svgContent = c2s.getSerializedSvg( true );
-        downloadBlob( new Blob( [ svgContent ], { type: 'image/svg+xml' } ), 'diagram.svg' );
     };
 
     const onDownloadJPG = () => {
         if( isForces ) {
-            const container = forcesCanvasRef.current;
-            const canvas = container?.querySelector( 'canvas' );
-            canvas.toBlob( blob => downloadBlob( blob, 'diagram.jpg' ), 'image/jpeg', 0.92 );
-        } else {
+            // Forces: renderizar TODA la escena; tamaño escala con zoom actual
+            const imp = fragmentCanvasRef.current;
+            if( !imp ) return;
+            const bounds = computeSceneBounds( imp.params );
+            if( !bounds ) return;
+            const scale = Math.max( 0.01, transform?.scale || 1 );
+            const targetW = Math.max( 1, Math.round( bounds.width * scale ) );
+            const targetH = Math.max( 1, Math.round( bounds.height * scale ) );
+            const s = svg || captureForcesSVG();
+            if( !s ) return;
             const img = new Image();
             img.onload = () => {
                 const cnv = document.createElement( 'canvas' );
-                cnv.width = img.width;
-                cnv.height = img.height;
+                cnv.width = targetW;
+                cnv.height = targetH;
                 const ctx = cnv.getContext( '2d' );
                 ctx.fillStyle = '#fff';
                 ctx.fillRect( 0, 0, cnv.width, cnv.height );
-                ctx.drawImage( img, 0, 0 );
+                ctx.drawImage( img, 0, 0, cnv.width, cnv.height );
                 cnv.toBlob( blob => downloadBlob( blob, 'diagram.jpg' ), 'image/jpeg', 0.92 );
                 URL.revokeObjectURL( img.src );
             };
-            img.src = URL.createObjectURL( new Blob( [ svg ], { type: 'image/svg+xml' } ) );
+            img.src = URL.createObjectURL( new Blob( [ s ], { type: 'image/svg+xml' } ) );
+            return;
         }
+
+        // ELK/Dagre: rasterizar TODO el SVG y escalar tamaño según el zoom actual del viewer (svg-pan-zoom)
+        if( !svg ) return;
+        const m = svg.match( /viewBox="([^"]+)"/ );
+        let viewW = 0, viewH = 0;
+        if( m && m[ 1 ] ) {
+            const parts = m[ 1 ].split( /[,\s]+/ ).map( Number );
+            // viewBox = x y w h
+            viewW = Math.max( 0, parts[ 2 ] || 0 );
+            viewH = Math.max( 0, parts[ 3 ] || 0 );
+        }
+        const scale = Math.max( 0.01, transform?.scale || 1 ); // ahora transform.scale refleja svg-pan-zoom
+        const targetW = Math.max( 1, Math.round( ( viewW || 1000 ) * scale ) );
+        const targetH = Math.max( 1, Math.round( ( viewH || 1000 ) * scale ) );
+
+        const img = new Image();
+        img.onload = () => {
+            const cnv = document.createElement( 'canvas' );
+            cnv.width = targetW;
+            cnv.height = targetH;
+            const ctx = cnv.getContext( '2d' );
+            ctx.fillStyle = '#fff';
+            ctx.fillRect( 0, 0, cnv.width, cnv.height );
+            // Escalamos el SVG completo al tamaño destino (zoom actual)
+            ctx.drawImage( img, 0, 0, cnv.width, cnv.height );
+            cnv.toBlob( blob => downloadBlob( blob, 'diagram.jpg' ), 'image/jpeg', 0.92 );
+            URL.revokeObjectURL( img.src );
+        };
+        img.src = URL.createObjectURL( new Blob( [ svg ], { type: 'image/svg+xml' } ) );
     };
-
-
     if( !isOpen ) return null;
 
     return (
@@ -201,13 +284,15 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
                         <p>{ status }</p>
                     ) : isForces
                         ? (
-                            <div ref={ forcesCanvasRef} style={ { width: '100%', height: '100%' } }>
+                            <div ref={ forcesCanvasRef } style={ { width: '100%', height: '100%' } }>
                                 <VisualRenderer
                                     ref={ fragmentCanvasRef }
                                     animTrigger={ animCounter }
                                     continueTrigger={ continueTrigger }
                                     dataStructure={ data }
                                     transform={ transform }
+                                    onForcesSimFinish={ () => { if( isForces ) captureForcesSVG(); } }
+                                    onForcesDragEnd={ () => { if( isForces ) captureForcesSVG(); } }
                                 />
                             </div>
                         )

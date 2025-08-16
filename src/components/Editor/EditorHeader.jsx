@@ -23,7 +23,8 @@ const EditorHeader = ( {
     onExpandAll,
     onUndo,
     onRedo,
-    statusMessage
+    statusMessage,
+    fileName
 } ) => {
     // Elapsed time solo para mostrar, no para mensajes
     const [ elapsed, setElapsed ] = React.useState( '' );
@@ -31,8 +32,8 @@ const EditorHeader = ( {
         const updateElapsed = () => {
             const ms = Date.now() - lastSaved;
             const sec = Math.floor( ms / 1000 );
-            if ( sec < 60 ) setElapsed( `${sec} sec` );
-            else if ( sec < 3600 ) setElapsed( `${Math.floor( sec / 60 )} min` );
+            if( sec < 60 ) setElapsed( `${sec} sec` );
+            else if( sec < 3600 ) setElapsed( `${Math.floor( sec / 60 )} min` );
             else setElapsed( `${Math.floor( sec / 3600 )} hrs` );
         };
         updateElapsed();
@@ -61,6 +62,9 @@ const EditorHeader = ( {
     return (
         <div>
             <div className="renderer-header">
+                <div style={ { color: 'lightgreen', whiteSpace: 'nowrap', marginRight: '12px' } }>
+                    { fileName || 'Untitled' }
+                </div>
                 <div className="title blinking">{ isModified && elapsed }</div>
                 <div className="menu-container">
                     <DropdownMenu label="File" items={ itemsFileMenu } />

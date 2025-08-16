@@ -4,7 +4,14 @@ import FragmentCanvas from './FragmentCanvas';
 
 export const VisualRenderer = forwardRef(
     ( ( props, ref ) => {
-        const { dataStructure, animTrigger, continueTrigger, transform } = props;
+        const {
+            dataStructure,
+            animTrigger,
+            continueTrigger,
+            transform,
+            onForcesSimFinish,
+            onForcesDragEnd
+        } = props;
 
         // Combina todos los fragments para pasarlos al canvas
         const merged = useMemo( () => ( {
@@ -28,6 +35,8 @@ export const VisualRenderer = forwardRef(
                 charLimit={ merged.width }
                 continueTrigger={ continueTrigger }
                 transform={ transform }
+                onSimFinish={ onForcesSimFinish }
+                onDragEnd={ onForcesDragEnd }
             />
         );
     } ) );
