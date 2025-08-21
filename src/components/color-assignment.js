@@ -26,53 +26,53 @@ const strokeColors = [
     // Rojos
     { nombre: "rojo-oscuro", hex: "#a83232" },
     { nombre: "rojo-medio", hex: "#e6194b" },
-    { nombre: "rojo-claro1", hex: "#ffb3b3" },
-    { nombre: "rojo-claro2", hex: "#ffcccc" },
+//    { nombre: "rojo-claro1", hex: "#ffb3b3" },
+//    { nombre: "rojo-claro2", hex: "#ffcccc" },
     // Azules
     { nombre: "azul-oscuro", hex: "#174ea6" },
     { nombre: "azul-medio", hex: "#4363d8" },
-    { nombre: "azul-claro1", hex: "#b3c6ff" },
-    { nombre: "azul-claro2", hex: "#cce0ff" },
+//    { nombre: "azul-claro1", hex: "#b3c6ff" },
+//    { nombre: "azul-claro2", hex: "#cce0ff" },
     // Amarillos
-    { nombre: "amarillo-oscuro", hex: "#b3b300" },
-    { nombre: "amarillo-medio", hex: "#ffe119" },
-    { nombre: "amarillo-claro1", hex: "#ffffb3" },
-    { nombre: "amarillo-claro2", hex: "#ffffcc" },
+    { nombre: "amarillo", hex: "#ffee00" },
+//    { nombre: "amarillo-medio", hex: "#ffe119" },
+//    { nombre: "amarillo-claro1", hex: "#ffffb3" },
+//    { nombre: "amarillo-claro2", hex: "#ffffcc" },
     // Naranjas
     { nombre: "naranja-oscuro", hex: "#cc7a00" },
     { nombre: "naranja-medio", hex: "#f58231" },
-    { nombre: "naranja-claro1", hex: "#ffd9b3" },
-    { nombre: "naranja-claro2", hex: "#ffe6cc" },
+//    { nombre: "naranja-claro1", hex: "#ffd9b3" },
+//    { nombre: "naranja-claro2", hex: "#ffe6cc" },
     // Violetas
     { nombre: "violeta-oscuro", hex: "#4b2e83" },
     { nombre: "violeta-medio", hex: "#911eb4" },
-    { nombre: "violeta-claro1", hex: "#e6ccff" },
-    { nombre: "violeta-claro2", hex: "#f3e6ff" },
+//    { nombre: "violeta-claro1", hex: "#e6ccff" },
+//    { nombre: "violeta-claro2", hex: "#f3e6ff" },
     // Marrones
     { nombre: "marron-oscuro", hex: "#5b3a29" },
     { nombre: "marron-medio", hex: "#9a6324" },
-    { nombre: "marron-claro1", hex: "#e6ccb3" },
-    { nombre: "marron-claro2", hex: "#f3e6d7" },
+//    { nombre: "marron-claro1", hex: "#e6ccb3" },
+//    { nombre: "marron-claro2", hex: "#f3e6d7" },
     // Rosas
     { nombre: "rosa-oscuro", hex: "#c71585" },
     { nombre: "rosa-medio", hex: "#fabebe" },
-    { nombre: "rosa-claro1", hex: "#ffd6e6" },
-    { nombre: "rosa-claro2", hex: "#ffe6f3" },
+//    { nombre: "rosa-claro1", hex: "#ffd6e6" },
+//    { nombre: "rosa-claro2", hex: "#ffe6f3" },
     // Verdes
     { nombre: "verde-oscuro", hex: "#008000" },
     { nombre: "verde-medio", hex: "#3cb44b" },
-    { nombre: "verde-claro1", hex: "#b3ffb3" },
-    { nombre: "verde-claro2", hex: "#ccffcc" },
+//    { nombre: "verde-claro1", hex: "#b3ffb3" },
+//    { nombre: "verde-claro2", hex: "#ccffcc" },
     // Grises
     { nombre: "gris-oscuro", hex: "#666666" },
     { nombre: "gris-medio", hex: "#a9a9a9" },
-    { nombre: "gris-claro1", hex: "#e6e6e6" },
-    { nombre: "gris-claro2", hex: "#f3f3f3" },
+//    { nombre: "gris-claro1", hex: "#e6e6e6" },
+//    { nombre: "gris-claro2", hex: "#f3f3f3" },
     // Cian
     { nombre: "cian-oscuro", hex: "#009999" },
     { nombre: "cian-medio", hex: "#42d4f4" },
-    { nombre: "cian-claro1", hex: "#b3fff9" },
-    { nombre: "cian-claro2", hex: "#ccfff9" }
+//    { nombre: "cian-claro1", hex: "#b3fff9" },
+//    { nombre: "cian-claro2", hex: "#ccfff9" }
 ];
 
 // ==================== REGLAS DE ARMONÍA ====================

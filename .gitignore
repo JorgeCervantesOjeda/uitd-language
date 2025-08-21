@@ -1,3 +1,19 @@
+*.uitd
+*.json
+*.xml  
+*.yaml
+*.yml  
+*.md
+*.txt
+*.zip
+*.d2
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.pub
+
+
 # Logs
 logs
 *.log
@@ -22,5 +38,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.svg
-*.jpg
+*.uitd
+
+dist/
+build/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+.idea/

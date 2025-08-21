@@ -252,9 +252,140 @@ const translateToD2 = ( parsedData ) => {
     return d2;
 };
 
+// Helper recursivo para generar la jerarquía como objeto
+const buildHierarchyObject = ( ref, uis, uiColorMap ) => {
+    const ui = uis.find( u => u.id === parseInt( ref.id ) );
+    if( !ui ) return null;
+    const node = {
+        id: ref.id,
+        className: `ui${ui.id}`,
+        style: {
+            fill: uiColorMap[ ui.id ]?.fill || '#eeeeee',
+            stroke: uiColorMap[ ui.id ]?.stroke || '#cccccc',
+            strokeDash: ref.full ? 0 : 5
+        },
+        label: ui.name,
+        children: []
+    };
+    if( ref.nested ) {
+        node.children = ref.nested
+            .map( nr => buildHierarchyObject( nr, uis, uiColorMap ) )
+            .filter( Boolean );
+    }
+    return node;
+};
+
+export const translateToD2Structure = ( parsedData ) => {
+    if( !parsedData || !parsedData.name ) return null;
+
+    const uiColorMap = generateUIColorMap( parsedData.uis );
+    const structure = {
+        direction: 'right',
+        vars: {},
+        classes: {},
+        labelClasses: {},
+        mainContainer: { id: 'UITD', name: parsedData.name, style: { fill: '#ffffff', strokeWidth: 0 } },
+        fragments: []
+    };
+
+    // 1) Vars
+    parsedData.uis.forEach( ui => {
+        structure.vars[ ui.id ] = {
+            fill: uiColorMap[ ui.id ]?.fill || '#eeeeee',
+            stroke: uiColorMap[ ui.id ]?.stroke || '#cccccc'
+        };
+    } );
+
+    // 2) Classes y labelClasses (usando directamente los colores calculados en vars)
+    parsedData.uis.forEach( ui => {
+        const v = structure.vars[ ui.id ];
+        structure.classes[ ui.id ] = {
+            shape: 'rectangle',
+            style: {
+                fill: v.fill,
+                stroke: v.stroke,
+                strokeWidth: 6,
+                '3d': true
+            }
+        };
+        structure.labelClasses[ ui.id ] = {
+            shape: 'oval',
+            style: {
+                fill: v.fill,
+                stroke: v.stroke,
+                strokeWidth: 6,
+                fontColor: '#003311'
+            }
+        };
+    } );
+
+    // 3) Fragments
+    parsedData.fragments.forEach( ( fragment, fIdx ) => {
+        const fragLetter = String.fromCharCode( 65 + fIdx );
+        const uiOrder = fragment.draws
+            .flatMap( d => d.uiRefs.flatMap( r => flattenUIRefs( r ) ) )
+            .filter( ( v, i, a ) => a.indexOf( v ) === i );
+        const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
+
+        const fragObj = {
+            id: fragLetter,
+            name: fragment.name,
+            width: fragment.width || 15,
+            style: { fill: fragment.color || '#eeeeee', strokeDash: 1 },
+            transitions: [],
+            labels: [],
+            hierarchy: []
+        };
+
+        // 3.1) Aristas y Labels
+        sortedTransitions.forEach( ( t, tIdx ) => {
+            const fromId = formatTransitionUIRef( t.from );
+            const toId = formatTransitionUIRef( t.to );
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+
+            // Arista: origen -> label
+            fragObj.transitions.push( {
+                from: fromId,
+                to: lblId,
+                style: {}
+            } );
+            // Arista: label -> destino
+            fragObj.transitions.push( {
+                from: lblId,
+                to: toId,
+                style: { strokeDash: 5 }
+            } );
+
+            // Definición del label
+            const originRef = getDeepestRef( t.from );
+            let action = `${t.action} "${t.target}"`;
+            if( t.condition ) action += ` AND (${t.condition})`;
+            fragObj.labels.push( {
+                id: lblId,
+                className: `label_ui${originRef.id}`,
+                text: action,
+                width: t.width
+            } );
+        } );
+
+        // 3.2) Jerarquía de UIs
+        fragment.draws.forEach( draw => {
+            draw.uiRefs.forEach( ref => {
+                const obj = buildHierarchyObject( ref, parsedData.uis, uiColorMap );
+                if( obj ) fragObj.hierarchy.push( obj );
+            } );
+        } );
+
+        structure.fragments.push( fragObj );
+    } );
+
+    return structure;
+};
 
 const RendererD2 = ( { data, theme } ) => {
     const initialD2 = translateToD2( data );
+    const datastructure = translateToD2Structure( data );
+    console.log( 'datastructure:', datastructure )
     const [ draftCode, setDraftCode ] = useState( initialD2 );
     const [ renderCode, setRenderCode ] = useState( initialD2 );
     const [ modalOpen, setModalOpen ] = useState( false );
@@ -317,7 +448,7 @@ const RendererD2 = ( { data, theme } ) => {
                         href="#"
                         onClick={ e => { e.preventDefault(); openInPlayground(); } }
                         className="mt-2 renderer-button block text-center">
-                        Playground
+                        D2 info
                     </a>
                 </div>
 
@@ -339,6 +470,7 @@ const RendererD2 = ( { data, theme } ) => {
 
             <RenderModal
                 d2Source={ renderCode }
+                data={ datastructure }
                 isOpen={ modalOpen }
                 onClose={ () => setModalOpen( false ) }
             />

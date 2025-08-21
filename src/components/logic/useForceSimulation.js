@@ -1,0 +1,283 @@
+import { useState, useEffect, useRef } from 'react';
+import {
+    SIMULATION_STEPS,
+    SPRING_K,
+    FRICTION_GAMMA,
+    COULOMB_C,
+    TIME_STEP,
+    EQUILIBRIUM_DIST
+} from '../../utils/constants';
+
+export default function useForceSimulation(
+    fragment,
+    nodesMap,
+    labelMap,
+    animTrigger,
+    continueTrigger,
+    hiddenSteps = 10,      // NUEVO: pasos iniciales sin mostrar
+    stepsPerFrame = 10,     // NUEVO: pasos por cuadro antes de pintar
+    onFinish,
+    getViewportBounds
+) {
+    const [ tick, setTick ] = useState( 0 );
+    const posRef = useRef( {} );
+    const velRef = useRef( {} );
+    const prevAnimRef = useRef();
+    const prevContinueRef = useRef();
+    const finishedRef = useRef( false );
+    // Mantener funciones estables durante la animación
+    const onFinishRef = useRef( onFinish );
+    const getViewportBoundsRef = useRef( getViewportBounds );
+    useEffect( () => { onFinishRef.current = onFinish; }, [ onFinish ] );
+    useEffect( () => { getViewportBoundsRef.current = getViewportBounds; }, [ getViewportBounds ] );
+
+
+    useEffect( () => {
+
+        const animChanged = prevAnimRef.current !== animTrigger;
+        prevAnimRef.current = animTrigger;
+        const continueChanged = prevContinueRef.current !== continueTrigger;
+        prevContinueRef.current = continueTrigger;
+        if( animChanged || continueChanged )
+            finishedRef.current = false;
+
+        const nodeIds = Object.keys( nodesMap );
+        const labelIds = Object.keys( labelMap );
+        const allIds = [ ...nodeIds, ...labelIds ];
+
+        // 1) Posiciones base
+        const basePos = {};
+        nodeIds.forEach( id => {
+            const n = nodesMap[ id ];
+            basePos[ id ] = { x: n._x, y: n._y };
+        } );
+        labelIds.forEach( id => {
+            const l = labelMap[ id ];
+            basePos[ id ] = { x: l.x, y: l.y };
+        } );
+
+        // 2) Raíces
+        const rootIds = Array.from( new Set( allIds.map( id => id.split( '.' )[ 0 ] ) ) );
+
+        // 3) Inicializa o reutiliza estado dinámico
+        if( animChanged ) {
+            rootIds.forEach( r => {
+                posRef.current[ r ] = { x: 0, y: 0 };
+                velRef.current[ r ] = { x: 0, y: 0 };
+            } );
+        } else if( continueChanged ) {
+            rootIds.forEach( r => {
+                posRef.current[ r ] = { x: 0, y: 0 };
+            } );
+        }
+
+        const edgePairs = fragment.transitions.map( e => [ e.from, e.to ] );
+
+        // 4) Parámetros de integración
+        const DT_MIN = 0.01;
+        const DT_MAX = 20;
+        const THRESH_HIGH = 50;
+        const THRESH_LOW = 10;
+        const ADJUST_PERCENT = 0.1;
+        const MAX_DISPLACEMENT = 50;
+        let dt = TIME_STEP;
+
+        let step = 0;
+        let rafId = null;
+
+        // --- NUEVO: separar integración y commit para poder "ocultar" pasos ---
+        function integrateOneStep() {
+            // a) Fuerzas iniciales a cero
+            const force = {};
+            allIds.forEach( id => { force[ id ] = { x: 0, y: 0 }; } );
+
+            // b) Resortes
+            edgePairs.forEach( ( [ u, v ] ) => {
+                const rU = u.split( '.' )[ 0 ], rV = v.split( '.' )[ 0 ];
+                const p1 = { x: basePos[ u ].x + posRef.current[ rU ].x, y: basePos[ u ].y + posRef.current[ rU ].y };
+                const p2 = { x: basePos[ v ].x + posRef.current[ rV ].x, y: basePos[ v ].y + posRef.current[ rV ].y };
+                const dx = p2.x - p1.x, dy = p2.y - p1.y;
+                const dist = Math.hypot( dx, dy ) || 1e-6;
+                const dif = dist - EQUILIBRIUM_DIST;
+                const fs = SPRING_K * Math.sign( dif ) * dif * dif;
+                const fx = fs * ( dx / dist ), fy = fs * ( dy / dist );
+                force[ u ].x += fx; force[ u ].y += fy;
+                force[ v ].x -= fx; force[ v ].y -= fy;
+            } );
+
+            // c) Coulomb
+            for( let i = 0; i < allIds.length; i++ ) {
+                for( let j = i + 1; j < allIds.length; j++ ) {
+                    const a = allIds[ i ], b = allIds[ j ];
+                    const rA = a.split( '.' )[ 0 ], rB = b.split( '.' )[ 0 ];
+                    const pa = { x: basePos[ a ].x + posRef.current[ rA ].x, y: basePos[ a ].y + posRef.current[ rA ].y };
+                    const pb = { x: basePos[ b ].x + posRef.current[ rB ].x, y: basePos[ b ].y + posRef.current[ rB ].y };
+                    const dx = pb.x - pa.x, dy = pb.y - pa.y;
+                    const dist2 = dx * dx + dy * dy || 1e-6;
+                    const f = COULOMB_C / dist2;
+                    const d = Math.sqrt( dist2 );
+                    const fx = f * ( dx / d ), fy = f * ( dy / d );
+                    force[ a ].x -= fx; force[ a ].y -= fy;
+                    force[ b ].x += fx; force[ b ].y += fy;
+                }
+            }
+
+            // e) Suma por raíz
+            const rootForce = {};
+            rootIds.forEach( r => { rootForce[ r ] = { x: 0, y: 0 }; } );
+            allIds.forEach( id => {
+                const root = id.split( '.' )[ 0 ];
+                rootForce[ root ].x += force[ id ].x;
+                rootForce[ root ].y += force[ id ].y;
+            } );
+
+            // f) Integración
+            let maxDisp = 0;
+            rootIds.forEach( r => {
+                const v = velRef.current[ r ];
+                v.x += ( rootForce[ r ].x - FRICTION_GAMMA * v.x ) * dt;
+                v.y += ( rootForce[ r ].y - FRICTION_GAMMA * v.y ) * dt;
+                let dx = v.x * dt;
+                let dy = v.y * dt;
+                const disp = Math.hypot( dx, dy );
+                if( disp > MAX_DISPLACEMENT ) {
+                    const s = MAX_DISPLACEMENT / disp;
+                    dx *= s; dy *= s;
+                }
+                posRef.current[ r ].x += dx;
+                posRef.current[ r ].y += dy;
+                maxDisp = Math.max( maxDisp, disp );
+            } );
+
+            // g) Adaptación de dt
+            if( maxDisp > THRESH_HIGH ) {
+                dt = Math.max( DT_MIN, dt * ( 1 - ADJUST_PERCENT ) );
+            } else if( maxDisp < THRESH_LOW ) {
+                dt = Math.min( DT_MAX, dt * ( 1 + ADJUST_PERCENT ) );
+            }
+
+            step++;
+        }
+
+        function commitPositions() {
+            // h) Calcular posiciones provisionales y bounding por raíz
+            const tempPos = {};          // id -> { x, y }
+            const rootBounds = {};       // root -> { minX, minY, maxX, maxY }
+
+            allIds.forEach( id => {
+                const root = id.split( '.' )[ 0 ];
+                const rawX = basePos[ id ].x + posRef.current[ root ].x;
+                const rawY = basePos[ id ].y + posRef.current[ root ].y;
+                tempPos[ id ] = { x: rawX, y: rawY };
+
+                // dimensiones del ítem
+                let w = 0, h = 0;
+                if( nodesMap[ id ]?._size ) {
+                    w = nodesMap[ id ]._size.width || 0;
+                    h = nodesMap[ id ]._size.height || 0;
+                } else if( labelMap[ id ] ) {
+                    w = labelMap[ id ].width || 0;
+                    h = labelMap[ id ].height || 0;
+                }
+                const x1 = rawX, y1 = rawY;
+                const x2 = rawX + w, y2 = rawY + h;
+                const b = rootBounds[ root ] || { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+                if( x1 < b.minX ) b.minX = x1;
+                if( y1 < b.minY ) b.minY = y1;
+                if( x2 > b.maxX ) b.maxX = x2;
+                if( y2 > b.maxY ) b.maxY = y2;
+                rootBounds[ root ] = b;
+            } );
+
+            // i) Forzar cada raíz a quedar dentro del viewport actual (sin tocar pan/zoom)
+            const vp = getViewportBoundsRef.current ? getViewportBoundsRef.current() : null;
+            const rootShift = {}; // root -> { dx, dy }
+            if( vp ) {
+                const vMinX = vp.minX, vMinY = vp.minY, vMaxX = vp.maxX, vMaxY = vp.maxY;
+                const vW = vMaxX - vMinX, vH = vMaxY - vMinY;
+                Object.entries( rootBounds ).forEach( ( [ root, b ] ) => {
+                    let dx = 0, dy = 0;
+                    const bW = b.maxX - b.minX;
+                    const bH = b.maxY - b.minY;
+                    // Eje X: si cabe, clamp; si no cabe, centrar en viewport
+                    if( bW <= vW ) {
+                        if( b.minX + dx < vMinX ) dx += ( vMinX - ( b.minX + dx ) );
+                        if( b.maxX + dx > vMaxX ) dx += ( vMaxX - ( b.maxX + dx ) );
+                    } else {
+                        const cB = ( b.minX + b.maxX ) / 2;
+                        const cV = ( vMinX + vMaxX ) / 2;
+                        dx += ( cV - cB );
+                    }
+                    // Eje Y: si cabe, clamp; si no cabe, centrar
+                    if( bH <= vH ) {
+                        if( b.minY + dy < vMinY ) dy += ( vMinY - ( b.minY + dy ) );
+                        if( b.maxY + dy > vMaxY ) dy += ( vMaxY - ( b.maxY + dy ) );
+                    } else {
+                        const cB = ( b.minY + b.maxY ) / 2;
+                        const cV = ( vMinY + vMaxY ) / 2;
+                        dy += ( cV - cB );
+                    }
+                    if( dx || dy ) {
+                        // Acumular en el estado físico por raíz para que la simulación lo herede
+                        posRef.current[ root ].x += dx;
+                        posRef.current[ root ].y += dy;
+                    }
+                    rootShift[ root ] = { dx, dy };
+                } );
+            }
+
+            // j) Aplicar posiciones finales (con el posible shift por raíz)
+            allIds.forEach( id => {
+                const root = id.split( '.' )[ 0 ];
+                const s = rootShift[ root ] || { dx: 0, dy: 0 };
+                const x = tempPos[ id ].x + s.dx;
+                const y = tempPos[ id ].y + s.dy;
+                if( nodesMap[ id ] ) {
+                    nodesMap[ id ]._x = x; nodesMap[ id ]._y = y;
+                } else {
+                    labelMap[ id ].x = x; labelMap[ id ].y = y;
+                }
+            } );
+        }        // --- FIN NUEVO ---
+
+        // --- NUEVO: “fast-forward” inicial sin mostrar ---
+        if( animTrigger && hiddenSteps > 0 ) {
+            const target = Math.min( hiddenSteps, SIMULATION_STEPS );
+            while( step < target )
+                integrateOneStep();
+            commitPositions();         // aplicamos solo una vez
+            setTick( t => t + 1 );       // un solo render tras el salto
+        }
+        // --- FIN NUEVO ---
+
+        function frame() {
+            // Hacer varios pasos antes de pintar
+            let count = 0;
+            const toDo = Math.max( 1, stepsPerFrame | 0 );
+            while( count < toDo && step < SIMULATION_STEPS ) {
+                integrateOneStep();
+                count++;
+            }
+            commitPositions();
+            setTick( t => t + 1 );
+
+            if( step < SIMULATION_STEPS ) {
+                rafId = requestAnimationFrame( frame );
+            } else {
+                if( !finishedRef.current ) {
+                    finishedRef.current = true;
+                    if( onFinishRef.current ) onFinishRef.current();
+                }
+            }
+        }
+
+        // Arranca SOLO si el usuario pulsó "continuar"
+        if( !( continueChanged && continueTrigger !== 0 ) )
+            return;
+        rafId = requestAnimationFrame( frame );
+        return () => rafId && cancelAnimationFrame( rafId );
+
+    }, [ fragment, nodesMap, labelMap, animTrigger, continueTrigger, hiddenSteps, stepsPerFrame ] );
+
+    return tick;
+}

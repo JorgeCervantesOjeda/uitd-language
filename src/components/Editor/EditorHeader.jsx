@@ -1,14 +1,12 @@
-// src/components/Editor/EditorHeader.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import DropdownMenu from './menus/DropdownMenu';
 
-function formatElapsed( ms ) {
-    const sec = Math.floor( ms / 1000 );
-    if( sec < 60 ) return `${sec} sec`;
-    const min = Math.floor( sec / 60 );
-    if( min < 60 ) return `${min} min`;
-    return `${Math.floor( min / 60 )} hrs`;
-}
+const typeStyles = {
+    success: { color: '#43a047', bg: '#e8f5e9' },
+    error: { color: '#c62828', bg: '#ffebee' },
+    info: { color: '#1565c0', bg: '#e3f2fd' },
+    warning: { color: '#f9a825', bg: '#fffde7' }
+};
 
 const EditorHeader = ( {
     isModified,
@@ -24,128 +22,78 @@ const EditorHeader = ( {
     onCollapseAll,
     onExpandAll,
     onUndo,
-    onRedo
+    onRedo,
+    statusMessage,
+    fileName
 } ) => {
-    const [ message, setMessage ] = useState( '' );
-    const displayMsg = useCallback( msg => setMessage( msg ), [] );
-
-    useEffect( () => {
-        if( isModified ) setMessage( '' );
-    }, [ isModified ] );
-
-    const [ elapsed, setElapsed ] = useState( formatElapsed( Date.now() - lastSaved ) );
-    useEffect( () => {
-        setElapsed( formatElapsed( Date.now() - lastSaved ) );
-        const iv = setInterval( () => {
-            setElapsed( formatElapsed( Date.now() - lastSaved ) );
-        }, 5000 );
+    // Elapsed time solo para mostrar, no para mensajes
+    const [ elapsed, setElapsed ] = React.useState( '' );
+    React.useEffect( () => {
+        const updateElapsed = () => {
+            const ms = Date.now() - lastSaved;
+            const sec = Math.floor( ms / 1000 );
+            if( sec < 60 ) setElapsed( `${sec} sec` );
+            else if( sec < 3600 ) setElapsed( `${Math.floor( sec / 60 )} min` );
+            else setElapsed( `${Math.floor( sec / 3600 )} hrs` );
+        };
+        updateElapsed();
+        const iv = setInterval( updateElapsed, 5000 );
         return () => clearInterval( iv );
     }, [ lastSaved ] );
 
-    const handleOpenFile = useCallback( async () => {
-        displayMsg( 'Open File...' );
-        const name = await onOpen();
-        if( name ) displayMsg( `Loaded: "${name}".` );
-        else displayMsg( '' );
-    }, [ onOpen, displayMsg ] );
-
-    const handleSaveFile = useCallback( async () => {
-        displayMsg( 'Save File...' );
-        const ok = await onSave();
-        if( ok ) displayMsg( 'File Saved.' );
-        else displayMsg( '' );
-    }, [ onSave, displayMsg ] );
-
-    const handleLoadExampleFile = useCallback( async () => {
-        displayMsg( 'Loading…' );
-        const name = await onLoadExample();
-        if( name ) displayMsg( `Loaded: "${name}".` );
-        else displayMsg( '' );
-    }, [ onLoadExample, displayMsg ] );
-
-    const handleCopy = useCallback( async () => {
-        const ok = await onCopyAll();
-        if( ok ) displayMsg( 'Copied to clipboard!' );
-        else displayMsg( '' );
-    }, [ onCopyAll, displayMsg ] );
-
-    const handlePaste = useCallback( async () => {
-        const ok = await onPaste();
-        if( ok ) displayMsg( 'Clipboard pasted.' );
-        else displayMsg( '' );
-    }, [ onPaste, displayMsg ] );
-
-    const handleFormat = useCallback( async () => {
-        displayMsg( 'Formatting...' );
-        const ok = await onFormat();
-        if( ok ) displayMsg( 'Formatted.' );
-        else displayMsg( '' );
-    }, [ onFormat, displayMsg ] );
-
-    const toggleErrors = useCallback( () => {
+    const toggleErrors = React.useCallback( () => {
         setShowErrors( v => !v );
     }, [ setShowErrors ] );
 
     const itemsFileMenu = [
-        { label: 'Open…', onClick: handleOpenFile },
-        { label: 'Load Example', onClick: handleLoadExampleFile },
-        { label: 'Save as…', onClick: handleSaveFile }
+        { label: 'Open…', onClick: onOpen },
+        { label: 'Load Example', onClick: onLoadExample },
+        { label: 'Save as…', onClick: onSave }
     ];
 
     const itemsEditMenu = [
-        { label: 'Copy All', onClick: handleCopy },
-        { label: 'Paste', onClick: handlePaste },
-        { label: 'Format', onClick: handleFormat }
+        { label: 'Copy All', onClick: onCopyAll },
+        { label: 'Paste', onClick: onPaste },
+        { label: 'Format', onClick: onFormat }
     ];
+
+    const style = statusMessage?.type ? typeStyles[ statusMessage.type ] || {} : {};
 
     return (
         <div>
             <div className="renderer-header">
+                <div style={ { color: 'lightgreen', whiteSpace: 'nowrap', marginRight: '12px' } }>
+                    { fileName || 'Untitled' }
+                </div>
                 <div className="title blinking">{ isModified && elapsed }</div>
                 <div className="menu-container">
                     <DropdownMenu label="File" items={ itemsFileMenu } />
                     <DropdownMenu label="Edit" items={ itemsEditMenu } />
-                    <button
-                        className="renderer-button"
-                        onClick={ onCollapseAll }
-                        title="Collapse all"
-                    >
+                    <button className="renderer-button" onClick={ onCollapseAll } title="Collapse all">
                         <span className="material-icons">unfold_less</span>
                     </button>
-                    <button
-                        className="renderer-button"
-                        onClick={ onExpandAll }
-                        title="Expand all"
-                    >
+                    <button className="renderer-button" onClick={ onExpandAll } title="Expand all">
                         <span className="material-icons">unfold_more</span>
                     </button>
-                    <button
-                        className="renderer-button"
-                        onClick={ onUndo }
-                        title="Undo"
-                    >
+                    <button className="renderer-button" onClick={ onUndo } title="Undo">
                         <span className="material-icons">undo</span>
                     </button>
-                    <button
-                        className="renderer-button"
-                        onClick={ onRedo }
-                        title="Redo"
-                    >
+                    <button className="renderer-button" onClick={ onRedo } title="Redo">
                         <span className="material-icons">redo</span>
                     </button>
-                    <button
-                        className="renderer-button"
-                        onClick={ toggleErrors }
-                        title={ showErrors ? "Hide errors" : "Show errors" }
-                    >
-                        <span className="material-icons">
-                            { showErrors ? "visibility_off" : "visibility" }
-                        </span>
+                    <button className="renderer-button" onClick={ toggleErrors } title={ showErrors ? "Hide errors" : "Show errors" }>
+                        <span className="material-icons">{ showErrors ? "visibility_off" : "visibility" }</span>
                     </button>
                 </div>
             </div>
-            <div className="alert-message" style={ { '--message-bg': message ? 'darkred' : 'black' } }>
-                { message || '\u00A0' }
+            <div
+                className="alert-message"
+                style={ {
+                    background: style.bg || 'black',
+                    color: style.color || 'white',
+                } }
+            >
+                { statusMessage?.text || '\u00A0' }
             </div>
         </div>
     );

@@ -308,3 +308,8 @@ button:hover {
   /* O el tamaño que prefieras, por ejemplo 18px */
   vertical-align: middle;
 }
+
+
+canvas {
+  font: 16px Arial, sans-serif;
+}

@@ -9,8 +9,10 @@ import { setupMonaco } from './utils/monacoSetup';
 import '../../App.css';
 import { debounce } from 'lodash';
 import { saveAs } from 'file-saver';
+import { ExampleUITD } from './utils/ExampleUITD';
 
 const STORAGE_KEY = 'uitdlContent';
+const FILENAME_KEY = 'uitdlFileName'; // ⬅️ NUEVO
 
 const Editor = ( { uitdlText, onChange, markers } ) => {
 
@@ -25,6 +27,15 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     const [ errors, setErrorsState ] = useState( [] );
     const [ showErrors, setShowErrors ] = useState( false );
     const [ localText, setLocalText ] = useState( uitdlText );
+    const [ fileHandle, setFileHandle ] = useState( null ); // NUEVO: guarda el fileHandle del archivo abierto/guardado
+    const [ statusMessage, setStatusMessage ] = useState( null ); // antes autosaveMsg
+    const [ fileName, setFileName ] = useState( null ); // ⬅️ NUEVO
+
+    // Centraliza la lógica de mostrar mensajes
+    const displayMsg = useCallback( ( msg, type = 'info', duration = 2000 ) => {
+        setStatusMessage( { text: msg, type } );
+        setTimeout( () => setStatusMessage( null ), duration );
+    }, [] );
 
     // Devuelve “1 day 2 hours 3 minutes 4 seconds” según ms
     const formatElapsed = () => {
@@ -54,12 +65,8 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
             setLocalText( text );
             // 2) Marcar como modificado sólo si NO está ya guardado
             setIsModified( !contentAlreadySaved );
-            if( contentAlreadySaved ) {
-                // al guardar/abrir/cargar ejemplo: reiniciamos el primer-modificado
-                setLastSaved( Date.now() );
-                setFirstModifiedAt( null );
-            } else {
-                // en la primera edición, fijamos el timestamp
+            // Solo fijar el primer modificado si es la primera edición tras guardar
+            if( !contentAlreadySaved ) {
                 setFirstModifiedAt( prev => prev ?? Date.now() );
             }
             // 4) Notificar cambio al padre
@@ -100,6 +107,9 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         if( saved ) {
             updateContent( saved, true );
         }
+        const savedName = localStorage.getItem( FILENAME_KEY ); // ⬅️ NUEVO
+        if( savedName )
+            setFileName( savedName );                // ⬅️ NUEVO
     }, [ updateContent ] );
 
     // Cuando cambian los marcadores, actualizar lista de errores
@@ -167,42 +177,66 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
 
     // ─── Handlers de archivo ───
 
-    // Guardar archivo
+    // Guardar archivo (Save as)
     const handleSave = useCallback(
         wrapLoading( 'save', async () => {
             try {
                 let ok = false;
+                let chosenName = null; // ⬅️ solo se llenará con showSaveFilePicker
+
                 if( window.showSaveFilePicker ) {
                     const handle = await window.showSaveFilePicker( {
-                        suggestedName: '_.uitd',
+                        suggestedName: fileName ?? '_.uitd', // ⬅️ usa el nombre actual si existe
                         types: [ { description: 'UITD files', accept: { 'text/plain': [ '.uitd' ] } } ],
                     } );
+                    setFileHandle( handle );
+
                     const writable = await handle.createWritable();
                     await writable.write( localText );
                     await writable.close();
+
                     ok = true;
+                    chosenName = handle?.name ?? null; // ⬅️ tenemos un nombre real
                 } else {
+                    // Fallback: descarga. No sabemos si el usuario “canceló” y no hay handle.
+                    // ➜ Tratar como “Exportar”: NO cambiar fileName.
+                    const usedName = fileName ?? '_.uitd';
                     const blob = new Blob( [ localText ], { type: 'text/plain;charset=utf-8' } );
-                    saveAs( blob, '_.uitd' );
+                    saveAs( blob, usedName );
+
+                    // Espera a que se cierre el diálogo para no bloquear la UI
                     await new Promise( resolve => {
-                        const onFocus = () => {
-                            window.removeEventListener( 'focus', onFocus );
-                            resolve();
-                        };
+                        const onFocus = () => { window.removeEventListener( 'focus', onFocus ); resolve(); };
                         window.addEventListener( 'focus', onFocus );
                     } );
+
+                    setFileHandle( null );
                     ok = true;
+                    // ⚠️ NO asignamos chosenName aquí: mantenemos el nombre actual
                 }
+
                 if( ok ) {
+                    if( chosenName ) {
+                        setFileName( chosenName );
+                        localStorage.setItem( FILENAME_KEY, chosenName );
+                    }
                     updateContent( localText, true );
+                    setLastSaved( Date.now() );
+                    setFirstModifiedAt( null );
+                    displayMsg( `Saved${chosenName ? ` to local file: ${chosenName}` : ' to your computer'}`, 'success' );
                 }
                 return ok;
             } catch( err ) {
-                if( err.name !== 'AbortError' ) console.error( err );
+                if( err?.name === 'AbortError' || /aborted/i.test( err?.message ) ) {
+                    // Usuario canceló: NO tocar fileName ni mostrar error
+                    return false;
+                }
+                console.error( err );
+                displayMsg( 'Could not save the file.', 'error' );
                 return false;
             }
         } ),
-        [ localText, updateContent, wrapLoading ]
+        [ localText, fileName, updateContent, wrapLoading, displayMsg ]
     );
 
     // Abrir archivo
@@ -213,14 +247,16 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 if( !discard ) return null;
             }
             try {
-                let fileName, text;
+                let chosenName, text;                  // ⬅️ usar chosenName en vez de fileName
+
                 if( window.showOpenFilePicker ) {
                     const [ handle ] = await window.showOpenFilePicker( {
                         types: [ { description: 'UITD files', accept: { 'text/plain': [ '.uitd' ] } } ],
                         multiple: false,
                     } );
+                    setFileHandle( handle );
                     const file = await handle.getFile();
-                    fileName = file.name;
+                    chosenName = file.name;
                     text = await file.text();
                 } else {
                     text = await new Promise( ( resolve, reject ) => {
@@ -236,7 +272,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                                     reject( new Error( 'No file selected' ) );
                                     return;
                                 }
-                                fileName = chosen.name;
+                                chosenName = chosen.name;
                                 const content = await chosen.text();
                                 resolve( content );
                             } catch( err ) {
@@ -247,16 +283,26 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                         };
                         input.click();
                     } );
+                    setFileHandle( null );
                 }
+
                 updateContent( text, true );
+                setFileName( chosenName || null );         // ⬅️ ACTUALIZA EL ESTADO
+                if( chosenName ) {
+                    localStorage.setItem( FILENAME_KEY, chosenName );   // ⬅️ NUEVO
+                } else {
+                    localStorage.removeItem( FILENAME_KEY );            // opcional
+                };
                 collapseAll();
-                return fileName;
+                if( chosenName ) displayMsg( `Opened file: ${chosenName}`, 'info' );
+                return chosenName;
             } catch( err ) {
                 if( err.name !== 'AbortError' ) console.error( err );
+                displayMsg( 'Could not open the file.', 'error' );
                 return null;
             }
         } ),
-        [ isModified, updateContent, wrapLoading ]
+        [ isModified, updateContent, wrapLoading, displayMsg ]
     );
 
     // Cargar ejemplo
@@ -266,12 +312,14 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                 const discard = window.confirm( `You have unsaved changes (elapsed: ${formatElapsed()}).\n\nDiscard and load the example?` );
                 if( !discard ) return null;
             }
-            const { ExampleUITD } = await import( './utils/ExampleUITD' );
             updateContent( ExampleUITD, true );
+            setFileName( null );
+            localStorage.removeItem( FILENAME_KEY );
             collapseAll();
+            displayMsg( 'Example loaded.', 'info' );
             return 'ExampleUITD';
         } ),
-        [ isModified, updateContent, wrapLoading ]
+        [ isModified, updateContent, wrapLoading, displayMsg ]
     );
 
     // ─── Handlers de edición ───
@@ -284,6 +332,7 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
         } ),
         [ wrapLoading ]
     );
+
 
     // Copiar todo
     const handleCopyAll = useCallback(
@@ -319,28 +368,85 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
     );
 
     const handleCollapseAll = () => {
-        if (editorRef.current) {
-            editorRef.current.getAction('editor.foldAll').run();
+        if( editorRef.current ) {
+            editorRef.current.getAction( 'editor.foldAll' ).run();
         }
     };
 
     const handleExpandAll = () => {
-        if (editorRef.current) {
-            editorRef.current.getAction('editor.unfoldAll').run();
+        if( editorRef.current ) {
+            editorRef.current.getAction( 'editor.unfoldAll' ).run();
         }
     };
 
     const handleUndo = () => {
-        if (editorRef.current) {
-            editorRef.current.trigger('', 'undo', null);
+        if( editorRef.current ) {
+            editorRef.current.trigger( '', 'undo', null );
         }
     };
 
     const handleRedo = () => {
-        if (editorRef.current) {
-            editorRef.current.trigger('', 'redo', null);
+        if( editorRef.current ) {
+            editorRef.current.trigger( '', 'redo', null );
         }
     };
+
+    // AUTOSAVE: guarda en localStorage y en archivo local si hay fileHandle
+    const debouncedAutosave = useCallback(
+        debounce( async ( value ) => {
+            localStorage.setItem( STORAGE_KEY, value );
+            if( fileHandle ) {
+                try {
+                    const writable = await fileHandle.createWritable();
+                    await writable.write( value );
+                    await writable.close();
+                    const fileName = fileHandle.name || 'file';
+                    displayMsg( `Saved to local file: ${fileName}`, 'success' );
+                    setLastSaved( Date.now() );
+                    setFirstModifiedAt( null );
+                    setIsModified( false );
+                } catch( err ) {
+                    displayMsg( 'Could not save the file to your computer.', 'error' );
+                }
+            } else {
+                displayMsg( 'Saved in browser (localStorage).', 'info' );
+            }
+        }, 5000 ),
+        [ fileHandle, displayMsg ]
+    );
+
+    useEffect( () => {
+        if( localText !== undefined ) {
+            debouncedAutosave( localText );
+        }
+        return () => debouncedAutosave.cancel();
+    }, [ localText, debouncedAutosave ] );
+
+    const handleCopy = useCallback( async () => {
+        const ok = await handleCopyAll();
+        if( ok ) {
+            displayMsg( 'Copied to clipboard!', 'success' );
+        } else {
+            displayMsg( 'Error copying', 'error' );
+        }
+    }, [ handleCopyAll, displayMsg ] );
+
+    // Añade esta función antes de usar handlePaste
+    const handlePasteFromClipboard = useCallback( async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            if( text ) {
+                updateContent( text );
+                return true;
+            }
+            return false;
+        } catch( err ) {
+            console.error( err );
+            return false;
+        }
+    }, [ updateContent ] );
+
+
 
     return (
         <div className="editor-container panel-container">
@@ -350,16 +456,18 @@ const Editor = ( { uitdlText, onChange, markers } ) => {
                     lastSaved={ firstModifiedAt ?? lastSaved }
                     onSave={ handleSave }
                     onOpen={ handleOpen }
-                    onCopyAll={ handleCopyAll }
+                    onCopyAll={ handleCopy }
                     onPaste={ handlePaste }
                     onFormat={ handleFormat }
                     onLoadExample={ handleLoadExample }
-                    showErrors={ showErrors }
-                    setShowErrors={ setShowErrors }
                     onCollapseAll={ handleCollapseAll }
                     onExpandAll={ handleExpandAll }
                     onUndo={ handleUndo }
                     onRedo={ handleRedo }
+                    showErrors={ showErrors }
+                    setShowErrors={ setShowErrors }
+                    statusMessage={ statusMessage }
+                    fileName={ fileName ? fileName : null }
                 />
             </div>
 

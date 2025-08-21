@@ -8,8 +8,6 @@ const CodeViewer = ( { code, onChange, theme } ) => {
         setupD2( monaco );
     }, [] );
 
-    console.log( theme );
-
     return (
         <div style={ { position: 'relative' } }>
             <MonacoEditor
