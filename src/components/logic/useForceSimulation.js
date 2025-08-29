@@ -189,49 +189,12 @@ export default function useForceSimulation(
                 rootBounds[ root ] = b;
             } );
 
-            // i) Forzar cada raíz a quedar dentro del viewport actual (sin tocar pan/zoom)
-            const vp = getViewportBoundsRef.current ? getViewportBoundsRef.current() : null;
-            const rootShift = {}; // root -> { dx, dy }
-            if( vp ) {
-                const vMinX = vp.minX, vMinY = vp.minY, vMaxX = vp.maxX, vMaxY = vp.maxY;
-                const vW = vMaxX - vMinX, vH = vMaxY - vMinY;
-                Object.entries( rootBounds ).forEach( ( [ root, b ] ) => {
-                    let dx = 0, dy = 0;
-                    const bW = b.maxX - b.minX;
-                    const bH = b.maxY - b.minY;
-                    // Eje X: si cabe, clamp; si no cabe, centrar en viewport
-                    if( bW <= vW ) {
-                        if( b.minX + dx < vMinX ) dx += ( vMinX - ( b.minX + dx ) );
-                        if( b.maxX + dx > vMaxX ) dx += ( vMaxX - ( b.maxX + dx ) );
-                    } else {
-                        const cB = ( b.minX + b.maxX ) / 2;
-                        const cV = ( vMinX + vMaxX ) / 2;
-                        dx += ( cV - cB );
-                    }
-                    // Eje Y: si cabe, clamp; si no cabe, centrar
-                    if( bH <= vH ) {
-                        if( b.minY + dy < vMinY ) dy += ( vMinY - ( b.minY + dy ) );
-                        if( b.maxY + dy > vMaxY ) dy += ( vMaxY - ( b.maxY + dy ) );
-                    } else {
-                        const cB = ( b.minY + b.maxY ) / 2;
-                        const cV = ( vMinY + vMaxY ) / 2;
-                        dy += ( cV - cB );
-                    }
-                    if( dx || dy ) {
-                        // Acumular en el estado físico por raíz para que la simulación lo herede
-                        posRef.current[ root ].x += dx;
-                        posRef.current[ root ].y += dy;
-                    }
-                    rootShift[ root ] = { dx, dy };
-                } );
-            }
 
-            // j) Aplicar posiciones finales (con el posible shift por raíz)
+
+            // j) Aplicar posiciones finales (SIN clamping/shift por viewport)
             allIds.forEach( id => {
-                const root = id.split( '.' )[ 0 ];
-                const s = rootShift[ root ] || { dx: 0, dy: 0 };
-                const x = tempPos[ id ].x + s.dx;
-                const y = tempPos[ id ].y + s.dy;
+                const x = tempPos[ id ].x;
+                const y = tempPos[ id ].y;
                 if( nodesMap[ id ] ) {
                     nodesMap[ id ]._x = x; nodesMap[ id ]._y = y;
                 } else {
