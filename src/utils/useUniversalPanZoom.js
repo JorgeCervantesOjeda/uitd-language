@@ -5,7 +5,7 @@ import svgPanZoom from 'svg-pan-zoom';
 export default function useUniversalPanZoom(
     containerRef,
     resetTrigger,
-    { minZoom = 0.05, maxZoom = 10 } = {}
+    { minZoom = 0.05, maxZoom = 10, initialTransform = null } = {}
 ) {
     const panZoomInst = useRef( null );
     const [ transform, setTransform ] = useState( { x: 0, y: 0, scale: 1 } );
@@ -78,13 +78,31 @@ export default function useUniversalPanZoom(
             try {
                 const initZoom = instance.getZoom();
                 const initPan = instance.getPan();
-                const init = { x: initPan.x, y: initPan.y, scale: initZoom };
+                const init = initialTransform ?? { x: initPan.x, y: initPan.y, scale: initZoom };
+                if( initialTransform ) {
+                    // Aplicar pan/zoom inicial (fit calculado externamente)
+                    instance.zoom( Math.max( minZoom, Math.min( maxZoom, initialTransform.scale || 1 ) ) );
+                    instance.pan( { x: initialTransform.x || 0, y: initialTransform.y || 0 } );
+                }
                 stateRef.current = init;
                 setTransform( init );
-            } catch { 
+            } catch {
 
             }
-            
+
+            // NUEVO: aplicar initialTransform si se suministra
+            if( initialTransform && Number.isFinite( initialTransform.scale ) ) {
+                try {
+                    const s = Math.min( maxZoom, Math.max( minZoom, initialTransform.scale ) );
+                    instance.zoom( s );
+                    instance.pan( { x: initialTransform.x || 0, y: initialTransform.y || 0 } );
+                    const pan = instance.getPan();
+                    const next = { x: pan.x, y: pan.y, scale: instance.getZoom() };
+                    stateRef.current = next;
+                    setTransform( next );
+                } catch { }
+            }
+
         } else {
             // ————— MODO CANVAS —————
             let dragging = false;
@@ -130,7 +148,20 @@ export default function useUniversalPanZoom(
             container.addEventListener( 'mousedown', downHandler );
             window.addEventListener( 'mousemove', moveHandler );
             window.addEventListener( 'mouseup', upHandler );
+
+
+            // Aplicar transform inicial en canvas (si viene)
+            if( initialTransform ) {
+                const init = {
+                    x: initialTransform.x || 0,
+                    y: initialTransform.y || 0,
+                    scale: Math.max( minZoom, Math.min( maxZoom, initialTransform.scale || 1 ) )
+                };
+                stateRef.current = init;
+                setTransform( init );
+            }
         }
+
 
         // Cleanup al desmontar o antes de re-montar
         return () => {
@@ -158,14 +189,56 @@ export default function useUniversalPanZoom(
         containerRef.current,
         resetTrigger,
         minZoom,
-        maxZoom
+        maxZoom,
+        // rehacer montaje si cambia initialTransform en un nuevo render del contenedor
+        initialTransform?.x,
+        initialTransform?.y,
+        initialTransform?.scale
     ] );
 
-    // 3) resetTrigger solo limpia el pan (x,y), no el zoom (scale)
+    // 3) resetTrigger: aplicar initialTransform si existe; si no, limpiar solo pan (x,y)
     useEffect( () => {
-        setTransform( t => ( { x: 0, y: 0, scale: t.scale } ) );
-        stateRef.current = { x: 0, y: 0, scale: stateRef.current.scale };
-    }, [ resetTrigger ] );
+        if( initialTransform ) {
+            const next = {
+                x: initialTransform.x || 0,
+                y: initialTransform.y || 0,
+                scale: Math.max( minZoom, Math.min( maxZoom, initialTransform.scale || 1 ) )
+            };
+            // Aplicar también en svg-pan-zoom si existe
+            if( panZoomInst.current ) {
+                try {
+                    panZoomInst.current.zoom( next.scale );
+                    panZoomInst.current.pan( { x: next.x, y: next.y } );
+                } catch { }
+            }
+            stateRef.current = next;
+            setTransform( next );
+        } else {
+            setTransform( t => ( { x: 0, y: 0, scale: t.scale } ) );
+            stateRef.current = { x: 0, y: 0, scale: stateRef.current.scale };
+        }
+    }, [ resetTrigger, initialTransform, minZoom, maxZoom ] );
+
+    // NUEVO: reaccionar a cambios posteriores en initialTransform sin re-montar
+    useEffect( () => {
+        if( !initialTransform ) return;
+        const s = Math.min( maxZoom, Math.max( minZoom, initialTransform.scale || 1 ) );
+        if( panZoomInst.current ) {
+            try {
+                panZoomInst.current.zoom( s );
+                panZoomInst.current.pan( { x: initialTransform.x || 0, y: initialTransform.y || 0 } );
+                const pan = panZoomInst.current.getPan();
+                const next = { x: pan.x, y: pan.y, scale: panZoomInst.current.getZoom() };
+                stateRef.current = next;
+                setTransform( next );
+                return;
+            } catch { }
+        }
+        // Canvas o sin instancia
+        const next = { x: initialTransform.x || 0, y: initialTransform.y || 0, scale: s };
+        stateRef.current = next;
+        setTransform( next );
+    }, [ initialTransform, minZoom, maxZoom ] );
 
     return transform;
 }

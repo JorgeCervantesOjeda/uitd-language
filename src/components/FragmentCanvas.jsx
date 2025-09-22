@@ -5,7 +5,6 @@ import useForceSimulation from './logic/useForceSimulation';
 import useDrawCanvas from './logic/useDrawCanvas';
 import useCharSizes from './hooks/useCharSizes';
 
-
 const FragmentCanvas = forwardRef( function FragmentCanvas( {
     fragment,
     vars,
@@ -29,7 +28,7 @@ const FragmentCanvas = forwardRef( function FragmentCanvas( {
         charLimit,
         charWidth,
         lineHeight,
-        animTrigger,
+        animTrigger
     );
 
     // Viewport actual en coordenadas de escena según transform y tamaño visible
@@ -61,7 +60,6 @@ const FragmentCanvas = forwardRef( function FragmentCanvas( {
         onSimFinish,
         getViewportBounds
     );
-
 
     // 4) Dibujar en el canvas según el transform pasado desde arriba
     useDrawCanvas( canvasRef, {

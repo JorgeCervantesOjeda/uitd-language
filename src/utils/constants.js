@@ -4,7 +4,7 @@
 export const LABEL_PADDING = 20;
 export const UI_PADDING = 10;
 export const VERTICAL_SPACING = 50;
-export const LINE_SPACING = 5; // Espacio adicional entre líneas de texto
+export const LINE_SPACING = 10; // Espacio adicional entre líneas de texto
 
 // Parámetros de simulación de fuerzas
 export const SIMULATION_STEPS = 300;

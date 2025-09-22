@@ -281,7 +281,9 @@ button:hover {
 .modal header .close-btn {
   margin-left: auto;
 }
-
+.modal header .restart-btn {
+  margin-left: auto;
+}
 .modal .content {
   flex-grow: 1;
   overflow: auto;

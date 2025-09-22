@@ -22,9 +22,11 @@ export default function useForceSimulation(
     const [ tick, setTick ] = useState( 0 );
     const posRef = useRef( {} );
     const velRef = useRef( {} );
+    const basePosRef = useRef( null );
     const prevAnimRef = useRef();
     const prevContinueRef = useRef();
     const finishedRef = useRef( false );
+    const firstMountRef = useRef( true ); // evitar tratar el primer render como "restart"
     // Mantener funciones estables durante la animación
     const onFinishRef = useRef( onFinish );
     const getViewportBoundsRef = useRef( getViewportBounds );
@@ -34,41 +36,118 @@ export default function useForceSimulation(
 
     useEffect( () => {
 
-        const animChanged = prevAnimRef.current !== animTrigger;
+        // --- detectar cambios, ignorando el primer montaje ---
+        const rawAnimChanged = prevAnimRef.current !== animTrigger;
+        const rawContinueChanged = prevContinueRef.current !== continueTrigger;
+        const isFirstMount = firstMountRef.current === true;
+        firstMountRef.current = false;
         prevAnimRef.current = animTrigger;
-        const continueChanged = prevContinueRef.current !== continueTrigger;
         prevContinueRef.current = continueTrigger;
+        const animChanged = !isFirstMount && rawAnimChanged;               // "Restart Simulation"
+        const continueChanged = !isFirstMount && rawContinueChanged;       // "Continue Animation"
+        console.log( '[UFS INIT] isFirstMount=', isFirstMount, 'rawAnimChanged=', rawAnimChanged, 'rawContinueChanged=', rawContinueChanged );
+        console.log( '[UFS INIT] computed animChanged=', animChanged, 'continueChanged=', continueChanged );
+
         if( animChanged || continueChanged )
             finishedRef.current = false;
+        // Considerar "restart" solo después del primer montaje del hook
+        const isRestart = animChanged && !firstMountRef.current;
+        if( firstMountRef.current ) {
+            firstMountRef.current = false;
+        }
 
         const nodeIds = Object.keys( nodesMap );
         const labelIds = Object.keys( labelMap );
         const allIds = [ ...nodeIds, ...labelIds ];
+        console.log( '[UFS INIT] nodeIds=', nodeIds.length, 'labelIds=', labelIds.length );
 
-        // 1) Posiciones base
-        const basePos = {};
-        nodeIds.forEach( id => {
-            const n = nodesMap[ id ];
-            basePos[ id ] = { x: n._x, y: n._y };
-        } );
-        labelIds.forEach( id => {
-            const l = labelMap[ id ];
-            basePos[ id ] = { x: l.x, y: l.y };
-        } );
+        // 1) Helper para tomar posiciones base actuales (tras rehidratación)
+        const computeBasePos = () => {
+            const bp = {};
+            nodeIds.forEach( id => {
+                const n = nodesMap[ id ];
+                bp[ id ] = { x: n._x, y: n._y };
+            } );
+            labelIds.forEach( id => {
+                const l = labelMap[ id ];
+                bp[ id ] = { x: l.x, y: l.y };
+            } );
+            return bp;
+        };
+
+        // NUEVO: base aleatoria que **preserva la forma interna** de cada subárbol.
+        // Toma el layout/rehidratación actual y traslada *todo el subárbol* a un ancla aleatoria por raíz.
+        // El área inicial crece con √(número total de elementos).
+        const computeRandomBasePosPreservingLayout = () => {
+            const base = computeBasePos();
+            const roots = Array.from( new Set( allIds.map( id => id.split( '.' )[ 0 ] ) ) );
+            const N = Math.max( 1, allIds.length );
+            const SPACING = 200;
+            const side = Math.max( SPACING, Math.ceil( Math.sqrt( N ) ) * SPACING );
+            const minX = -side / 2, minY = -side / 2;
+            const rnd = () => Math.random() * side;
+            // Objetivo aleatorio por raíz
+            const target = {};
+            roots.forEach( r => { target[ r ] = { x: minX + rnd(), y: minY + rnd() }; } );
+            // Desplazar cada id por el offset (target_r - base_r)
+            const out = {};
+            allIds.forEach( id => {
+                const r = id.split( '.' )[ 0 ];
+                const dx = ( target[ r ].x - ( base[ r ]?.x ?? 0 ) );
+                const dy = ( target[ r ].y - ( base[ r ]?.y ?? 0 ) );
+                const bx = base[ id ]?.x ?? 0;
+                const by = base[ id ]?.y ?? 0;
+                out[ id ] = { x: bx + dx, y: by + dy };
+            } );
+            return out;
+        };
+
+        // Inicializa/renueva basePos
+        let baseSource = null;
+        if( animChanged ) {
+            // Restart explícito: nuevas posiciones aleatorias (agrupadas por raíz)
+            basePosRef.current = computeRandomBasePosPreservingLayout();
+            baseSource = 'restart';
+        } else if( continueChanged ) {
+            // CONTINUE: tomar como base las posiciones *actuales* (incluye drag)
+            basePosRef.current = computeBasePos();
+            const rootIds = Array.from( new Set( allIds.map( id => id.split( '.' )[ 0 ] ) ) );
+            rootIds.forEach( r => {
+                // Δpos en 0 para evitar “saltos”; aseguramos velRef existente
+                posRef.current[ r ] = { x: 0, y: 0 };
+                if( !velRef.current[ r ] ) velRef.current[ r ] = { x: 0, y: 0 };
+            } );
+            baseSource = 'continue';    
+        } else if( isFirstMount && !basePosRef.current ) {
+            // Primer montaje: usar SIEMPRE la base ya rehidratada por FragmentCanvas (no randomizar)
+            basePosRef.current = computeBasePos();
+            baseSource = 'first-mount';
+        }
+        console.log( '[UFS BASE] source=', baseSource, 'basePosKeys=', basePosRef.current ? Object.keys( basePosRef.current ).length : 0 );
 
         // 2) Raíces
         const rootIds = Array.from( new Set( allIds.map( id => id.split( '.' )[ 0 ] ) ) );
 
         // 3) Inicializa o reutiliza estado dinámico
-        if( animChanged ) {
+        if( isRestart ) {
             rootIds.forEach( r => {
                 posRef.current[ r ] = { x: 0, y: 0 };
                 velRef.current[ r ] = { x: 0, y: 0 };
             } );
-        } else if( continueChanged ) {
-            rootIds.forEach( r => {
-                posRef.current[ r ] = { x: 0, y: 0 };
+            // Aplicar inmediatamente la base aleatoria a pantalla (todos los hijos en la misma (x,y) que su raíz)
+            const basePos = basePosRef.current || computeRandomBasePosPreservingLayout();
+            allIds.forEach( id => {
+                const root = id.split( '.' )[ 0 ];
+                const x = basePos[ id ].x + ( posRef.current[ root ]?.x || 0 );
+                const y = basePos[ id ].y + ( posRef.current[ root ]?.y || 0 );
+                if( nodesMap[ id ] ) {
+                    nodesMap[ id ]._x = x; nodesMap[ id ]._y = y;
+                } else if( labelMap[ id ] ) {
+                    labelMap[ id ].x = x; labelMap[ id ].y = y;
+                }
             } );
+            setTick( t => t + 1 );
+
         }
 
         const edgePairs = fragment.transitions.map( e => [ e.from, e.to ] );
@@ -87,6 +166,10 @@ export default function useForceSimulation(
 
         // --- NUEVO: separar integración y commit para poder "ocultar" pasos ---
         function integrateOneStep() {
+            // Asegurar basePos una sola vez, en el primer paso efectivo
+            if( !basePosRef.current ) basePosRef.current = computeBasePos();
+            const basePos = basePosRef.current;
+
             // a) Fuerzas iniciales a cero
             const force = {};
             allIds.forEach( id => { force[ id ] = { x: 0, y: 0 }; } );
@@ -134,7 +217,9 @@ export default function useForceSimulation(
             // f) Integración
             let maxDisp = 0;
             rootIds.forEach( r => {
-                const v = velRef.current[ r ];
+                // asegurar estructuras por raíz para evitar "v es undefined"
+                const p = ( posRef.current[ r ] ||= { x: 0, y: 0 } );
+                const v = ( velRef.current[ r ] ||= { x: 0, y: 0 } );
                 v.x += ( rootForce[ r ].x - FRICTION_GAMMA * v.x ) * dt;
                 v.y += ( rootForce[ r ].y - FRICTION_GAMMA * v.y ) * dt;
                 let dx = v.x * dt;
@@ -144,8 +229,8 @@ export default function useForceSimulation(
                     const s = MAX_DISPLACEMENT / disp;
                     dx *= s; dy *= s;
                 }
-                posRef.current[ r ].x += dx;
-                posRef.current[ r ].y += dy;
+                p.x += dx;
+                p.y += dy;
                 maxDisp = Math.max( maxDisp, disp );
             } );
 
@@ -160,6 +245,7 @@ export default function useForceSimulation(
         }
 
         function commitPositions() {
+            const basePos = basePosRef.current || computeBasePos();
             // h) Calcular posiciones provisionales y bounding por raíz
             const tempPos = {};          // id -> { x, y }
             const rootBounds = {};       // root -> { minX, minY, maxX, maxY }
@@ -203,8 +289,8 @@ export default function useForceSimulation(
             } );
         }        // --- FIN NUEVO ---
 
-        // --- NUEVO: “fast-forward” inicial sin mostrar ---
-        if( animTrigger && hiddenSteps > 0 ) {
+        // “fast-forward” inicial solo cuando el usuario pulsa Continue
+        if( continueChanged && hiddenSteps > 0 ) {
             const target = Math.min( hiddenSteps, SIMULATION_STEPS );
             while( step < target )
                 integrateOneStep();
@@ -237,6 +323,7 @@ export default function useForceSimulation(
         // Arranca SOLO si el usuario pulsó "continuar"
         if( !( continueChanged && continueTrigger !== 0 ) )
             return;
+        console.log( '[UFS START] scheduling RAF; continueChanged=', continueChanged, 'continueTrigger=', continueTrigger );
         rafId = requestAnimationFrame( frame );
         return () => rafId && cancelAnimationFrame( rafId );
 

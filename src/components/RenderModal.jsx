@@ -16,8 +16,12 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
     );
     const isForces = viewMode === 'forces';
 
-    const [ animCounter, setAnimCounter ] = useState( 0 );
+    const [ restartTrigger, setRestartTrigger ] = useState( 0 );
     const [ continueTrigger, setContinueTrigger ] = useState( 0 );
+    // Persistencia simple de posiciones (una sola clave fija)
+    const LOCAL_KEY = 'forcesLayout';
+    const [ initialTransform, setInitialTransform ] = useState( null ); // pan/zoom inicial (fit)
+
 
     // Persist layout engine choice
     useEffect( () => {
@@ -39,6 +43,7 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
     // Compile and render D2 when open and not in custom view
     useEffect( () => {
         if( !isOpen || isForces ) return;
+        console.log( '[RM FIT] about to fit; isForces=', isForces );
 
         const layoutEngine = viewMode;
         const key = `${layoutEngine}::${d2Source}`;
@@ -90,15 +95,13 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
     const forcesCanvasRef = useRef( null );
     const fragmentCanvasRef = useRef( null );
 
-    const activeRef = isForces
-        ? forcesCanvasRef
-        : svgContainerRef;
+    const activeRef = isForces ? forcesCanvasRef : svgContainerRef;
 
     // dentro de RenderModal, tras obtener `svg` y `isForces`
-    const trigger = isForces ? animCounter : svg;
-    const transform = useUniversalPanZoom( activeRef, trigger );
+    const trigger = isForces ? isOpen : svg;
+    const transform = useUniversalPanZoom( activeRef, trigger, { initialTransform } );
 
-    // NUEVO: captura inicial/reinicio del SVG en modo "forces"
+    // NUEVO: captura inicial del SVG en modo "forces"
     useEffect( () => {
         if( !isOpen || !isForces ) return;
         // Espera a que el canvas y params existan (después del primer render)
@@ -107,7 +110,7 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
         } );
         return () => cancelAnimationFrame( id );
         // Disparamos en open, cambio a forces, y restart animation
-    }, [ isOpen, isForces, animCounter ] );
+    }, [ isOpen, isForces ] );
 
     // Download handlers
     const downloadBlob = ( blob, filename ) => {
@@ -164,6 +167,68 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
         setSvg( svgContent );
         return svgContent;
     };
+
+    // NUEVO: snapshot de posiciones actuales (nodos + etiquetas)
+    const snapshotForcesPositions = () => {
+        try {
+            const imp = fragmentCanvasRef.current;
+            const params = imp?.params;
+            if( !params ) return null;
+            const nodes = {};
+            const labels = {};
+            for( const [ id, n ] of Object.entries( params.nodesMap || {} ) ) {
+                if( !n ) continue;
+                nodes[ id ] = { x: n._x, y: n._y };
+            }
+            for( const [ id, l ] of Object.entries( params.labelMap || {} ) ) {
+                if( !l ) continue;
+                labels[ id ] = { x: l.x, y: l.y };
+            }
+            return { nodes, labels, ts: Date.now() };
+        } catch {
+            return null;
+        }
+    };
+
+    // NUEVO: guardar snapshot en localStorage (eventos discretos)
+    const saveForcesSnapshot = () => {
+        const snap = snapshotForcesPositions();
+        if( !snap ) return;
+        try {
+            localStorage.setItem( LOCAL_KEY, JSON.stringify( snap ) );
+        } catch { }
+    };
+
+    // NUEVO: fit al entrar a Forces (pan/zoom inicial con padding)
+    useEffect( () => {
+        if( !isOpen || !isForces ) return;
+        const id = requestAnimationFrame( () => {
+            const imp = fragmentCanvasRef.current;
+            const container = forcesCanvasRef.current;
+            if( !imp || !container ) return;
+            const bounds = computeSceneBounds( imp.params );
+            if( !bounds ) return;
+            const rect = container.getBoundingClientRect();
+            
+            console.log( '[RM FIT] raf tick' );
+            console.log( '[RM FIT] fragmentCanvasRef.current?=', !!fragmentCanvasRef.current, 'bounds=', bounds );
+
+            const PADDING = 40;
+            const availW = Math.max( 1, rect.width );
+            const availH = Math.max( 1, rect.height );
+            const bw = Math.max( 1, bounds.width );
+            const bh = Math.max( 1, bounds.height );
+            const scaleX = ( availW - 2 * PADDING ) / bw;
+            const scaleY = ( availH - 2 * PADDING ) / bh;
+            const scale = Math.max( 0.05, Math.min( 10, Math.min( scaleX, scaleY ) ) );
+            const x = PADDING - bounds.minX * scale;
+            const y = PADDING - bounds.minY * scale;
+            console.log( '[RM FIT] initialTransform=', { x, y, scale } );
+            setInitialTransform( { x, y, scale } );
+        } );
+        return () => cancelAnimationFrame( id );
+    }, [ isOpen, isForces ] );
+
 
     const onDownloadSVG = () => {
         // Unificado: descargamos siempre desde el estado `svg`
@@ -234,10 +299,47 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
         };
         img.src = URL.createObjectURL( new Blob( [ svg ], { type: 'image/svg+xml' } ) );
     };
+
+    // NUEVO: guardar al cerrar (si estamos en Forces)
+    const handleClose = () => {
+        if( isForces ) {
+            const snap = snapshotForcesPositions();
+            console.log( '[RM CLOSE] isForces=', true, 'snapNodes=', Object.keys( snap?.nodes || {} ).length, 'snapLabels=', Object.keys( snap?.labels || {} ).length );
+            try { saveForcesSnapshot(); } catch { }
+            try {
+                const raw = localStorage.getItem( LOCAL_KEY );
+                console.log( '[RM CLOSE] savedToLocal=', !!raw, 'length=', raw ? raw.length : 0 );
+            } catch { }
+        } else {
+            console.log( '[RM CLOSE] isForces=', false );
+        }
+        onClose();
+    };
+
+    // Guardar snapshot si se cambia de modo de vista saliendo de "forces"
+    useEffect( () => {
+        // cuando el modo anterior era forces y ahora no, persistimos
+        let prev = isForces;
+        return () => {
+            console.log( '[RM CLEANUP] prevWasForces=', prev );
+            if( prev ) {
+                console.log( '[RM CLEANUP] fragmentCanvasRef.current?=', !!fragmentCanvasRef.current );
+                const snap = snapshotForcesPositions();
+                console.log( '[RM CLEANUP] snapNodes=', Object.keys( snap?.nodes || {} ).length, 'snapLabels=', Object.keys( snap?.labels || {} ).length );
+                try { saveForcesSnapshot(); } catch { }
+                try {
+                    const raw = localStorage.getItem( LOCAL_KEY );
+                    console.log( '[RM CLEANUP] savedToLocal=', !!raw, 'length=', raw ? raw.length : 0 );
+                } catch { }
+            }
+        };
+    }, [ isForces ] );
+
+
     if( !isOpen ) return null;
 
     return (
-        <div className="modal-backdrop" onClick={ onClose }>
+        <div className="modal-backdrop">
             <div
                 className={ full ? 'modal fullscreen' : 'modal' }
                 style={ { display: 'flex', flexDirection: 'column', height: '100%' } }
@@ -272,12 +374,17 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
                             disabled={ !isForces || status !== '' }>
                             Continue Animation
                         </button>
-                        <button onClick={ () => setAnimCounter( c => c + 1 ) }
-                            disabled={ !isForces || status !== '' }>
-                            Restart Animation
-                        </button>
                     </div>
-                    <button className="close-btn" onClick={ onClose }>Close</button>
+                    <button
+                        onClick={ () => {
+                            try { localStorage.removeItem( 'forcesLayout' ); } catch { }
+                            setRestartTrigger( c => c + 1 );
+                        } }
+                        className='restart-btn'
+                        disabled={ !isForces || status !== '' }>
+                        Restart Simulation
+                    </button>
+                    <button className="close-btn" onClick={ handleClose }>Close</button>
                 </header>
                 <div className="content" style={ { flex: 1, overflow: 'hidden', position: 'relative' } }>
                     { status ? (
@@ -287,12 +394,12 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
                             <div ref={ forcesCanvasRef } style={ { width: '100%', height: '100%' } }>
                                 <VisualRenderer
                                     ref={ fragmentCanvasRef }
-                                    animTrigger={ animCounter }
+                                    animTrigger={ restartTrigger }
                                     continueTrigger={ continueTrigger }
                                     dataStructure={ data }
                                     transform={ transform }
-                                    onForcesSimFinish={ () => { if( isForces ) captureForcesSVG(); } }
-                                    onForcesDragEnd={ () => { if( isForces ) captureForcesSVG(); } }
+                                    onForcesSimFinish={ () => { if( isForces ) { saveForcesSnapshot(); captureForcesSVG(); } } }
+                                    onForcesDragEnd={ () => { if( isForces ) { saveForcesSnapshot(); captureForcesSVG(); } } }
                                 />
                             </div>
                         )

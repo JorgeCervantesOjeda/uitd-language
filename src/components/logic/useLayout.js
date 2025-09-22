@@ -10,6 +10,8 @@ import { wrapText } from '../../utils/canvasUtils';
 import { random } from 'lodash';
 
 export default function useLayout( fragment, charLimit, charWidth, lineH, animTrigger ) {
+    const LOCAL_KEY = 'forcesLayout';
+
     return useMemo( () => {
         // 1) Ancho medio de carácter
         if( charWidth <= 0 ) {
@@ -113,7 +115,31 @@ export default function useLayout( fragment, charLimit, charWidth, lineH, animTr
             };
         } );
 
-        // 6) Crear aristas con coordenadas iniciales
+        // 6) Rehidratación SINCRÓNICA desde localStorage (si existe)
+        try {
+            const raw = localStorage.getItem( LOCAL_KEY );
+            if( raw ) {
+                const snap = JSON.parse( raw );
+                const sNodes = snap?.nodes || {};
+                const sLabels = snap?.labels || {};
+                Object.keys( nodesMap ).forEach( id => {
+                    const s = sNodes[ id ];
+                    if( s && Number.isFinite( s.x ) && Number.isFinite( s.y ) ) {
+                        nodesMap[ id ]._x = s.x;
+                        nodesMap[ id ]._y = s.y;
+                    }
+                } );
+                Object.keys( labelMap ).forEach( id => {
+                    const s = sLabels[ id ];
+                    if( s && Number.isFinite( s.x ) && Number.isFinite( s.y ) ) {
+                        labelMap[ id ].x = s.x;
+                        labelMap[ id ].y = s.y;
+                    }
+                } );
+            }
+        } catch { /* snapshot corrupto → ignorar */ }
+
+        // 7) Crear aristas con coordenadas iniciales
         const transitions = fragment.transitions.map( e => {
             const fromNode = nodesMap[ e.from ] || labelMap[ e.from ];
             const toNode = nodesMap[ e.to ] || labelMap[ e.to ];
@@ -124,14 +150,14 @@ export default function useLayout( fragment, charLimit, charWidth, lineH, animTr
             return { ...e, x1, y1, x2, y2 };
         } );
 
-        // 7) Agrupar aristas por nivel
+        // 8) Agrupar aristas por nivel
         const edgesByLevel = Array.from( { length: maxLevel + 1 }, () => [] );
         transitions.forEach( edge => {
             const lvl = levels[ edge.from ] ?? levels[ edge.to ];
             edgesByLevel[ lvl ].push( edge );
         } );
 
-        // 8) Construir orden de dibujo: aristas, nodos por nivel, luego etiquetas
+        // 9) Orden de dibujo: aristas, nodos por nivel, luego etiquetas
         const drawOrder = [];
         for( let lvl = 0; lvl <= maxLevel; lvl++ ) {
             edgesByLevel[ lvl ].forEach( edge => drawOrder.push( { type: 'edge', edge } ) );
@@ -139,7 +165,7 @@ export default function useLayout( fragment, charLimit, charWidth, lineH, animTr
         }
         Object.values( labelMap ).forEach( lbl => drawOrder.push( { type: 'label', lbl } ) );
 
-        // 9) Calcular tamaño total del canvas
+        // 10) Tamaño total del canvas
         const xs = [
             ...Object.values( nodesMap ).map( n => n._x + n._size.width ),
             ...Object.values( labelMap ).map( l => l.x + l.width )
