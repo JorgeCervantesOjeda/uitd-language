@@ -384,8 +384,10 @@ export const translateToD2Structure = ( parsedData ) => {
 
 const RendererD2 = ( { data, theme } ) => {
     const initialD2 = translateToD2( data );
-    const datastructure = translateToD2Structure( data );
-    console.log( 'datastructure:', datastructure )
+    // Estructura para Forces en estado (reemplaza a `datastructure`)
+    const [ sceneData, setSceneData ] = useState( translateToD2Structure( data ) );
+    console.log( 'sceneData:', sceneData )
+
     const [ draftCode, setDraftCode ] = useState( initialD2 );
     const [ renderCode, setRenderCode ] = useState( initialD2 );
     const [ modalOpen, setModalOpen ] = useState( false );
@@ -405,6 +407,11 @@ const RendererD2 = ( { data, theme } ) => {
         setDraftCode( updated );
     }, [ data ] );
 
+    // Mantener `sceneData` sincronizado con `data`
+    useEffect( () => {
+        setSceneData( translateToD2Structure( data ) );
+    }, [ data ] );
+
     const handleUpdate = () => {
         // Regeneramos completamente, con nuevos colores aleatorios
         const updated = translateToD2( data );
@@ -413,6 +420,17 @@ const RendererD2 = ( { data, theme } ) => {
         setRenderCode( updated );
         displayMsg( 'D2 updated.' );
     };
+
+    // Recolor global (Dagre/ELK y Forces), usado por RenderModal
+    const handleRecolor = () => {
+        const updatedD2 = translateToD2( data );
+        const updatedScene = translateToD2Structure( data );
+        setDraftCode( updatedD2 );
+        setRenderCode( updatedD2 );
+        setSceneData( updatedScene );
+        displayMsg( 'Colores regenerados.' );
+    };
+
 
     const handleCopy = () => {
         navigator.clipboard.writeText( renderCode )
@@ -470,9 +488,10 @@ const RendererD2 = ( { data, theme } ) => {
 
             <RenderModal
                 d2Source={ renderCode }
-                data={ datastructure }
+                data={ sceneData }
                 isOpen={ modalOpen }
                 onClose={ () => setModalOpen( false ) }
+                onRecolor={ handleRecolor }
             />
         </div>
     );

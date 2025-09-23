@@ -6,7 +6,7 @@ import useUniversalPanZoom from './../utils/useUniversalPanZoom';
 import C2S from 'canvas2svg';
 import { drawDiagram } from '../utils/drawDiagram';
 
-export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
+export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolor } ) {
     const [ svg, setSvg ] = useState( '' );
     const [ status, setStatus ] = useState( '' );
     const [ full, setFull ] = useState( false );
@@ -419,6 +419,13 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
                             style={ { display: 'none' } } onChange={ onFileChosen } />
 
                     </div>
+
+                    <button
+                        className='restart-btn'
+                        onClick={ () => { onRecolor && onRecolor(); } }
+                        disabled={ status !== '' }>
+                        Change Colors
+                    </button>
                     <button
                         onClick={ () => {
                             try { localStorage.removeItem( 'forcesLayout' ); } catch { }
