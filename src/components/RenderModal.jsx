@@ -20,6 +20,8 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
     const [ continueTrigger, setContinueTrigger ] = useState( 0 );
     // Persistencia simple de posiciones (una sola clave fija)
     const LOCAL_KEY = 'forcesLayout';
+    // Forzar rehidratación normal al cambiar la versión
+    const [ layoutVersion, setLayoutVersion ] = useState( 0 );
     const [ initialTransform, setInitialTransform ] = useState( null ); // pan/zoom inicial (fit)
 
 
@@ -209,7 +211,7 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
             const bounds = computeSceneBounds( imp.params );
             if( !bounds ) return;
             const rect = container.getBoundingClientRect();
-            
+
             console.log( '[RM FIT] raf tick' );
             console.log( '[RM FIT] fragmentCanvasRef.current?=', !!fragmentCanvasRef.current, 'bounds=', bounds );
 
@@ -300,6 +302,35 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
         img.src = URL.createObjectURL( new Blob( [ svg ], { type: 'image/svg+xml' } ) );
     };
 
+
+    // === SAVE: exporta lo que esté en localStorage[LOCAL_KEY] ===
+    const onExportLayout = () => {
+        try {
+            const raw = localStorage.getItem( LOCAL_KEY );
+            if( !raw ) { alert( 'No hay layout guardado.' ); return; }
+            const blob = new Blob( [ raw ], { type: 'application/json' } );
+            const a = document.createElement( 'a' );
+            a.href = URL.createObjectURL( blob );
+            a.download = 'forcesLayout.json';
+            a.click();
+            URL.revokeObjectURL( a.href );
+        } catch( e ) {
+            console.error( e ); alert( 'No se pudo exportar el layout.' );
+        }
+    };
+
+    // === LOAD: lee archivo -> guarda en localStorage -> incrementa layoutVersion ===
+    const fileInputRef = useRef( null );
+    const onImportLayoutClick = () => fileInputRef.current?.click();
+    const onFileChosen = async ( ev ) => {
+        const file = ev.target.files?.[ 0 ];
+        ev.target.value = '';
+        if( !file ) return;
+        const text = await file.text();
+        localStorage.setItem( LOCAL_KEY, text );
+        setLayoutVersion( v => v + 1 );
+    };
+
     // NUEVO: guardar al cerrar (si estamos en Forces)
     const handleClose = () => {
         if( isForces ) {
@@ -374,6 +405,19 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
                             disabled={ !isForces || status !== '' }>
                             Continue Animation
                         </button>
+                        <button
+                            onClick={ onExportLayout }
+                            disabled={ !isForces || status !== '' }>
+                            Save Layout
+                        </button>
+                        <button
+                            onClick={ onImportLayoutClick }
+                            disabled={ !isForces || status !== '' }>
+                            Load Layout
+                        </button>
+                        <input ref={ fileInputRef } type="file" accept="application/json"
+                            style={ { display: 'none' } } onChange={ onFileChosen } />
+
                     </div>
                     <button
                         onClick={ () => {
@@ -393,6 +437,7 @@ export default function RenderModal( { data, d2Source, isOpen, onClose } ) {
                         ? (
                             <div ref={ forcesCanvasRef } style={ { width: '100%', height: '100%' } }>
                                 <VisualRenderer
+                                    key={ layoutVersion }  // forzar remount si cambia la versión
                                     ref={ fragmentCanvasRef }
                                     animTrigger={ restartTrigger }
                                     continueTrigger={ continueTrigger }
