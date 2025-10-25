@@ -17,12 +17,11 @@ const buildIdPath = (node) => {
     }
     return path;
 };
-
+// Componente principal para generar y navegar el HTML interactivo
 const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
     // Cargar datos guardados del localStorage
     const parsedData = useMemo(
-        () => JSON.parse(localStorage.getItem('parsedData') || '{}'),
-        []
+        () => JSON.parse(localStorage.getItem('parsedData') || '{}'),[]
     );
     // Estados principales del componente
     const [uiMap, setUIMap] = useState({}); // Mapeo de IDs a objetos UI
@@ -69,16 +68,13 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
                     const h = parseFloat(rect.getAttribute('height') || 0);
                     cx = x + w / 2;
                     cy = y + h / 2;
-                }
-                else if(ellipse){
+                } else if(ellipse){
                     cx = parseFloat(ellipse.getAttribute('cx') || 0);
                     cy = parseFloat(ellipse.getAttribute('cy') || 0);
-                }
-                else if(circle){
+                } else if(circle){
                     cx = parseFloat(circle.getAttribute('cx') || 0);
                     cy = parseFloat(circle.getAttribute('cy') || 0);
-                }
-                else if(polygon){
+                } else if(polygon){
                     // Calcular centroide del polígono
                     const pts = polygon.getAttribute('points')
                     .trim()
@@ -109,17 +105,13 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
                 const text = tEl.textContent?.trim();
                 if(!text) return;
                 if(/^clicks|selects|deletes|lbl_|^\d+$|^[A-Z]+_\d+$/i.test(text)) return;
-                
                 const parent = tEl.parentElement;
                 if(parent.tagName === 'g') return; // Ya fue procesado en el bucle anterior
-                
                 const x = parseFloat(tEl.getAttribute('x') || 0);
                 const y = parseFloat(tEl.getAttribute('y') || 0);
                 if(isNaN(x) || isNaN(y)) return;
-                
                 const normName = Normalize(text);
                 if(!centersMap[normName]) centersMap[normName] = [];
-                
                 const isDuplicate = centersMap[normName].some(center =>
                     Math.abs(center.x - x) < 5 && Math.abs(center.y - y) < 5
                 );
@@ -133,10 +125,20 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
                     delete centersMap[key];
                 }
             });
-
+            // Eliminar la primera coordenada válida (fantasma en modo forces)
+            const allKeys = Object.keys(centersMap);
+            if(allKeys.length > 0){
+                const firstKey = allKeys[0];
+                if(Array.isArray(centersMap[firstKey]) && centersMap[firstKey].length > 0){
+                    centersMap[firstKey].shift(); // quita el primer punto
+                    // si ya no quedan coordenadas para ese nombre, eliminar la clave
+                    if(centersMap[firstKey].length === 0){
+                        delete centersMap[firstKey];
+                    }
+                }
+            }
             setSvgCenters(centersMap);
-        }
-        catch(e){
+        } catch(e){
             console.error('Error parsing SVG:', e);
         }
     }, [svg]);
@@ -170,11 +172,23 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
             allPaths.sort((a, b) => {
                 const aFirst = parseInt(a[0]);
                 const bFirst = parseInt(b[0]);
-                if (aFirst !== bFirst) return aFirst - bFirst;
+                if(aFirst !== bFirst) return aFirst - bFirst;
                 return b.length - a.length;
             });
             if(allPaths.length > 0) setCurrentIds(allPaths[0]);
         }
+    }, []);
+    // Escuchar cambios de colores desde RenderModal/RendererD2
+    useEffect(() => {
+        const handleColorUpdate = () => {
+            const updatedColors = JSON.parse(localStorage.getItem('uiColors') || '{}');
+            setUiColors(updatedColors);
+            console.log('🎨 Colores sincronizados con RenderModal:', updatedColors);
+        };
+        window.addEventListener('uiColorsUpdated', handleColorUpdate);
+        return () => {
+            window.removeEventListener('uiColorsUpdated', handleColorUpdate);
+        };
     }, []);
     // Resetear índice de ubicación cuando cambia la UI actual
     useEffect(() => {
@@ -195,14 +209,14 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
         for(const key of keys){
             if(typeof key !== 'string') continue;
             // Verificar si la clave empieza con el ID seguido de texto
-            if(key.startsWith(uiId.toString()) && key !== uiId.toString()) {
+            if(key.startsWith(uiId.toString()) && key !== uiId.toString()){
                 return svgCenters[key];
             }
         }
         // 3. PRIORIDAD MEDIA: Búsqueda por clave que contenga el ID en cualquier posición
         for(const key of keys){
             if(typeof key !== 'string') continue;
-            if(key.includes(uiId.toString())) {
+            if(key.includes(uiId.toString())){
                 return svgCenters[key];
             }
         }
@@ -213,7 +227,7 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
         // 5. PRIORIDAD BAJA: Búsqueda por inclusión de nombres
         for(const key of keys){
             if(typeof key !== 'string') continue;
-            if(key.includes(normalized) || normalized.includes(key)) {
+            if(key.includes(normalized) || normalized.includes(key)){
                 return svgCenters[key];
             }
         }
@@ -231,29 +245,39 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
     };
     // Centra la vista del SVG en las coordenadas especificadas
     const panToSVGPoint = (cx, cy) => {
-        if(!panZoomRef?.current || !isFinite(cx) || !isFinite(cy)) return;
+        if(!isFinite(cx) || !isFinite(cy)) return;
         try{
-            const inst = panZoomRef.current;
-            // Obtener información actual del zoom y viewport
-            const sizes = typeof inst.getSizes === 'function' ? inst.getSizes() : null;
-            const realZoom = sizes?.realZoom ?? (typeof inst.getZoom === 'function' ? inst.getZoom() : 1);
-            const viewportW = sizes?.width ?? window.innerWidth;
-            const viewportH = sizes?.height ?? window.innerHeight;
-            if(!isFinite(realZoom)) return;
-            // Calcular nueva posición para centrar el punto
-            const panX = -(cx * realZoom) + viewportW / 2;
-            const panY = -(cy * realZoom) + viewportH / 2;
-            // Aplicar movimiento de forma asíncrona para mejor rendimiento
-            requestAnimationFrame(() => {
-                if(typeof inst.pan === 'function'){
-                    inst.pan({ x: panX, y: panY });
+            // 1) Si hay instancia de svg-pan-zoom -> usarla
+            const inst = panZoomRef?.current;
+            if(inst && (typeof inst.pan === 'function' || typeof inst.centerOn === 'function')){
+                // intentar usar getSizes si existe
+                const sizes = typeof inst.getSizes === 'function' ? inst.getSizes() : null;
+                const realZoom = sizes?.realZoom ?? (typeof inst.getZoom === 'function' ? inst.getZoom() : 1);
+                const viewportW = sizes?.width ?? window.innerWidth;
+                const viewportH = sizes?.height ?? window.innerHeight;
+                if(isFinite(realZoom)){
+                    const panX = -(cx * realZoom) + viewportW / 2;
+                    const panY = -(cy * realZoom) + viewportH / 2;
+                    requestAnimationFrame(() => {
+                        try{
+                            if(typeof inst.pan === 'function'){
+                                inst.pan({ x: panX, y: panY });
+                            } else if(typeof inst.centerOn === 'function'){
+                                inst.centerOn(cx, cy);
+                            }
+                        } catch(e){
+                            // fallback: si falló, intentar centerOn si existe
+                            if(typeof inst.centerOn === 'function') inst.centerOn(cx, cy);
+                        }
+                    });
+                    return;
                 }
-                else if(typeof inst.centerOn === 'function'){
-                    inst.centerOn(cx, cy);
-                }
-            });
-        }
-        catch(e){
+            }
+            // 2) Si no hay instancia (modo forces / canvas2svg)
+            // -> enviar evento para que RenderModal lo calcule y aplique initialTransform
+            const ev = new CustomEvent('panToPoint', { detail: { cx, cy } });
+            window.dispatchEvent(ev);
+        } catch(e){
             console.error('Error panning:', e);
         }
     };
@@ -282,7 +306,6 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
         // Usar la interfaz actual (último elemento del path de navegación)
         const currentInterfaceId = currentIds[currentIds.length - 1];
         const centers = findCentersForUIId(currentInterfaceId);
-
         return {
             centers,
             current: currentLocationIndex,
@@ -297,12 +320,10 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
         if(direction === 'prev'){
             // Ir a ubicación anterior o la última si está en la primera
             newIndex = currentLocationIndex > 0 ? currentLocationIndex - 1 : total - 1;
-        }
-        else{
+        } else{
             // Ir a siguiente ubicación o la primera si está en la última
             newIndex = currentLocationIndex < total - 1 ? currentLocationIndex + 1 : 0;
         }
-        
         setCurrentLocationIndex(newIndex);
         // Centrar vista en la nueva ubicación
         if(centers[newIndex]){
@@ -320,7 +341,6 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
             if(t.from.length !== searchPath.length) return false;
             return t.from.every((id, i) => id === searchPath[i]);
         });
-
         if(matches.length === 0){
             alert(`No hay transición válida para ${verb} "${target}".`);
             return;
@@ -365,7 +385,6 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
         const colors = uiColors[currentId] || { fill: '#fff', stroke: '#000' };
         // Solo mostrar controles de navegación en el nivel raíz
         const locationInfo = level === 0 ? getCurrentLocationInfo() : { total: 0 };
-        
         return (
             <div
                 key={`${currentId}-${level}`}
@@ -433,11 +452,9 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
     useEffect(() => {
         const container = containerRef.current;
         if(!container) return;
-
         let isDragging = false;
         let offsetX = 0;
         let offsetY = 0;
-
         const handleMouseDown = (e) => {
             // Solo permitir arrastrar desde elementos con clase draggable-header
             if(e.target.classList.contains('draggable-header')){
@@ -450,7 +467,6 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
                 e.preventDefault();
             }
         };
-
         const handleMouseMove = (e) => {
             if(!isDragging) return;
             // Calcular nueva posición manteniendo la ventana dentro de los límites
@@ -461,19 +477,15 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
             // Limitar posición para que no se salga de la pantalla
             newLeft = Math.max(0, Math.min(windowWidth - container.offsetWidth, newLeft));
             newTop = Math.max(0, Math.min(windowHeight - container.offsetHeight, newTop));
-            
             container.style.left = `${newLeft}px`;
             container.style.top = `${newTop}px`;
         };
-
         const handleMouseUp = () => {
             isDragging = false;
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
         };
-
         container.addEventListener('mousedown', handleMouseDown);
-
         return () => {
             container.removeEventListener('mousedown', handleMouseDown);
             document.removeEventListener('mousemove', handleMouseMove);
@@ -498,35 +510,29 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
             z-index: 10;
         `;
         container.appendChild(resizeHandle);
-
         const handleMouseDown = (e) => {
             e.preventDefault();
             const startX = e.clientX;
             const startY = e.clientY;
             const startWidth = container.offsetWidth;
             const startHeight = container.offsetHeight;
-
             const onMouseMove = (e) => {
                 // Calcular nuevo tamaño basado en el movimiento del mouse
                 const dx = e.clientX - startX;
                 const dy = e.clientY - startY;
                 const newWidth = Math.max(minDimensions.width, startWidth + dx);
                 const newHeight = Math.max(minDimensions.height, startHeight + dy);
-                
                 container.style.width = `${newWidth}px`;
                 container.style.height = `${newHeight}px`;
                 setHasUserResized(true);
             };
-
             const onMouseUp = () => {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             };
-
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         };
-        
         resizeHandle.addEventListener('mousedown', handleMouseDown);
         // Observador para ajustar tamaño mínimo automáticamente
         const contentObserver = new ResizeObserver(() => {
@@ -546,9 +552,7 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
                 }
             }
         });
-
         contentObserver.observe(content);
-
         return () => {
             if(resizeHandle.parentNode){
                 resizeHandle.parentNode.removeChild(resizeHandle);
@@ -556,9 +560,9 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
             contentObserver.disconnect();
         };
     }, []);
-
+    // Renderizado principal del componente
     const structureToRender = getCurrentInterfaceStructure();
-
+    
     return (
         <>
             {/* Estilos CSS para botones neutrales */}
@@ -645,16 +649,12 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
                                     key={i}
                                     onClick={() => selectCondition(cond)}
                                     style={{ display: 'block', margin: '10px auto', padding: '8px 16px' }}
-                                >
-                                    {cond}
-                                </button>
+                                >{cond}</button>
                             ))}
                             <button
                                 onClick={() => setModalConditions(null)}
                                 style={{ marginTop: '10px', backgroundColor: '#ccc' }}
-                            >
-                                Cancelar
-                            </button>
+                            >Cancelar</button>
                         </div>
                     </div>
                 )}

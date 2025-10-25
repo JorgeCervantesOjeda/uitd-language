@@ -97,6 +97,7 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
 };
 
 const generateUIColorMap = ( uis ) => {
+    //! SS
     // Si no retomamos uiColors se desincronizan los colores del DTIU con el HTML
     const existing = localStorage.getItem('uiColors');
     if(existing) return JSON.parse(existing);
@@ -106,6 +107,7 @@ const generateUIColorMap = ( uis ) => {
     uis.forEach( ui => {
         folderToNodes[ ui.id ] = [ ui.id ];
     } );
+    //! SS
     const colorMap = asignarColores(folderToNodes);
     localStorage.setItem('uiColors', JSON.stringify(colorMap));
     return colorMap;
@@ -119,13 +121,9 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
         return '';
     }
     const indent = '  '.repeat( indentLevel );
-    const fillColor = ( uiColorMap[ ui.id ] && uiColorMap[ ui.id ].fill ) || '#eeeeee';
-    const strokeColor = ( uiColorMap[ ui.id ] && uiColorMap[ ui.id ].stroke ) || '#cccccc';
-    let out = `${indent}${ref.id}.style.fill: "${fillColor}"\n`;
-    out += `${indent}${ref.id}.style.stroke: "${strokeColor}"\n`;
-    out += `${indent}${ref.id}.shape: rectangle\n`;
-    out += `${indent}${ref.id}.style.3d: true\n`;
-    out += `${indent}${ref.id}.style.stroke-width: 6\n`;
+    let out = '';
+    out += `${indent}${ref.id}.class: ui${ui.id}\n`;
+    // Solo pon stroke-dash si aplica a este nodo
     out += ref.full
         ? ''
         : `${indent}${ref.id}.style.stroke-dash: 5\n`;
@@ -157,21 +155,50 @@ const translateToD2 = ( parsedData ) => {
 
     const uiColorMap = generateUIColorMap( parsedData.uis );
 
-    // Cabecera y bloque classes (las primeras 15 líneas)
+    // 1. Vars block (already in English)
+    let varsBlock = 'vars: {\n';
+    parsedData.uis.forEach( ui => {
+        varsBlock += `  ui${ui.id}: {\n`;
+        varsBlock += `    fill: "${uiColorMap[ ui.id ]?.fill || '#eeeeee'}"\n`;
+        varsBlock += `    stroke: "${uiColorMap[ ui.id ]?.stroke || '#cccccc'}"\n`;
+        varsBlock += `  }\n`;
+    } );
+    varsBlock += '}\n\n';
+
+    // 2. Classes block (already in English)
+    let uiClasses = '';
+    let labelUiClasses = '';
+    parsedData.uis.forEach( ui => {
+        uiClasses += `  ui${ui.id}: {\n`;
+        uiClasses += `    shape: rectangle\n`;
+        uiClasses += `    style: {\n`;
+        uiClasses += `      fill: \${ui${ui.id}.fill}\n`;
+        uiClasses += `      stroke: \${ui${ui.id}.stroke}\n`;
+        uiClasses += `      stroke-width: 6\n`;
+        uiClasses += `      3d: true\n`;
+        uiClasses += `    }\n`;
+        uiClasses += `  }\n`;
+        labelUiClasses += `  label_ui${ui.id}: {\n`;
+        labelUiClasses += `    shape: oval\n`;
+        labelUiClasses += `    style: {\n`;
+        labelUiClasses += `      fill: \${ui${ui.id}.fill}\n`;
+        labelUiClasses += `      stroke: \${ui${ui.id}.stroke}\n`;
+        labelUiClasses += `      stroke-width: 6\n`;
+        labelUiClasses += `      font-color: "#003311"\n`;
+        labelUiClasses += `    }\n`;
+        labelUiClasses += `  }\n`;
+    } );
+
+    // 3. Insert in your D2 (change comments and block names to English)
     let d2 =
         `direction: right\n\n` +
-        `# Clase para etiquetas de transición\n` +
+        varsBlock +
+        `# Classes generated for each UI\n` +
         `classes: {\n` +
-        `  label_bg: {\n` +
-        `    shape: oval\n` +
-        `    style: {\n` +
-        `      stroke-width: 6\n` +
-        `      font-color: "#003311"\n` +
-        `      font-size: 18\n` +
-        `    }\n` +
-        `  }\n` +
+        uiClasses +
+        labelUiClasses +
         `}\n\n` +
-        `# Contenedor principal\n` +
+        `# Main container\n` +
         `UITD.style.fill: "#ffffff"\n` +
         `UITD.style.stroke-width: 0\n` +
         `UITD: ${parsedData.name} {\n`;
@@ -181,18 +208,18 @@ const translateToD2 = ( parsedData ) => {
         const bgColor = fragment.color || '#eeeeee';
         const defaultWidth = fragment.width ?? 15;
 
-        // Extraemos y ordenamos transiciones
+        // Extract and sort transitions
         const uiOrder = fragment.draws
             .flatMap( draw => draw.uiRefs.flatMap( ref => flattenUIRefs( ref ) ) )
             .filter( ( v, i, a ) => a.indexOf( v ) === i );
         const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
 
-        // 1) Inicio del fragmento
+        // 1) Fragment start
         d2 += `  ${fragLetter}.style.fill: "${bgColor}"\n`;
         d2 += `  ${fragLetter}.style.stroke-dash: 1\n`;
         d2 += `  ${fragLetter}: ${formatString( fragment.name, 20 )} {\n`;
 
-        // 2) Flechas de transición al inicio del fragmento
+        // 2) Transition arrows at the start of the fragment
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
@@ -201,35 +228,30 @@ const translateToD2 = ( parsedData ) => {
             d2 += `    ${lblId} -> ${toId}:{style.stroke-dash:5}\n`;
         } );
 
-        // 3) Definiciones de labels (clase y texto)
+        // 3) Label definitions (class and text)
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
             const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
 
-            // 1) Color de fondo de la etiqueta igual al color del nodo origen
-            // 1) Encuentra la UI anidada más profunda
+            // 1) Background color of the label is the same as the origin node color
+            // 1) Find the deepest nested UI reference
             const originRef = getDeepestRef( t.from );
-            // 2) Usa su id para el color
-            const fillColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].fill ) || '#eeeeee';
-            const strokeColor = ( uiColorMap[ originRef.id ] && uiColorMap[ originRef.id ].stroke ) || '#cccccc';
-            d2 += `    ${lblId}.style.fill: "${fillColor}"\n`;
-            d2 += `    ${lblId}.style.stroke: "${strokeColor}"\n`;
-            d2 += `    ${lblId}\n`;
-            d2 += `    ${lblId}.class: label_bg\n`;
+            // 2) Use its id for the color
+            d2 += `    ${lblId}.class: label_ui${originRef.id}\n`;
             let action = `${t.action} "${t.target}"`;
             if( t.condition ) action += ` AND (${t.condition})`;
             d2 += `    ${lblId}: ${formatString( action, t.width ?? defaultWidth )}\n`;
         } );
 
-        // 4) Jerarquía de UIs y resto de definiciones
+        // 4) UI hierarchy and other definitions
         fragment.draws.forEach( draw => {
             draw.uiRefs.forEach( ref => {
                 d2 += buildUIHierarchy( ref, 2, parsedData.uis, '', uiColorMap );
             } );
         } );
 
-        // Cierre del bloque de fragmento
+        // End of fragment block
         d2 += `  }\n`;
     } );
 
@@ -237,9 +259,142 @@ const translateToD2 = ( parsedData ) => {
     return d2;
 };
 
+// Helper recursivo para generar la jerarquía como objeto
+const buildHierarchyObject = ( ref, uis, uiColorMap ) => {
+    const ui = uis.find( u => u.id === parseInt( ref.id ) );
+    if( !ui ) return null;
+    const node = {
+        id: ref.id,
+        className: `ui${ui.id}`,
+        style: {
+            fill: uiColorMap[ ui.id ]?.fill || '#eeeeee',
+            stroke: uiColorMap[ ui.id ]?.stroke || '#cccccc',
+            strokeDash: ref.full ? 0 : 5
+        },
+        label: ui.name,
+        children: []
+    };
+    if( ref.nested ) {
+        node.children = ref.nested
+            .map( nr => buildHierarchyObject( nr, uis, uiColorMap ) )
+            .filter( Boolean );
+    }
+    return node;
+};
 
-const RendererD2 = ( { data } ) => {
+export const translateToD2Structure = ( parsedData ) => {
+    if( !parsedData || !parsedData.name ) return null;
+
+    const uiColorMap = generateUIColorMap( parsedData.uis );
+    const structure = {
+        direction: 'right',
+        vars: {},
+        classes: {},
+        labelClasses: {},
+        mainContainer: { id: 'UITD', name: parsedData.name, style: { fill: '#ffffff', strokeWidth: 0 } },
+        fragments: []
+    };
+
+    // 1) Vars
+    parsedData.uis.forEach( ui => {
+        structure.vars[ ui.id ] = {
+            fill: uiColorMap[ ui.id ]?.fill || '#eeeeee',
+            stroke: uiColorMap[ ui.id ]?.stroke || '#cccccc'
+        };
+    } );
+
+    // 2) Classes y labelClasses (usando directamente los colores calculados en vars)
+    parsedData.uis.forEach( ui => {
+        const v = structure.vars[ ui.id ];
+        structure.classes[ ui.id ] = {
+            shape: 'rectangle',
+            style: {
+                fill: v.fill,
+                stroke: v.stroke,
+                strokeWidth: 6,
+                '3d': true
+            }
+        };
+        structure.labelClasses[ ui.id ] = {
+            shape: 'oval',
+            style: {
+                fill: v.fill,
+                stroke: v.stroke,
+                strokeWidth: 6,
+                fontColor: '#003311'
+            }
+        };
+    } );
+
+    // 3) Fragments
+    parsedData.fragments.forEach( ( fragment, fIdx ) => {
+        const fragLetter = String.fromCharCode( 65 + fIdx );
+        const uiOrder = fragment.draws
+            .flatMap( d => d.uiRefs.flatMap( r => flattenUIRefs( r ) ) )
+            .filter( ( v, i, a ) => a.indexOf( v ) === i );
+        const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
+
+        const fragObj = {
+            id: fragLetter,
+            name: fragment.name,
+            width: fragment.width || 15,
+            style: { fill: fragment.color || '#eeeeee', strokeDash: 1 },
+            transitions: [],
+            labels: [],
+            hierarchy: []
+        };
+
+        // 3.1) Aristas y Labels
+        sortedTransitions.forEach( ( t, tIdx ) => {
+            const fromId = formatTransitionUIRef( t.from );
+            const toId = formatTransitionUIRef( t.to );
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+
+            // Arista: origen -> label
+            fragObj.transitions.push( {
+                from: fromId,
+                to: lblId,
+                style: {}
+            } );
+            // Arista: label -> destino
+            fragObj.transitions.push( {
+                from: lblId,
+                to: toId,
+                style: { strokeDash: 5 }
+            } );
+
+            // Definición del label
+            const originRef = getDeepestRef( t.from );
+            let action = `${t.action} "${t.target}"`;
+            if( t.condition ) action += ` AND (${t.condition})`;
+            fragObj.labels.push( {
+                id: lblId,
+                className: `label_ui${originRef.id}`,
+                text: action,
+                width: t.width
+            } );
+        } );
+
+        // 3.2) Jerarquía de UIs
+        fragment.draws.forEach( draw => {
+            draw.uiRefs.forEach( ref => {
+                const obj = buildHierarchyObject( ref, parsedData.uis, uiColorMap );
+                if( obj ) fragObj.hierarchy.push( obj );
+            } );
+        } );
+
+        structure.fragments.push( fragObj );
+    } );
+
+    return structure;
+};
+
+const RendererD2 = ( { data, theme } ) => {
     const initialD2 = translateToD2( data );
+    // Estructura para Forces en estado (reemplaza a `datastructure`)
+    const [ sceneData, setSceneData ] = useState( translateToD2Structure( data ) );
+    console.log( 'sceneData:', sceneData )
+
     const [ draftCode, setDraftCode ] = useState( initialD2 );
     const [ renderCode, setRenderCode ] = useState( initialD2 );
     const [ modalOpen, setModalOpen ] = useState( false );
@@ -259,9 +414,12 @@ const RendererD2 = ( { data } ) => {
         setDraftCode( updated );
     }, [ data ] );
 
+    // Mantener `sceneData` sincronizado con `data`
+    useEffect( () => {
+        setSceneData( translateToD2Structure( data ) );
+    }, [ data ] );
+
     const handleUpdate = () => {
-        // Borramos uiColors para que se generen nuevos colores cada vez que se actualiza el diagrama
-        localStorage.removeItem("uiColors");
         // Regeneramos completamente, con nuevos colores aleatorios
         const updated = translateToD2( data );
         // Actualizamos ambos estados para reflejar el nuevo código
@@ -269,6 +427,22 @@ const RendererD2 = ( { data } ) => {
         setRenderCode( updated );
         displayMsg( 'D2 updated.' );
     };
+
+    // Recolor global (Dagre/ELK y Forces), usado por RenderModal
+    const handleRecolor = () => {
+        //! SS
+        // Borramos uiColors para que se generen nuevos colores cada vez que se actualiza el diagrama
+        localStorage.removeItem("uiColors");
+        const updatedD2 = translateToD2( data );
+        const updatedScene = translateToD2Structure( data );
+        setDraftCode( updatedD2 );
+        setRenderCode( updatedD2 );
+        setSceneData( updatedScene );
+        displayMsg( 'Colores regenerados.' );
+        //! SS
+        window.dispatchEvent(new CustomEvent("uiColorsUpdated"));
+    };
+
 
     const handleCopy = () => {
         navigator.clipboard.writeText( renderCode )
@@ -304,7 +478,7 @@ const RendererD2 = ( { data } ) => {
                         href="#"
                         onClick={ e => { e.preventDefault(); openInPlayground(); } }
                         className="mt-2 renderer-button block text-center">
-                        Playground
+                        D2 info
                     </a>
                 </div>
 
@@ -320,13 +494,16 @@ const RendererD2 = ( { data } ) => {
                 <CodeViewer
                     code={ renderCode }
                     onChange={ value => setRenderCode( value ) }
+                    theme={ theme }
                 />
             </div>
 
             <RenderModal
                 d2Source={ renderCode }
+                data={ sceneData }
                 isOpen={ modalOpen }
                 onClose={ () => setModalOpen( false ) }
+                onRecolor={ handleRecolor }
             />
         </div>
     );

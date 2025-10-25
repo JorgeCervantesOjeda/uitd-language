@@ -281,7 +281,9 @@ button:hover {
 .modal header .close-btn {
   margin-left: auto;
 }
-
+.modal header .restart-btn {
+  margin-left: auto;
+}
 .modal .content {
   flex-grow: 1;
   overflow: auto;
@@ -301,4 +303,15 @@ button:hover {
   to {
     opacity: 1
   }
+}
+
+.material-icons {
+  font-size: 12px;
+  /* O el tamaño que prefieras, por ejemplo 18px */
+  vertical-align: middle;
+}
+
+
+canvas {
+  font: 16px Arial, sans-serif;
 }
