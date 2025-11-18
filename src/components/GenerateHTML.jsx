@@ -38,6 +38,7 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
     // Estados para navegación múltiple entre ubicaciones
     const [svgCenters, setSvgCenters] = useState({}); // Coordenadas de elementos en el SVG
     const [currentLocationIndex, setCurrentLocationIndex] = useState(0); // Índice de ubicación actual
+    const [globalNesting, setGlobalNesting] = useState({});
     // Extrae las coordenadas de todos los elementos del SVG
     useEffect(() => {
         if(!svg) return;
@@ -144,6 +145,26 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
     }, [svg]);
     // Inicializar mapas de UI, colores y transiciones
     useEffect(() => {
+        // Mapa global de anidamientos
+        const nestingMap = {};
+        // Procesar todos los paths de todas las referencias UI en todos los draws
+        const allUIPaths = [];
+        parsedData.fragments?.forEach(fragment => {
+            fragment.draws?.forEach(draw => {
+                draw.uiRefs?.forEach(ref => {
+                    const path = buildIdPath(ref);
+                    allUIPaths.push(path);
+                });
+            });
+        });
+        // Elegimos el path más largo para cada UI raíz
+        allUIPaths.forEach(path => {
+            const root = path[0];
+            if(!nestingMap[root] || path.length > nestingMap[root].length){
+                nestingMap[root] = path;
+            }
+        });
+        setGlobalNesting(nestingMap);
         // Crear mapeo de ID a UI para acceso rápido
         const uis = {};
         parsedData.uis?.forEach(ui => { uis[ui.id] = ui; });
@@ -283,14 +304,19 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
     };
     // Encuentra la estructura anidada completa para un ID específico
     const findNestedStructure = (targetId) => {
-        const allDraws = parsedData.fragments?.flatMap(f => f.draws) || [];
-        for(const draw of allDraws){
-            for(const uiRef of draw.uiRefs){
-                const fullPath = buildIdPath(uiRef);
-                const idx = fullPath.findIndex(id => id === targetId);
-                if(idx !== -1) return fullPath.slice(idx);
+        // Si la UI es raíz de una cadena de anidamiento
+        if(globalNesting[targetId]){
+            return globalNesting[targetId];
+        }
+        // Si NO es raíz, buscar a qué cadena pertenece
+        for(const root in globalNesting){
+            const path = globalNesting[root];
+            const index = path.indexOf(targetId);
+            if(index !== -1){
+                return path.slice(index);
             }
         }
+        // Si no hay nada, devolver solo el id
         return [targetId];
     };
     // Obtiene la estructura de interfaz actual para renderizar
@@ -430,15 +456,15 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
                 {/* Renderizar botones de acciones disponibles */}
                 {ui.actions?.length > 0 ? (
                     ui.actions.map((a, i) => (
-                        <div key={i}>
-                        <button
-                            key={i}
-                            onClick={() => handleClick(a.verb, a.target, currentId)}
-                            className="neutral-btn"
-                        >
-                        {a.verb} "{a.target}"
-                        </button>
-                        </div>
+                        <span key={i}>
+                            <button
+                                key={i}
+                                onClick={() => handleClick(a.verb, a.target, currentId)}
+                                className="neutral-btn"
+                            >
+                            {a.verb} "{a.target}"
+                            </button>
+                        </span>
                     ))
                 ) : (
                     <p>No hay acciones disponibles.</p>
