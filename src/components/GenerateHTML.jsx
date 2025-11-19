@@ -356,37 +356,59 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
             panToSVGPoint(centers[newIndex].x, centers[newIndex].y);
         }
     };
-    // Maneja clics en acciones de UI y ejecuta transiciones
-    const handleClick = (verb, target, fromInterfaceId) => {
-        // Determinar desde qué UI buscar la transición
-        const searchPath = fromInterfaceId ? [fromInterfaceId] : currentIds;
-        // Buscar transiciones que coincidan con la acción
-        const matches = transitions.filter(t => {
-            if(t.action !== verb || t.target !== target) return false;
-            if(!Array.isArray(t.from) || !Array.isArray(searchPath)) return false;
-            if(t.from.length !== searchPath.length) return false;
-            return t.from.every((id, i) => id === searchPath[i]);
-        });
-        if(matches.length === 0){
-            alert(`No hay transición válida para ${verb} "${target}".`);
-            return;
+    // --- 1) Función para obtener la UI efectiva (la más profunda)
+const resolveEffectiveUI = (idPath) => {
+    if (!Array.isArray(idPath)) return null;
+    return idPath[idPath.length - 1]; // Siempre la UI más interna
+};
+
+// --- 2) handleClick completo y funcionando
+const handleClick = (verb, target, fromInterfaceId) => {
+    // Determinar desde qué UI buscar la transición
+    // Si `fromInterfaceId` viene desde el HTML, úsalo
+    // Si no, usar la UI más profunda del estado actual
+    const effectiveFrom = fromInterfaceId || resolveEffectiveUI(currentIds);
+
+    // Buscar transiciones que coincidan con acción + from + target
+    const matches = transitions.filter(t => {
+        if (t.action !== verb || t.target !== target) return false;
+
+        // Asegurar que t.from es un array
+        if (!Array.isArray(t.from)) return false;
+
+        // -------------------------------------------------
+        // Coincidencia por sufijo: la interfaz más profunda
+        // debe coincidir con la parte más profunda de t.from
+        // -------------------------------------------------
+        const lastInFrom = t.from[t.from.length - 1];
+        return Number(lastInFrom) === Number(effectiveFrom);
+    });
+
+    if (matches.length === 0) {
+        alert(`No hay transición válida para ${verb} "${target}".`);
+        return;
+    }
+
+    // Caso simple: solo una transición sin condiciones
+    const noCond = matches.find(m => !m.condition);
+    if (matches.length === 1 && noCond) {
+        setCurrentIds(noCond.to);
+
+        // Centrar en la nueva UI efectiva
+        const targetId = resolveEffectiveUI(noCond.to);
+        const centers = findCentersForUIId(targetId);
+
+        if (centers.length > 0) {
+            panToSVGPoint(centers[0].x, centers[0].y);
         }
-        // Si hay solo una transición sin condiciones, ejecutar directamente
-        const noCond = matches.find(m => !m.condition);
-        if(matches.length === 1 && noCond){
-            setCurrentIds(noCond.to);
-            // Centrar en la primera ubicación de la nueva UI
-            const targetId = noCond.to[noCond.to.length - 1];
-            const centers = findCentersForUIId(targetId);
-            if(centers.length > 0){
-                panToSVGPoint(centers[0].x, centers[0].y);
-            }
-            return;
-        }
-        // Mostrar modal para seleccionar condición si hay múltiples opciones
-        const conditions = [...new Set(matches.map(m => m.condition).filter(Boolean))];
-        setModalConditions({ verb, target, options: conditions, matches });
-    };
+        return;
+    }
+
+    // Varias transiciones → abrir modal
+    const conditions = [...new Set(matches.map(m => m.condition).filter(Boolean))];
+    setModalConditions({ verb, target, options: conditions, matches });
+};
+
     // Ejecuta transición basada en la condición seleccionada
     const selectCondition = (cond) => {
         const selected = modalConditions.matches.find(m => (m.condition || '') === cond);
