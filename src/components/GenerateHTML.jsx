@@ -356,58 +356,49 @@ const GenerateHTML = ({ onClose, svg, panZoomRef }) => {
             panToSVGPoint(centers[newIndex].x, centers[newIndex].y);
         }
     };
-    // --- 1) Función para obtener la UI efectiva (la más profunda)
-const resolveEffectiveUI = (idPath) => {
-    if (!Array.isArray(idPath)) return null;
-    return idPath[idPath.length - 1]; // Siempre la UI más interna
-};
 
-// --- 2) handleClick completo y funcionando
-const handleClick = (verb, target, fromInterfaceId) => {
-    // Determinar desde qué UI buscar la transición
-    // Si `fromInterfaceId` viene desde el HTML, úsalo
-    // Si no, usar la UI más profunda del estado actual
-    const effectiveFrom = fromInterfaceId || resolveEffectiveUI(currentIds);
+    const resolveEffectiveUI = (idPath) => {
+        if(!Array.isArray(idPath)) return null;
+        return idPath[idPath.length - 1]; // Siempre la UI más interna
+    };
 
-    // Buscar transiciones que coincidan con acción + from + target
-    const matches = transitions.filter(t => {
-        if (t.action !== verb || t.target !== target) return false;
+    const handleClick = (verb, target, fromInterfaceId) => {
+        // Determinar desde qué UI buscar la transición
+        // Si `fromInterfaceId` viene desde el HTML, úsalo
+        // Si no, usar la UI más profunda del estado actual
+        const effectiveFrom = fromInterfaceId || resolveEffectiveUI(currentIds);
 
-        // Asegurar que t.from es un array
-        if (!Array.isArray(t.from)) return false;
+        // Buscar transiciones que coincidan con acción + from + target
+        const matches = transitions.filter(t => {
+            if(t.action !== verb || t.target !== target) return false;
 
-        // -------------------------------------------------
-        // Coincidencia por sufijo: la interfaz más profunda
-        // debe coincidir con la parte más profunda de t.from
-        // -------------------------------------------------
-        const lastInFrom = t.from[t.from.length - 1];
-        return Number(lastInFrom) === Number(effectiveFrom);
-    });
+            // Asegurar que t.from es un array
+            if(!Array.isArray(t.from)) return false;
+            const lastInFrom = t.from[t.from.length - 1];
+            return Number(lastInFrom) === Number(effectiveFrom);
+        });
 
-    if (matches.length === 0) {
-        alert(`No hay transición válida para ${verb} "${target}".`);
-        return;
-    }
-
-    // Caso simple: solo una transición sin condiciones
-    const noCond = matches.find(m => !m.condition);
-    if (matches.length === 1 && noCond) {
-        setCurrentIds(noCond.to);
-
-        // Centrar en la nueva UI efectiva
-        const targetId = resolveEffectiveUI(noCond.to);
-        const centers = findCentersForUIId(targetId);
-
-        if (centers.length > 0) {
-            panToSVGPoint(centers[0].x, centers[0].y);
+        if(matches.length === 0){
+            alert(`No hay transición válida para ${verb} "${target}".`);
+            return;
         }
-        return;
-    }
+        // Caso simple: solo una transición sin condiciones
+        const noCond = matches.find(m => !m.condition);
+        if(matches.length === 1 && noCond){
+            setCurrentIds(noCond.to);
+            // Centrar en la nueva UI efectiva
+            const targetId = resolveEffectiveUI(noCond.to);
+            const centers = findCentersForUIId(targetId);
 
-    // Varias transiciones → abrir modal
-    const conditions = [...new Set(matches.map(m => m.condition).filter(Boolean))];
-    setModalConditions({ verb, target, options: conditions, matches });
-};
+            if(centers.length > 0){
+                panToSVGPoint(centers[0].x, centers[0].y);
+            }
+            return;
+        }
+        // Varias transiciones → abrir modal
+        const conditions = [...new Set(matches.map(m => m.condition).filter(Boolean))];
+        setModalConditions({ verb, target, options: conditions, matches });
+    };
 
     // Ejecuta transición basada en la condición seleccionada
     const selectCondition = (cond) => {
