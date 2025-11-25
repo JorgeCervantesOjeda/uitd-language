@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CodeViewer from './CodeViewer';
 import '../App.css';
 import RenderModal from './RenderModal';
-import { asignarColores } from './color-assignment'
+import { asignarColores } from './color-assignment';
 
 // Helper functions (formatTransitionUIRef, formatString, buildUIHierarchy) remain unchanged
 const formatTransitionUIRef = ( uiRef ) => {
@@ -99,8 +99,8 @@ const ordenarTransiciones = ( transitions, uiOrder ) => {
 const generateUIColorMap = ( uis ) => {
     //! SS
     // Si no retomamos uiColors se desincronizan los colores del DTIU con el HTML
-    const existing = localStorage.getItem('uiColors');
-    if(existing) return JSON.parse(existing);
+    const existing = localStorage.getItem( 'uiColors' );
+    if( existing ) return JSON.parse( existing );
     // Construye el objeto tipo folderToNodes, donde cada clave es el id de la UI
     // y el valor es un array con ese mismo id (puede extenderse a más nodos si se desea)
     const folderToNodes = {};
@@ -108,8 +108,8 @@ const generateUIColorMap = ( uis ) => {
         folderToNodes[ ui.id ] = [ ui.id ];
     } );
     //! SS
-    const colorMap = asignarColores(folderToNodes);
-    localStorage.setItem('uiColors', JSON.stringify(colorMap));
+    const colorMap = asignarColores( folderToNodes );
+    localStorage.setItem( 'uiColors', JSON.stringify( colorMap ) );
     return colorMap;
 };
 
@@ -393,25 +393,28 @@ const RendererD2 = ( { data, theme } ) => {
     const initialD2 = translateToD2( data );
     // Estructura para Forces en estado (reemplaza a `datastructure`)
     const [ sceneData, setSceneData ] = useState( translateToD2Structure( data ) );
-    console.log( 'sceneData:', sceneData )
+    console.log( 'sceneData:', sceneData );
 
-    const [ draftCode, setDraftCode ] = useState( initialD2 );
+    // Un solo estado de código D2 (ya no hay draftCode/renderCode separados)
     const [ renderCode, setRenderCode ] = useState( initialD2 );
     const [ modalOpen, setModalOpen ] = useState( false );
     const [ message, setMessage ] = useState( '' );
     const timer = useRef( null );
 
-    useEffect( () => () => { if( timer.current ) clearTimeout( timer.current ); }, [] );
+    useEffect( () => () => {
+        if( timer.current ) clearTimeout( timer.current );
+    }, [] );
+
     const displayMsg = useCallback( ( msg, duration = 3000 ) => {
         setMessage( msg );
         if( timer.current ) clearTimeout( timer.current );
         timer.current = setTimeout( () => setMessage( '' ), duration );
     }, [] );
 
-
+    // Cada vez que cambia `data` (ya debounced en App), regeneramos D2 automáticamente
     useEffect( () => {
         const updated = translateToD2( data );
-        setDraftCode( updated );
+        setRenderCode( updated );
     }, [ data ] );
 
     // Mantener `sceneData` sincronizado con `data`
@@ -419,30 +422,19 @@ const RendererD2 = ( { data, theme } ) => {
         setSceneData( translateToD2Structure( data ) );
     }, [ data ] );
 
-    const handleUpdate = () => {
-        // Regeneramos completamente, con nuevos colores aleatorios
-        const updated = translateToD2( data );
-        // Actualizamos ambos estados para reflejar el nuevo código
-        setDraftCode( updated );
-        setRenderCode( updated );
-        displayMsg( 'D2 updated.' );
-    };
-
     // Recolor global (Dagre/ELK y Forces), usado por RenderModal
     const handleRecolor = () => {
         //! SS
         // Borramos uiColors para que se generen nuevos colores cada vez que se actualiza el diagrama
-        localStorage.removeItem("uiColors");
+        localStorage.removeItem( "uiColors" );
         const updatedD2 = translateToD2( data );
         const updatedScene = translateToD2Structure( data );
-        setDraftCode( updatedD2 );
         setRenderCode( updatedD2 );
         setSceneData( updatedScene );
         displayMsg( 'Colores regenerados.' );
         //! SS
-        window.dispatchEvent(new CustomEvent("uiColorsUpdated"));
+        window.dispatchEvent( new CustomEvent( "uiColorsUpdated" ) );
     };
-
 
     const handleCopy = () => {
         navigator.clipboard.writeText( renderCode )
@@ -452,9 +444,8 @@ const RendererD2 = ( { data, theme } ) => {
 
     const openInPlayground = () => window.open( 'https://play.d2lang.com', '_blank' );
 
-    const needsUpdate = renderCode !== draftCode;
-    const alertText = message || ( needsUpdate ? 'Update d2.' : '\u00A0' );
-    const alertBg = message || needsUpdate ? 'darkred' : 'black';
+    const alertText = message || '\u00A0';
+    const alertBg = message ? 'darkred' : 'black';
 
     return (
         <div className="renderer-container panel-container">
@@ -464,9 +455,7 @@ const RendererD2 = ( { data, theme } ) => {
                         D2 Translation
                     </div>
                     <div className="flex space-x-2">
-                        <button onClick={ handleUpdate } className="renderer-button">
-                            Update D2
-                        </button>
+                        {/* Botón Update D2 eliminado; ya no es necesario */ }
                         <button onClick={ () => setModalOpen( true ) } className="renderer-button">
                             View Diagram
                         </button>

@@ -1,0 +1,142 @@
+UI 0: Main Navigation
+  elements: [Standings, Event Priorities, Past Registrations, Forum, News, Profile]
+  TRANSITION:
+    Standings -> UI 4
+    Event Priorities -> UI 5
+    Past Registrations -> UI 6
+    Forum -> UI 29
+    News -> UI 30
+    Profile -> UI 31
+
+UI 1: Login
+  elements: [Username, Password, Login Button]
+  TRANSITION:
+    Login Button -> UI 0
+
+UI 2: Registration
+  elements: [Name, Email, Password, Register Button]
+  TRANSITION:
+    Register Button -> UI 0
+
+UI 3: Welcome (Viral Center)
+  elements: [Active Auction Countdown, Featured News/Forum Post, Login Button, Register Button, View All Auctions Button]
+  TRANSITION:
+    Login Button -> UI 1
+    Register Button -> UI 2
+    View All Auctions Button -> UI 4 (Filtered to Active Auctions)
+    Active Auction Countdown -> UI 8 (View Registration/Auction)
+
+UI 4: Standings
+  elements: [Filter by Region, Filter by Event, Efficiency Leaderboard, Speed Leaderboard]
+  TRANSITION:
+    Event Name -> UI 7
+
+UI 5: Event Priorities
+  elements: [Filter by Region, Event List]
+  TRANSITION:
+    Event Name -> UI 7
+    Create New Event Button -> UI 10
+
+UI 6: Past Registrations
+  elements: [Filter by User, Filter by Event, Registration List]
+  TRANSITION:
+    Registration Item -> UI 8
+
+UI 7: View Event
+  elements: [Event Details, Registered Participants List, View Auction Button]
+  TRANSITION:
+    Registered Participant -> UI 8
+    View Auction Button -> UI 8 (View Registration/Auction)
+
+UI 8: View Registration/Auction
+  elements: [Vehicle Details, Driver Details, Auction Status, Bid Input, Bid Button, Efficiency Score, Race Results]
+  TRANSITION:
+    Bid Button -> UI 8 (Update Auction Status)
+
+UI 9: Edit Registration
+  elements: [Vehicle Selector, Driver Selector, Save Button]
+  TRANSITION:
+    Save Button -> UI 8
+
+UI 10: Create Event
+  elements: [Event Name, Date, Venue Selector, ML Input, Race Type Selector, Save Button]
+  TRANSITION:
+    Venue Selector -> UI 11 (Venue Selection/Creation)
+    Save Button -> UI 5
+
+UI 11: Venue Selection/Creation (UX Simplification)
+  elements: [Search Venue Input, Create New Venue Button]
+  TRANSITION:
+    Search Venue Input -> UI 11 (Filter List)
+    Venue Item -> UI 10 (Return Venue ID)
+    Create New Venue Button -> UI 12 (In-Line Creation)
+
+UI 12: Create New Venue (In-Line)
+  elements: [Venue Name, Address, Assign Region Button, Save Button]
+  TRANSITION:
+    Assign Region Button -> UI 13 (In-Line Region Assignment)
+    Save Button -> UI 11 (Return Venue ID)
+
+UI 13: In-Line Region Assignment (Just-in-Time Creation)
+  elements: [Current Region Breadcrumb, Select Existing Region Dropdown, Create New Region Button]
+  TRANSITION:
+    Select Existing Region Dropdown -> UI 10 (Return Region ID)
+    Create New Region Button -> UI 14 (In-Line Region Creation)
+
+UI 14: In-Line Region Creation (Community Driven)
+  elements: [Region Name, Parent Region Dropdown, Save Button]
+  TRANSITION:
+    Save Button -> UI 13 (Return New Region ID)
+
+UI 29: Forum (Centralized)
+  elements: [Post List, Create New Post Button, Search Bar]
+  TRANSITION:
+    Post Item -> UI 29.1
+    Create New Post Button -> UI 29.2
+
+UI 29.1: View Post
+  elements: [Post Content, Comment List, Comment Input, Submit Comment Button]
+  TRANSITION:
+    Submit Comment Button -> UI 29.1 (Update Comment List)
+
+UI 29.2: Create Post
+  elements: [Title Input, Content Input, Submit Button]
+  TRANSITION:
+    Submit Button -> UI 29
+
+UI 30: News (Centralized)
+  elements: [News Feed List, Filter by Source]
+  TRANSITION:
+    News Item -> UI 30.1
+
+UI 30.1: View News Article
+  elements: [Article Content, Share Button]
+  TRANSITION:
+    Share Button -> UI 30.1 (Open Share Modal)
+
+UI 31: Profile
+  elements: [User Details, Edit Profile Button, View Vehicles Button, View Promoted Events Button]
+  TRANSITION:
+    Edit Profile Button -> UI 32
+    View Vehicles Button -> UI 33
+    View Promoted Events Button -> UI 5 (Filtered by User)
+
+UI 32: Edit Profile
+  elements: [Name, Email, Password, Save Button]
+  TRANSITION:
+    Save Button -> UI 31
+
+UI 33: Vehicle Management
+  elements: [Vehicle List, Create New Vehicle Button]
+  TRANSITION:
+    Vehicle Item -> UI 34
+    Create New Vehicle Button -> UI 34
+
+UI 34: Edit Vehicle
+  elements: [Vehicle Details, Save Button]
+  TRANSITION:
+    Save Button -> UI 33
+
+// Note: The original diagram had UI 15-26 for geographic management.
+// This new design replaces that complex flow with the simplified UI 11-14.
+// The remaining UI numbers (35+) are reserved for future features like Fantasy Racing.

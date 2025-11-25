@@ -1,0 +1,290 @@
+UITD "TOP-Racing" {
+  // UI 0-34: Definición de las pantallas de usuario (UI) y sus acciones
+  UI 0 "Navigation" actions {
+    clicks "Banner";
+    clicks "Welcome Page";
+    clicks "Standings";
+    clicks "Event Priorities";
+    clicks "Past Registrations";
+    clicks "Forum"; // Centralizado
+    clicks "News"; // Centralizado
+    clicks "Login";
+    clicks "Edit Profile";
+    clicks "Contact";
+    clicks "Logout";
+  }
+  UI 1 "Login" actions {
+    clicks "Login";
+    clicks "Create Account";
+    clicks "Request a password reset";
+  }
+  UI 2 "Contact" actions {
+    clicks "OK";
+  }
+  UI 3 "Welcome" actions { // Centro de Viralidad
+    clicks "What is TOP-Racing";
+    clicks "FAQ";
+    clicks "Map";
+    clicks "Active Auction Countdown"; // Nuevo: Acceso directo a la subasta
+    clicks "Featured News/Forum Post"; // Nuevo: Contenido destacado
+  }
+  UI 4 "Standings" actions {
+    types "in a search field";
+    selects "territorial level";
+    selects "temporal level";
+  }
+  UI 5 "Priorities" actions {
+    types "in a search field";
+    selects "territorial level";
+    selects "temporal level";
+    clicks "on an Event";
+    clicks "Create Event";
+  }
+  UI 6 "Past Registrations" actions {
+    types "in a search field";
+  }
+  UI 7 "View/Edit Event" actions {
+    clicks "Previous";
+    clicks "Next";
+    clicks "Next Status";
+    clicks "View/Edit Event registrations";
+    clicks "View Variants";
+    clicks "Save Data";
+    clicks "Return";
+  }
+  UI 8 "View/Edit Event Registrations" actions { // Contiene la funcionalidad de Subasta
+    selects "Registration status";
+    clicks "Save Data";
+    clicks "Create Registration";
+    clicks "Return";
+    clicks "Bid Button"; // Nuevo: Acción de puja
+    clicks "View Auction Results"; // Nuevo: Acción de ver resultados
+  }
+  UI 9 "View/Edit Registration" actions {
+    clicks "View Drivers";
+    clicks "View Vehicles";
+    clicks "Save Data";
+    clicks "Return";
+  }
+  UI 10 "View Drivers" actions {
+    selects "Driver";
+    clicks "Return";
+  }
+  UI 11 "View Vehicles" actions {
+    selects "Vehicle";
+    clicks "Create Vehicle";
+    clicks "on a Vehicle";
+  }
+  UI 12 "Edit Vehicle" actions {
+    clicks "Save Data";
+    clicks "Return";
+  }
+  UI 13 "Variants" actions {
+    types "in a search field";
+    clicks "Create Variant";
+    clicks "Select";
+    clicks "on a Variant";
+    clicks "Return";
+  }
+  UI 14 "View/Edit Variant" actions {
+    clicks "View Venues";
+    clicks "Save Data";
+    clicks "Return";
+  }
+  // UI 15-26: Flujo de Gestión Geográfica Simplificado (Reemplaza la jerarquía original)
+  UI 15 "Venues" actions { // Punto de entrada simplificado
+    types "in a search field";
+    clicks "Create Venue";
+    clicks "Select";
+    clicks "View in Map";
+    clicks "on a Venue";
+    clicks "Return";
+  }
+  UI 16 "View/Edit Venue" actions {
+    clicks "View Province Regions"; // Se mantiene el enlace a la jerarquía para edición
+    clicks "Save Data";
+    clicks "Return";
+  }
+  UI 17 "In-Line Region Assignment" actions { // Reemplaza Province Regions original
+    selects "Existing Region";
+    clicks "Create New Region";
+    clicks "Return";
+  }
+  UI 18 "In-Line Region Creation" actions { // Reemplaza View/Edit Province Region original
+    selects "Parent Region";
+    clicks "Save Data";
+    clicks "Return";
+  }
+  // Se eliminan las UI 19-26 del flujo de creación de eventos para simplificar la UX.
+  // La creación de la jerarquía superior (Province, Country, etc.) se maneja
+  // a través de la UI 17 y 18 de forma recursiva y "Just-in-Time".
+  
+  UI 27 "Edit Profile" actions {
+    clicks "View Venues";
+    clicks "Save Data";
+  }
+  UI 28 "Map" actions {
+    clicks "on Map";
+    clicks "Return";
+  }
+  UI 29 "Forum" actions { // Centralizado
+    clicks "Create New Post";
+    clicks "on a Post";
+  }
+  UI 30 "News" actions { // Centralizado
+    clicks "on a News Item";
+  }
+  UI 31 "Login Failed Alert" actions {
+    clicks "OK";
+  }
+  UI 32 "Account Creation Failed Alert" actions {
+    clicks "OK";
+  }
+  UI 33 "Password Reset Success Alert" actions {
+    clicks "OK";
+  }
+  UI 34 "Next Status Alert" actions {
+    clicks "OK";
+  }
+  
+  // FRAGMENTS: Definición de las transiciones (Flujo)
+  
+  FRAGMENT "Login" {
+    DRAW {
+      1, 31, 33
+    };
+    DRAW {
+      32, 3(0), 27
+    };
+    TRANSITION from 1 to 3 if user clicks "Login" AND "e-mail/password correct";
+    TRANSITION from 1 to 31 if user clicks "Login" AND "e-mail or password incorrect";
+    TRANSITION from 31 to 1 if user clicks "OK";
+    TRANSITION from 1 to 33 if user clicks "Request a password reset" AND "email given";
+    TRANSITION from 33 to 1 if user clicks "OK";
+    TRANSITION from 1 to 27 if user clicks "Create Account";
+    TRANSITION from 27 to 32 if user clicks "Save Data" AND "Creation fails";
+    TRANSITION from 32 to 1 if user clicks "OK";
+    TRANSITION from 27 to 3 if user clicks "Save Data" AND "Data is saved";
+  }
+  
+  FRAGMENT "Navigation" {
+    DRAW {
+      0
+    };
+    DRAW {
+      1(0), 2(0), 3(0), 4(0), 5(0), 6(0)
+    };
+    DRAW {
+      27(0), 29, 30
+    };
+    TRANSITION from 0 to 1 if user clicks "Login" AND "has no open session";
+    TRANSITION from 0 to 2 if user clicks "Contact";
+    TRANSITION from 0 to 3 if user clicks "Welcome Page";
+    TRANSITION from 0 to 3 if user clicks "Logout" AND "has an open session";
+    TRANSITION from 0 to 4 if user clicks "Standings";
+    TRANSITION from 4 to 4 if user types "in a search field";
+    TRANSITION from 4 to 4 if user selects "territorial level";
+    TRANSITION from 4 to 4 if user selects "temporal level";
+    TRANSITION from 0 to 5 if user clicks "Event Priorities";
+    TRANSITION from 0 to 6 if user clicks "Past Registrations";
+    TRANSITION from 6 to 6 if user types "in a search field";
+    TRANSITION from 0 to 27 if user clicks "Edit Profile" AND "has an open session";
+    
+    // Nuevas Transiciones de Viralidad (UI 3)
+    TRANSITION from 3 to 1 if user clicks "Login Button";
+    TRANSITION from 3 to 27 if user clicks "Register Button";
+    TRANSITION from 3 to 8 if user clicks "Active Auction Countdown"; // Acceso directo a la subasta
+    TRANSITION from 3 to 30 if user clicks "Featured News/Forum Post"; // Acceso directo al contenido
+  }
+  
+  FRAGMENT "Priorities" {
+    DRAW {
+      1, 5, 7, 34, 13 
+    };
+    TRANSITION from 5 to 5 if user types "in a search field";
+    TRANSITION from 5 to 5 if user selects "territorial level";
+    TRANSITION from 5 to 5 if user selects "temporal level";
+    TRANSITION from 5 to 7 if user clicks "on an Event";
+    TRANSITION from 5 to 7 if user clicks "Create Event";
+    TRANSITION from 7 to 7 if user clicks "Previous";
+    TRANSITION from 7 to 7 if user clicks "Next";
+    TRANSITION from 7 to 5 if user clicks "Return";
+    TRANSITION from 7 to 34 if user clicks "Next Status";
+    TRANSITION from 34 to 7 if user clicks "OK";
+    TRANSITION from 7 to 1 if user clicks "View/Edit Event registrations" AND "is not logged in";
+    TRANSITION from 7 to 8 if user clicks "View/Edit Event registrations" AND "is logged in"; // Transición a UI 8
+    TRANSITION from 7 to 7 if user clicks "Save Data" AND "is the event creator";
+    TRANSITION from 7 to 13 if user clicks "View Variants";
+    TRANSITION from 13 to 7 if user clicks "Select" AND "is Event creator";
+    TRANSITION from 13 to 7 if user clicks "Return";
+    TRANSITION from 13 to 13 if user types "in a search field";
+  }
+  
+  FRAGMENT "Edit results" {
+    DRAW {
+      7, 8, 9, 10, 11, 12
+    };
+    TRANSITION from 7 to 8 if user clicks "View/Edit Event registrations" AND "is logged in";
+    TRANSITION from 8 to 7 if user clicks "Return";
+    TRANSITION from 8 to 8 if user selects "Registration status" AND "is Event creator";
+    TRANSITION from 8 to 8 if user clicks "Save Data" AND "is Event creator";
+    TRANSITION from 8 to 9 if user clicks "Create Registration";
+    TRANSITION from 9 to 8 if user clicks "Return";
+    TRANSITION from 9 to 9 if user clicks "Save Data" AND "is Registration creator";
+    TRANSITION from 9 to 10 if user clicks "View Drivers" AND "is Registration creator";
+    TRANSITION from 10 to 9 if user selects "Driver";
+    TRANSITION from 10 to 9 if user clicks "Return";
+    TRANSITION from 9 to 11 if user clicks "View Vehicles" AND "is Registration creator";
+    TRANSITION from 11 to 9 if user selects "Vehicle";
+    TRANSITION from 11 to 12 if user clicks "Create Vehicle";
+    TRANSITION from 11 to 12 if user clicks "on a Vehicle";
+    TRANSITION from 12 to 11 if user clicks "Return";
+    TRANSITION from 12 to 12 if user clicks "Save Data";
+    
+    // Transiciones de Subasta (UI 8)
+    TRANSITION from 8 to 8 if user clicks "Bid Button" AND "is logged in";
+    TRANSITION from 8 to 8 if user clicks "View Auction Results";
+  }
+  
+  FRAGMENT "description" {
+    DRAW {
+      13, 14
+    };
+    DRAW {
+      15, 28, 16
+    };
+    DRAW {
+      17, 18 // Flujo simplificado de regiones
+    };
+    TRANSITION from 13 to 14 if user clicks "Create Variant";
+    TRANSITION from 13 to 14 if user clicks "on a Variant";
+    TRANSITION from 14 to 13 if user clicks "Return";
+    TRANSITION from 14 to 14 if user clicks "Save Data" AND "is the variant creator";
+    TRANSITION from 14 to 15 if user clicks "View Venues";
+    TRANSITION from 15 to 14 if user clicks "Select" AND "is Variant creator";
+    TRANSITION from 15 to 14 if user clicks "Return";
+    TRANSITION from 15 to 15 if user types "in a search field";
+    TRANSITION from 15 to 16 if user clicks "Create Venue";
+    TRANSITION from 15 to 16 if user clicks "on a Venue";
+    TRANSITION from 16 to 15 if user clicks "Return";
+    TRANSITION from 16 to 16 if user clicks "Save Data" AND "is the venue creator";
+    TRANSITION from 15 to 28 if user clicks "View in Map";
+    TRANSITION from 28 to 15 if user clicks "Return";
+    TRANSITION from 28 to 28 if user clicks "on Map" AND "is the venue creator";
+    
+    // Flujo Simplificado de Creación de Regiones (In-Line)
+    TRANSITION from 16 to 17 if user clicks "View Province Regions"; // Acceso a la gestión de regiones
+    TRANSITION from 17 to 16 if user clicks "Select Existing Region" AND "is Venue creator";
+    TRANSITION from 17 to 16 if user clicks "Return";
+    TRANSITION from 17 to 18 if user clicks "Create New Region"; // Inicia la creación
+    TRANSITION from 18 to 17 if user clicks "Save Data" AND "is Region creator"; // Vuelve a la asignación
+    TRANSITION from 18 to 17 if user clicks "Return";
+    
+    // Transiciones de Contenido Centralizado
+    TRANSITION from 0 to 29 if user clicks "Forum";
+    TRANSITION from 29 to 29 if user clicks "Create New Post";
+    TRANSITION from 29 to 29 if user clicks "on a Post";
+    TRANSITION from 0 to 30 if user clicks "News";
+    TRANSITION from 30 to 30 if user clicks "on a News Item";
+  }
+}
