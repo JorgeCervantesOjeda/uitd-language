@@ -122,12 +122,25 @@ export default function useLayout( fragment, charLimit, charWidth, lineH, animTr
                 const snap = JSON.parse( raw );
                 const sNodes = snap?.nodes || {};
                 const sLabels = snap?.labels || {};
-                Object.keys( nodesMap ).forEach( id => {
-                    const s = sNodes[ id ];
-                    if( s && Number.isFinite( s.x ) && Number.isFinite( s.y ) ) {
-                        nodesMap[ id ]._x = s.x;
-                        nodesMap[ id ]._y = s.y;
-                    }
+                // Rehidratar por raíz para preservar la estructura interna.
+                // Si se aplican coordenadas por hijo (de otro diagrama/shape),
+                // pueden quedar nodos "sueltos" fuera de su contenedor.
+                const rootIds = Object.keys( nodesMap ).filter( id => !id.includes( '.' ) );
+                rootIds.forEach( rootId => {
+                    const s = sNodes[ rootId ];
+                    if( !( s && Number.isFinite( s.x ) && Number.isFinite( s.y ) ) ) return;
+
+                    const root = nodesMap[ rootId ];
+                    const dx = s.x - root._x;
+                    const dy = s.y - root._y;
+                    const prefix = `${rootId}.`;
+
+                    Object.keys( nodesMap ).forEach( id => {
+                        if( id === rootId || id.startsWith( prefix ) ) {
+                            nodesMap[ id ]._x += dx;
+                            nodesMap[ id ]._y += dy;
+                        }
+                    } );
                 } );
                 Object.keys( labelMap ).forEach( id => {
                     const s = sLabels[ id ];

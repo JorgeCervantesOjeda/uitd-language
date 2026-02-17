@@ -27,6 +27,11 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
     // Forzar rehidratación normal al cambiar la versión
     const [ layoutVersion, setLayoutVersion ] = useState( 0 );
     const [ initialTransform, setInitialTransform ] = useState( null ); // pan/zoom inicial (fit)
+    const transformCacheRef = useRef( new Map() );
+    const latestTransformRef = useRef( null );
+    const prevOpenRef = useRef( isOpen );
+
+    const buildTransformKey = ( mode ) => `${mode}::${d2Source}`;
 
 
     // Persist layout engine choice
@@ -106,6 +111,19 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
     // dentro de RenderModal, tras obtener `svg` y `isForces`
     const trigger = isForces ? isOpen : svg;
     const transform = useUniversalPanZoom( activeRef, trigger, { initialTransform } );
+
+    useEffect( () => {
+        latestTransformRef.current = transform;
+    }, [ transform ] );
+
+    const saveCurrentTransform = () => {
+        const t = latestTransformRef.current;
+        if( !t ) return;
+        transformCacheRef.current.set(
+            buildTransformKey( viewMode ),
+            { x: t.x, y: t.y, scale: t.scale }
+        );
+    };
 
     // NUEVO: captura inicial del SVG en modo "forces"
     useEffect( () => {
@@ -207,6 +225,8 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
     // NUEVO: fit al entrar a Forces (pan/zoom inicial con padding)
     useEffect( () => {
         if( !isOpen || !isForces ) return;
+        const cached = transformCacheRef.current.get( buildTransformKey( viewMode ) );
+        if( cached ) return;
         const id = requestAnimationFrame( () => {
             const imp = fragmentCanvasRef.current;
             const container = forcesCanvasRef.current;
@@ -232,7 +252,19 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
             setInitialTransform( { x, y, scale } );
         } );
         return () => cancelAnimationFrame( id );
-    }, [ isOpen, isForces ] );
+    }, [ isOpen, isForces, viewMode, d2Source ] );
+
+    useEffect( () => {
+        if( !isOpen ) return;
+        const cached = transformCacheRef.current.get( buildTransformKey( viewMode ) );
+        if( cached ) {
+            setInitialTransform( cached );
+            return;
+        }
+        if( !isForces ) {
+            setInitialTransform( null );
+        }
+    }, [ isOpen, viewMode, d2Source, isForces ] );
 
     //! SS
     // Escucha eventos emitidos por GenerateHTML para centrar un punto en forces mode
@@ -372,6 +404,7 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
 
     // NUEVO: guardar al cerrar (si estamos en Forces)
     const handleClose = () => {
+        saveCurrentTransform();
         if( isForces ) {
             const snap = snapshotForcesPositions();
             console.log( '[RM CLOSE] isForces=', true, 'snapNodes=', Object.keys( snap?.nodes || {} ).length, 'snapLabels=', Object.keys( snap?.labels || {} ).length );
@@ -385,6 +418,13 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         }
         onClose();
     };
+
+    useEffect( () => {
+        if( prevOpenRef.current && !isOpen ) {
+            saveCurrentTransform();
+        }
+        prevOpenRef.current = isOpen;
+    }, [ isOpen ] );
 
     // Guardar snapshot si se cambia de modo de vista saliendo de "forces"
     useEffect( () => {
