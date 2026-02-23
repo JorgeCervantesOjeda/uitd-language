@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // Normaliza texto eliminando acentos, espacios extras y caracteres especiales
 const Normalize = ( s = '' ) =>
     String( s )
@@ -17,12 +17,17 @@ const buildIdPath = ( node ) => {
     }
     return path;
 };
+
+const getStoredParsedData = () => {
+    try {
+        return JSON.parse( localStorage.getItem( 'parsedData' ) || '{}' );
+    } catch {
+        return {};
+    }
+};
 // Componente principal para generar y navegar el HTML interactivo
 const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
-    // Cargar datos guardados del localStorage
-    const parsedData = useMemo(
-        () => JSON.parse( localStorage.getItem( 'parsedData' ) || '{}' ), []
-    );
+    const [ parsedData, setParsedData ] = useState( () => getStoredParsedData() );
     // Estados principales del componente
     const [ uiMap, setUIMap ] = useState( {} ); // Mapeo de IDs a objetos UI
     const [ transitions, setTransitions ] = useState( [] ); // Lista de transiciones entre UIs
@@ -39,6 +44,20 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
     const [ svgCenters, setSvgCenters ] = useState( {} ); // Coordenadas de elementos en el SVG
     const [ currentLocationIndex, setCurrentLocationIndex ] = useState( 0 ); // Índice de ubicación actual
     const [ globalNesting, setGlobalNesting ] = useState( {} );
+    useEffect( () => {
+        const syncParsedData = () => {
+            setParsedData( getStoredParsedData() );
+        };
+        const onStorage = ( ev ) => {
+            if( ev.key === 'parsedData' ) syncParsedData();
+        };
+        window.addEventListener( 'parsedDataUpdated', syncParsedData );
+        window.addEventListener( 'storage', onStorage );
+        return () => {
+            window.removeEventListener( 'parsedDataUpdated', syncParsedData );
+            window.removeEventListener( 'storage', onStorage );
+        };
+    }, [] );
     // Extrae las coordenadas de todos los elementos del SVG
     useEffect( () => {
         if( !svg ) return;
@@ -197,8 +216,10 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
                 return b.length - a.length;
             } );
             if( allPaths.length > 0 ) setCurrentIds( allPaths[ 0 ] );
+        } else {
+            setCurrentIds( [] );
         }
-    }, [] );
+    }, [ parsedData ] );
     // Escuchar cambios de colores desde RenderModal/RendererD2
     useEffect( () => {
         const handleColorUpdate = () => {

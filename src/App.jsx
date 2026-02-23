@@ -18,6 +18,7 @@ const App = () => {
         const parsed = parseUITDL( text );
         setParsedData( parsed );
         localStorage.setItem( 'parsedData', JSON.stringify( parsed ) );
+        window.dispatchEvent( new CustomEvent( 'parsedDataUpdated' ) );
       }, 1000 ), // 1 segundo
     []
   );
