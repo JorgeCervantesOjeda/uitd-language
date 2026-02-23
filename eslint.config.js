@@ -1,14 +1,29 @@
 // eslint.config.js
 import js from "@eslint/js";
 import globals from "globals";
-import { defineConfig } from "eslint/config";
 
-export default defineConfig([
+const browserGlobals = Object.fromEntries(
+  Object.entries( globals.browser ).map( ([ key, value ]) => [ key.trim(), value ] )
+);
+
+export default [
   {
-    files: ["**/*.{js,mjs,cjs,jsx}"],
-    extends: [js.configs.recommended],
-    languageOptions: { globals: globals.browser },
+    ignores: ["dist/**", "build/**", "node_modules/**", ".eslintrc.cjs"]
+  },
+  {
+    files: ["src/**/*.{js,jsx}"],
+    ...js.configs.recommended,
+    languageOptions: {
+      ...js.configs.recommended.languageOptions,
+      globals: browserGlobals,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: { jsx: true }
+      }
+    },
     rules: {
+      ...js.configs.recommended.rules,
       "space-in-parens": ["error", "always"],
       "object-curly-spacing": ["error", "always"],
       "array-bracket-spacing": ["error", "always"],
@@ -18,4 +33,4 @@ export default defineConfig([
       "dot-location": ["error", "property"]
     }
   }
-]);
+];

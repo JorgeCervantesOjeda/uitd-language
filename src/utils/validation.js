@@ -77,6 +77,7 @@ export const validateData = ( parsedData ) => {
     parsedData.fragments.forEach( fragment => {
         const drawnUIs = new Set();
         const uniqueTransitions = new Set(); // Track unique transitions
+        const transitionsByAction = new Map();
 
         const collectDrawnUIs = ( ref ) => {
             drawnUIs.add( ref.id.toString() );
@@ -86,6 +87,35 @@ export const validateData = ( parsedData ) => {
         fragment.draws.forEach( ( { uiRefs } ) => {
             uiRefs.forEach( ref => {
                 collectDrawnUIs( ref );
+            } );
+        } );
+
+        // Detect ambiguous transitions:
+        // same origin + action + target with one unconditional and one/more conditional transitions.
+        fragment.transitions.forEach( transition => {
+            const fromRef = formatUIRef( transition.from );
+            const actionKey = `${fromRef}:${transition.action}:${transition.target}`;
+            const list = transitionsByAction.get( actionKey ) || [];
+            list.push( transition );
+            transitionsByAction.set( actionKey, list );
+        } );
+
+        transitionsByAction.forEach( ( list, actionKey ) => {
+            if( list.length < 2 ) return;
+            const hasUnconditional = list.some( t => !( t.condition || '' ).trim() );
+            const hasConditional = list.some( t => ( t.condition || '' ).trim() );
+            if( !hasUnconditional || !hasConditional ) return;
+
+            list.forEach( transition => {
+                markers.push( {
+                    severity: 8,
+                    startLineNumber: transition.line,
+                    startColumn: transition.verbColumn,
+                    endLineNumber: transition.line,
+                    endColumn: transition.verbColumn + transition.action.length + 1 + 1 + transition.target.length + 1,
+                    message: `Ambiguous transitions for ${actionKey}: an unconditional transition overlaps with conditional transition(s).`,
+                    code: 'ambiguous-transition'
+                } );
             } );
         } );
 
