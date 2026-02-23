@@ -18,6 +18,36 @@ const buildIdPath = ( node ) => {
     return path;
 };
 
+const createTreeFromRef = ( ref ) => ( {
+    id: Number( ref.id ),
+    children: Array.isArray( ref.nested ) ? ref.nested.map( createTreeFromRef ) : []
+} );
+
+const mergeTreeNodes = ( baseNode, incomingNode ) => {
+    const childrenById = new Map(
+        ( baseNode.children || [] ).map( child => [ Number( child.id ), child ] )
+    );
+    ( incomingNode.children || [] ).forEach( child => {
+        const id = Number( child.id );
+        if( childrenById.has( id ) ) {
+            mergeTreeNodes( childrenById.get( id ), child );
+        } else {
+            childrenById.set( id, child );
+        }
+    } );
+    baseNode.children = Array.from( childrenById.values() );
+};
+
+const findTreeNodeById = ( node, targetId ) => {
+    if( !node ) return null;
+    if( Number( node.id ) === Number( targetId ) ) return node;
+    for( const child of node.children || [] ) {
+        const found = findTreeNodeById( child, targetId );
+        if( found ) return found;
+    }
+    return null;
+};
+
 const getStoredParsedData = () => {
     try {
         return JSON.parse( localStorage.getItem( 'parsedData' ) || '{}' );
@@ -167,22 +197,21 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
         // Mapa global de anidamientos
         const nestingMap = {};
         // Procesar todos los paths de todas las referencias UI en todos los draws
-        const allUIPaths = [];
+        // Conservamos arbol por raiz para no perder UIs hermanas
         parsedData.fragments?.forEach( fragment => {
             fragment.draws?.forEach( draw => {
                 draw.uiRefs?.forEach( ref => {
-                    const path = buildIdPath( ref );
-                    allUIPaths.push( path );
+                    const tree = createTreeFromRef( ref );
+                    const rootId = Number( tree.id );
+                    if( nestingMap[ rootId ] ) {
+                        mergeTreeNodes( nestingMap[ rootId ], tree );
+                    } else {
+                        nestingMap[ rootId ] = tree;
+                    }
                 } );
             } );
         } );
         // Elegimos el path más largo para cada UI raíz
-        allUIPaths.forEach( path => {
-            const root = path[ 0 ];
-            if( !nestingMap[ root ] || path.length > nestingMap[ root ].length ) {
-                nestingMap[ root ] = path;
-            }
-        } );
         setGlobalNesting( nestingMap );
         // Crear mapeo de ID a UI para acceso rápido
         const uis = {};
@@ -205,17 +234,16 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
             } );
         } );
         setTransitions( tList );
-        // Establecer UI inicial (la primera disponible)
+        // Establecer UI inicial: UI padre (raiz) con menor ID
         if( parsedData.fragments?.length ) {
             const allRefs = parsedData.fragments.flatMap( f => f.draws.flatMap( d => d.uiRefs ) );
-            const allPaths = allRefs.map( ref => buildIdPath( ref ) );
-            allPaths.sort( ( a, b ) => {
-                const aFirst = parseInt( a[ 0 ] );
-                const bFirst = parseInt( b[ 0 ] );
-                if( aFirst !== bFirst ) return aFirst - bFirst;
-                return b.length - a.length;
-            } );
-            if( allPaths.length > 0 ) setCurrentIds( allPaths[ 0 ] );
+            const rootIds = allRefs
+                .map( ref => Number( ref.id ) )
+                .filter( id => Number.isFinite( id ) )
+                .sort( ( a, b ) => a - b );
+            if( rootIds.length > 0 ) {
+                setCurrentIds( [ rootIds[ 0 ] ] );
+            }
         } else {
             setCurrentIds( [] );
         }
@@ -251,14 +279,17 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
         for( const key of keys ) {
             if( typeof key !== 'string' ) continue;
             // Verificar si la clave empieza con el ID seguido de texto
-            if( key.startsWith( uiId.toString() ) && key !== uiId.toString() ) {
+            const startsWithExactId = new RegExp( `^${uiId}(?!\\d)` ).test( key );
+            if( startsWithExactId && key !== uiId.toString() ) {
                 return svgCenters[ key ];
             }
         }
         // 3. PRIORIDAD MEDIA: Búsqueda por clave que contenga el ID en cualquier posición
         for( const key of keys ) {
             if( typeof key !== 'string' ) continue;
-            if( key.includes( uiId.toString() ) ) {
+            const numberTokens = key.match( /\d+/g ) || [];
+            const hasExactIdToken = numberTokens.some( token => Number( token ) === Number( uiId ) );
+            if( hasExactIdToken ) {
                 return svgCenters[ key ];
             }
         }
@@ -325,24 +356,20 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
     };
     // Encuentra la estructura anidada completa para un ID específico
     const findNestedStructure = ( targetId ) => {
-        // Si la UI es raíz de una cadena de anidamiento
         if( globalNesting[ targetId ] ) {
             return globalNesting[ targetId ];
         }
-        // Si NO es raíz, buscar a qué cadena pertenece
         for( const root in globalNesting ) {
-            const path = globalNesting[ root ];
-            const index = path.indexOf( targetId );
-            if( index !== -1 ) {
-                return path.slice( index );
+            const found = findTreeNodeById( globalNesting[ root ], targetId );
+            if( found ) {
+                return found;
             }
         }
-        // Si no hay nada, devolver solo el id
-        return [ targetId ];
+        return { id: targetId, children: [] };
     };
     // Obtiene la estructura de interfaz actual para renderizar
     const getCurrentInterfaceStructure = () => {
-        if( !currentIds || currentIds.length === 0 ) return [];
+        if( !currentIds || currentIds.length === 0 ) return null;
         const currentInterfaceId = currentIds[ currentIds.length - 1 ];
         return findNestedStructure( currentInterfaceId );
     };
@@ -436,14 +463,12 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
         setModalConditions( null );
     };
     // Renderiza la estructura anidada de UIs con controles de navegación
-    const renderNestedUI = ( ids, level = 0 ) => {
-        if( !ids || ids.length === 0 ) return null;
-        const [ currentId, ...rest ] = ids;
+    const renderNestedUI = ( node, level = 0 ) => {
+        if( !node ) return null;
+        const currentId = Number( node.id );
         const ui = uiMap[ currentId ];
         if( !ui ) return null;
-        // Obtener colores personalizados o usar valores por defecto
         const colors = uiColors[ currentId ] || { fill: '#fff', stroke: '#000' };
-        // Solo mostrar controles de navegación en el nivel raíz
         const locationInfo = level === 0 ? getCurrentLocationInfo() : { total: 0 };
         return (
             <div
@@ -453,14 +478,12 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
                     backgroundColor: colors.fill,
                     padding: '10px',
                     marginTop: level > 0 ? '20px' : '0',
-                    marginLeft: `${level * 20}px`, // Indentación por nivel
+                    marginLeft: `${level * 20}px`,
                     borderRadius: '10px',
                 } }
             >
-                {/* Encabezado con título y controles de navegación */ }
                 <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' } }>
                     <h3 style={ { color: 'black', margin: '0' } }>UI { currentId } ({ ui.name })</h3>
-                    {/* Mostrar controles solo si hay múltiples ubicaciones */ }
                     { level === 0 && locationInfo.total > 1 && (
                         <div style={ { display: 'flex', alignItems: 'center', gap: '5px' } }>
                             <button
@@ -470,8 +493,8 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
                                     padding: '2px 6px',
                                     fontSize: '12px'
                                 } }
-                                title="Ubicación anterior"
-                            >←</button>
+                                title="Ubicacion anterior"
+                            >{'<-'}</button>
                             <span style={ { fontSize: '12px', color: '#666' } }>
                                 { locationInfo.current + 1 }/{ locationInfo.total }
                             </span>
@@ -482,12 +505,11 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
                                     padding: '2px 6px',
                                     fontSize: '12px'
                                 } }
-                                title="Ubicación siguiente"
-                            >→</button>
+                                title="Ubicacion siguiente"
+                            >{'->'}</button>
                         </div>
                     ) }
                 </div>
-                {/* Renderizar botones de acciones disponibles */ }
                 { ui.actions?.length > 0 ? (
                     ui.actions.map( ( a, i ) => (
                         <span key={ i }>
@@ -503,8 +525,9 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
                 ) : (
                     <p>No hay acciones disponibles.</p>
                 ) }
-                {/* Renderizar niveles anidados recursivamente */ }
-                { rest.length > 0 && renderNestedUI( rest, level + 1 ) }
+                { Array.isArray( node.children ) && node.children.map( child =>
+                    renderNestedUI( child, level + 1 )
+                ) }
             </div>
         );
     };
