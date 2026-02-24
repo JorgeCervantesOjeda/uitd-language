@@ -175,18 +175,6 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
                     delete centersMap[ key ];
                 }
             } );
-            // Eliminar la primera coordenada válida (fantasma en modo forces)
-            const allKeys = Object.keys( centersMap );
-            if( allKeys.length > 0 ) {
-                const firstKey = allKeys[ 0 ];
-                if( Array.isArray( centersMap[ firstKey ] ) && centersMap[ firstKey ].length > 0 ) {
-                    centersMap[ firstKey ].shift(); // quita el primer punto
-                    // si ya no quedan coordenadas para ese nombre, eliminar la clave
-                    if( centersMap[ firstKey ].length === 0 ) {
-                        delete centersMap[ firstKey ];
-                    }
-                }
-            }
             setSvgCenters( centersMap );
         } catch( e ) {
             console.error( 'Error parsing SVG:', e );
@@ -414,7 +402,7 @@ const GenerateHTML = ( { onClose, svg, panZoomRef } ) => {
         // Determinar desde qué UI buscar la transición
         // Si `fromInterfaceId` viene desde el HTML, úsalo
         // Si no, usar la UI más profunda del estado actual
-        const effectiveFrom = fromInterfaceId || resolveEffectiveUI( currentIds );
+        const effectiveFrom = fromInterfaceId ?? resolveEffectiveUI( currentIds );
 
         // Buscar transiciones que coincidan con acción + from + target
         const matches = transitions.filter( t => {
