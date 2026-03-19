@@ -24,6 +24,35 @@ body,
   height: 100%;
   overflow: hidden;
   /* allow overlays */
+  --chrome-bg: #111111;
+  --chrome-border: #444444;
+  --chrome-text: #f5f5f5;
+  --chrome-accent: #7dd3fc;
+  --menu-bg: #454545;
+  --menu-item-bg: #6c6c6c;
+  --menu-item-hover: #2cf546;
+  --toggle-bg: rgba(17, 17, 17, 0.9);
+  --toggle-text: #f5f5f5;
+  --toggle-border: #444444;
+  --renderer-title-color: #90ee90;
+  --message-active-bg: #7f1d1d;
+  --message-active-text: #fef2f2;
+}
+
+.app-container.uitdlTheme-light {
+  --chrome-bg: #f4f7fb;
+  --chrome-border: #cbd5e1;
+  --chrome-text: #1f2937;
+  --chrome-accent: #2563eb;
+  --menu-bg: #ffffff;
+  --menu-item-bg: #e2e8f0;
+  --menu-item-hover: #bfdbfe;
+  --toggle-bg: rgba(255, 255, 255, 0.92);
+  --toggle-text: #1f2937;
+  --toggle-border: #cbd5e1;
+  --renderer-title-color: #166534;
+  --message-active-bg: #fee2e2;
+  --message-active-text: #7f1d1d;
 }
 
 /* Shared panel layout */
@@ -72,7 +101,7 @@ body,
 .sticky-area {
   position: sticky;
   top: 0;
-  background: black;
+  background: var(--chrome-bg);
   z-index: 2;
   /* sit above scroll area */
 }
@@ -81,8 +110,9 @@ body,
 .renderer-header {
   display: flex;
   padding: 10px;
-  background-color: black;
-  border-bottom: 1px solid #444;
+  background-color: var(--chrome-bg);
+  border-bottom: 1px solid var(--chrome-border);
+  color: var(--chrome-text);
   justify-content: center;
   align-items: center;
 }
@@ -91,14 +121,26 @@ body,
   margin-right: 1rem;
 }
 
+.header-file-name {
+  color: var(--chrome-accent);
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+.renderer-title-label {
+  color: var(--renderer-title-color);
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
 /* Message bar below header */
 .alert-message {
   position: sticky;
   top: var(--header-height, 3.5rem);
   min-height: 20px;
   padding: 5px;
-  color: yellow;
-  background-color: var(--message-bg, black);
+  color: var(--message-fg, var(--chrome-text));
+  background-color: var(--message-bg, var(--chrome-bg));
   z-index: 1;
   /* NEW: ensure dropdown z-index lifts above this */
 }
@@ -172,10 +214,11 @@ body,
   z-index: 10000;
   /* NEW: sits above errors & alerts */
   display: none;
-  background-color: #454545;
-  color: white;
+  background-color: var(--menu-bg);
+  color: var(--chrome-text);
   min-width: 160px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--chrome-border);
 }
 
 .dropdown.open .dropdown-menu {
@@ -185,7 +228,8 @@ body,
 .dropdown-item {
   padding: 12px 16px;
   cursor: pointer;
-  background-color: rgb(108, 108, 108);
+  background-color: var(--menu-item-bg);
+  color: var(--chrome-text);
   width: 100%;
   text-align: left;
   font-weight: bold;
@@ -194,7 +238,7 @@ body,
 
 .dropdown-item:hover,
 .dropdown-item:focus {
-  background-color: #2cf546;
+  background-color: var(--menu-item-hover);
 }
 
 /* Buttons */
@@ -203,6 +247,31 @@ button {
   opacity: 0.5;
   font-size: 10px !important;
   padding: 5px 10px !important;
+}
+
+.renderer-header button,
+.dropdown-button {
+  background: transparent;
+  color: var(--chrome-text);
+  border: 1px solid var(--chrome-border);
+}
+
+.theme-toggle-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background: var(--toggle-bg);
+  color: var(--toggle-text);
+  border: 1px solid var(--toggle-border);
+  border-radius: 999px;
+}
+
+.renderer-header button:hover,
+.dropdown-button:hover,
+.renderer-header button:focus,
+.dropdown-button:focus {
+  color: var(--chrome-text);
 }
 
 button:hover {

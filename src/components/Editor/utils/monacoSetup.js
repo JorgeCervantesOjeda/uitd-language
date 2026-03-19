@@ -140,6 +140,15 @@ export const setupMonaco = ( monacoInstance ) => {
         colors: {
             'editor.background': '#1e1e1e',
             'editor.foreground': '#F8F8F8',
+            'editorWidget.background': '#252526',
+            'editorWidget.border': '#3c3c3c',
+            'quickInput.background': '#252526',
+            'quickInput.foreground': '#f8f8f8',
+            'quickInputList.focusBackground': '#094771',
+            'quickInputList.focusForeground': '#ffffff',
+            'input.background': '#3c3c3c',
+            'input.foreground': '#f8f8f8',
+            'input.border': '#3c3c3c',
         }
     } 
 );
@@ -158,6 +167,15 @@ export const setupMonaco = ( monacoInstance ) => {
         colors: {
             'editor.background': '#ffffff',
             'editor.foreground': '#222222',
+            'editorWidget.background': '#f8f8f8',
+            'editorWidget.border': '#d4d4d4',
+            'quickInput.background': '#f8f8f8',
+            'quickInput.foreground': '#222222',
+            'quickInputList.focusBackground': '#dbeafe',
+            'quickInputList.focusForeground': '#111827',
+            'input.background': '#ffffff',
+            'input.foreground': '#222222',
+            'input.border': '#cbd5e1',
         }
     } 
 );

@@ -538,7 +538,12 @@ duration
 );
 
     const alertText = message || '\u00A0';
-    const alertBg = message ? 'darkred' : 'black';
+    const alertStyle = message
+        ? {
+            '--message-bg': 'var(--message-active-bg)',
+            '--message-fg': 'var(--message-active-text)'
+        }
+        : {};
     const codeViewerElement = React.createElement(
  CodeViewer,
 {
@@ -562,7 +567,7 @@ duration
         <div className="renderer-container panel-container">
             <div className="sticky-area">
                 <div className="renderer-header">
-                    <div style={ { color: 'lightgreen', whiteSpace: 'nowrap', marginRight: '12px' } }>
+                    <div className="renderer-title-label">
                         D2 Translation
                     </div>
                     <div className="flex space-x-2">
@@ -584,7 +589,7 @@ duration
 
                 <div
                     className="alert-message"
-                    style={ { '--message-bg': alertBg } }
+                    style={ alertStyle }
                 >
                     { alertText }
                 </div>

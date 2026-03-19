@@ -1,6 +1,8 @@
 import React from 'react';
 import DropdownMenu from './menus/DropdownMenu';
 
+void DropdownMenu;
+
 const typeStyles = {
     success: { color: '#43a047', bg: '#e8f5e9' },
     error: { color: '#c62828', bg: '#ffebee' },
@@ -28,7 +30,8 @@ const EditorHeader = ( {
 } ) => {
     // Elapsed time solo para mostrar, no para mensajes
     const [ elapsed, setElapsed ] = React.useState( '' );
-    React.useEffect( () => {
+    React.useEffect(
+ () => {
         const updateElapsed = () => {
             const ms = Date.now() - lastSaved;
             const sec = Math.floor( ms / 1000 );
@@ -37,13 +40,25 @@ const EditorHeader = ( {
             else setElapsed( `${Math.floor( sec / 3600 )} hrs` );
         };
         updateElapsed();
-        const iv = setInterval( updateElapsed, 5000 );
+        const iv = setInterval(
+            updateElapsed,
+            5000
+        );
         return () => clearInterval( iv );
-    }, [ lastSaved ] );
+    },
+    [
+        lastSaved
+    ] 
+);
 
-    const toggleErrors = React.useCallback( () => {
+    const toggleErrors = React.useCallback(
+ () => {
         setShowErrors( v => !v );
-    }, [ setShowErrors ] );
+    },
+    [
+        setShowErrors
+    ] 
+);
 
     const itemsFileMenu = [
         { label: 'Open…', onClick: onOpen },
@@ -62,7 +77,7 @@ const EditorHeader = ( {
     return (
         <div>
             <div className="renderer-header">
-                <div style={ { color: 'lightgreen', whiteSpace: 'nowrap', marginRight: '12px' } }>
+                <div className="header-file-name">
                     { fileName || 'Untitled' }
                 </div>
                 <div className="title blinking">{ isModified && elapsed }</div>
@@ -89,8 +104,8 @@ const EditorHeader = ( {
             <div
                 className="alert-message"
                 style={ {
-                    background: style.bg || 'black',
-                    color: style.color || 'white',
+                    background: style.bg || 'var(--chrome-bg)',
+                    color: style.color || 'var(--chrome-text)',
                 } }
             >
                 { statusMessage?.text || '\u00A0' }

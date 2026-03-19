@@ -94,6 +94,7 @@ JSON.stringify( parsed )
         uitdlText,
         onChange: setUitdlText,
         markers: parsedData.errors,
+        theme,
     } 
 );
     const rendererElement = React.createElement(
@@ -105,10 +106,10 @@ JSON.stringify( parsed )
 );
 
     return (
-        <div className="app-container">
+        <div className={ `app-container ${theme}` }>
             <button
+                className="theme-toggle-button"
                 onClick={ toggleTheme }
-                style={ { position: 'absolute', top: 10, left: 10, zIndex: 10 } }
             >
                 Toggle theme
             </button>
