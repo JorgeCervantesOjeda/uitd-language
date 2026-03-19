@@ -3,26 +3,31 @@ import { validVerbs } from '../../../utils/TokenParser';
 export const setupMonaco = ( monacoInstance ) => {
     monacoInstance.languages.register( { id: 'uitdl' } );
 
-    monacoInstance.languages.setMonarchTokensProvider( 'uitdl', {
+    monacoInstance.languages.setMonarchTokensProvider(
+ 'uitdl',
+{
         tokenizer: {
             root: [
                 [ new RegExp( validVerbs.join( '|' ) ), 'keyword' ],
                 [ /\b(UITD|UI|actions|FRAGMENT|DRAW|TRANSITION|from|to|if|user|AND|WIDTH)\b/, 'keyword' ],
-                [ /[{}]/, '@brackets' ],
+                [ /[{}[\]]/, '@brackets' ],
                 [ /\d+/, 'number' ],
                 [ /"[^"]*"/, 'string' ],
                 [ /\b[\w-]+\b/, 'identifier' ],
             ],
         },
-    } );
+    } 
+);
 
-    monacoInstance.languages.registerCompletionItemProvider( 'uitdl', {
+    monacoInstance.languages.registerCompletionItemProvider(
+ 'uitdl',
+{
         provideCompletionItems: () => {
             const suggestions = [
                 {
                     label: 'UITD',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'UITD "${1:title}" {\n\tUI 1 "${2:name}" actions {\n\t\t${3:verb}\n\t}\n\tFRAGMENT "${4:description}" {\n\t\tDRAW { 1 };\n\t\tTRANSITION from 1 to ${5:id} if user ${6:verb}\n\t}\n}',
+                    insertText: 'UITD "${1:title}" {\n\tUI 1 "${2:name}" actions {\n\t\t${3:clicks} "${4:target}";\n\t}\n\tFRAGMENT "${5:description}" {\n\t\tDRAW { 1 };\n\t\tTRANSITION from 1 to ${6:id} if user ${3:clicks} "${4:target}";\n\t}\n}',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define the UITD structure with a title, a UI and a fragment',
                 },
@@ -36,7 +41,7 @@ export const setupMonaco = ( monacoInstance ) => {
                 {
                     label: 'FRAGMENT',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'FRAGMENT "${1:description}" {\n\tDRAW {${2:id}};\n\tTRANSITION from ${3:id} to ${4:id} if user ${5:verb}\n}',
+                    insertText: 'FRAGMENT "${1:description}" {\n\tDRAW { ${2:id}[${3:nestedId}] };\n\tTRANSITION from ${2:id}(${3:nestedId}) to ${4:id} if user ${5:clicks} "${6:target}";\n}',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define a fragment with draw and transitions',
                 },
@@ -50,14 +55,14 @@ export const setupMonaco = ( monacoInstance ) => {
                 {
                     label: 'WIDTH',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'WIDTH ${1:id}',
+                    insertText: 'WIDTH ${1:20};',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define width option',
                 },
                 {
                     label: 'TRANSITION',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'TRANSITION from ${1:id} to ${2:id} if user ${3:verb}',
+                    insertText: 'TRANSITION from ${1:id} to ${2:id} if user ${3:clicks} "${4:target}";',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define a transition between UIs with conditions',
                 },
@@ -78,11 +83,14 @@ export const setupMonaco = ( monacoInstance ) => {
             ];
             return { suggestions: suggestions };
         },
-    } );
+    } 
+);
 
-    monacoInstance.languages.setLanguageConfiguration( 'uitdl', {
+    monacoInstance.languages.setLanguageConfiguration(
+ 'uitdl',
+{
         // Indica que {} son delimiters
-        brackets: [ [ '{', '}' ] ],
+        brackets: [ [ '{', '}' ], [ '[', ']' ] ],
         // Auto-fold con esas llaves
         folding: {
             offSide: false, // desactiva indent-based folding
@@ -94,12 +102,16 @@ export const setupMonaco = ( monacoInstance ) => {
         },
         autoClosingPairs: [
             { open: '{', close: '}' },
+            { open: '[', close: ']' },
             { open: '"', close: '"' },
             { open: '(', close: ')' },
         ],
-    } );
+    } 
+);
 
-    monacoInstance.editor.defineTheme( 'uitdlTheme', {
+    monacoInstance.editor.defineTheme(
+ 'uitdlTheme',
+{
         base: 'vs-dark',
         inherit: true,
         rules: [
@@ -111,10 +123,13 @@ export const setupMonaco = ( monacoInstance ) => {
             // text color
             'editor.foreground': '#F8F8F8',
         }
-    } );
+    } 
+);
 
     // Tema oscuro personalizado
-    monacoInstance.editor.defineTheme( 'uitdlTheme-dark', {
+    monacoInstance.editor.defineTheme(
+ 'uitdlTheme-dark',
+{
         base: 'vs-dark',
         inherit: true,
         rules: [
@@ -126,10 +141,13 @@ export const setupMonaco = ( monacoInstance ) => {
             'editor.background': '#1e1e1e',
             'editor.foreground': '#F8F8F8',
         }
-    } );
+    } 
+);
 
     // Tema claro personalizado
-    monacoInstance.editor.defineTheme( 'uitdlTheme-light', {
+    monacoInstance.editor.defineTheme(
+ 'uitdlTheme-light',
+{
         base: 'vs',
         inherit: true,
         rules: [
@@ -141,9 +159,12 @@ export const setupMonaco = ( monacoInstance ) => {
             'editor.background': '#ffffff',
             'editor.foreground': '#222222',
         }
-    } );
+    } 
+);
 
-    monacoInstance.languages.registerFoldingRangeProvider( 'uitdl', {
+    monacoInstance.languages.registerFoldingRangeProvider(
+ 'uitdl',
+{
         provideFoldingRanges( model ) {
             const ranges = [];
             const stack = [];
@@ -152,18 +173,20 @@ export const setupMonaco = ( monacoInstance ) => {
             for( let line = 1; line <= total; line++ ) {
                 const text = model.getLineContent( line );
                 // Por cada “{” detectada, anotamos la línea
-                for( const _ of text.matchAll( /{/g ) ) {
+                for( const match of text.matchAll( /{/g ) ) {
+                    void match;
                     stack.push( line );
                 }
                 // Por cada “}”, emparejamos con la última apertura
-                for( const _ of text.matchAll( /}/g ) ) {
+                for( const match of text.matchAll( /}/g ) ) {
+                    void match;
                     const start = stack.pop();
                     // Sólo plegar si tiene al menos una línea interna
                     if( start != null && line > start + 1 ) {
                         ranges.push( {
                             start,
                             end: line,
-                            kind: monaco.languages.FoldingRangeKind.Region
+                            kind: monacoInstance.languages.FoldingRangeKind.Region
                         } );
                     }
                 }
@@ -171,7 +194,8 @@ export const setupMonaco = ( monacoInstance ) => {
 
             return ranges;
         }
-    } );
+    } 
+);
 
 };
 
@@ -181,7 +205,9 @@ export const setupMonaco = ( monacoInstance ) => {
 export function setupD2( monaco ) {
     monaco.languages.register( { id: 'd2' } );
 
-    monaco.languages.setMonarchTokensProvider( 'd2', {
+    monaco.languages.setMonarchTokensProvider(
+ 'd2',
+{
         // very crude example—tweak to match your D2 syntax
         tokenizer: {
             root: [
@@ -193,11 +219,15 @@ export function setupD2( monaco ) {
                 [ /[A-Za-z_]\w*/, 'identifier' ],
             ]
         }
-    } );
+    } 
+);
 
-    monaco.languages.setLanguageConfiguration( 'd2', {
+    monaco.languages.setLanguageConfiguration(
+ 'd2',
+{
         brackets: [ [ '{', '}' ], [ '(', ')' ] ],
         autoClosingPairs: [ { open: '{', close: '}' }, { open: '(', close: ')' } ],
         surroundingPairs: [ { open: '"', close: '"' } ],
-    } );
+    } 
+);
 }

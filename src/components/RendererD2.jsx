@@ -1,16 +1,19 @@
 // src/components/RendererD2.jsx
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import CodeViewer from './CodeViewer';
 import '../App.css';
-import RenderModal from './RenderModal';
 import { asignarColores } from './color-assignment';
+
+const CodeViewer = React.lazy( () => import( './CodeViewer' ) );
+const RenderModal = React.lazy( () => import( './RenderModal' ) );
 
 // Helper functions (formatTransitionUIRef, formatString, buildUIHierarchy) remain unchanged
 const formatTransitionUIRef = ( uiRef ) => {
     if( !uiRef.nested || uiRef.nested.length === 0 ) {
         return uiRef.id;
     }
-    const nestedRefs = uiRef.nested.map( nestedRef => formatTransitionUIRef( nestedRef ) ).join( '.' );
+    const nestedRefs = uiRef.nested.map( nestedRef => formatTransitionUIRef( nestedRef ) )
+.join( '.' );
     return `${uiRef.id}.${nestedRefs}`;
 };
 
@@ -19,7 +22,10 @@ const flattenUIRefs = ( ref, parentKey = '' ) => {
     let keys = [ key ];
     if( ref.nested && ref.nested.length > 0 ) {
         ref.nested.forEach( nr => {
-            keys = keys.concat( flattenUIRefs( nr, key ) );
+            keys = keys.concat( flattenUIRefs(
+ nr,
+key 
+) );
         } );
     }
     return keys;
@@ -46,7 +52,8 @@ const formatString = ( name, maxLength = 15 ) => {
 
 // Función recursiva para ordenar transiciones según especificación,
 const ordenarTransiciones = ( transitions, uiOrder ) => {
-    const usadas = Array( transitions.length ).fill( false );
+    const usadas = Array( transitions.length )
+.fill( false );
     const resultado = [];
 
     const dfs = ( actual ) => {
@@ -109,7 +116,10 @@ const generateUIColorMap = ( uis ) => {
     } );
     //! SS
     const colorMap = asignarColores( folderToNodes );
-    localStorage.setItem( 'uiColors', JSON.stringify( colorMap ) );
+    localStorage.setItem(
+ 'uiColors',
+JSON.stringify( colorMap ) 
+);
     return colorMap;
 };
 
@@ -129,15 +139,27 @@ const buildUIHierarchy = ( ref, indentLevel, uis, parentKey, uiColorMap ) => {
         : `${indent}${ref.id}.style.stroke-dash: 5\n`;
 
     if( ref.nested.length > 0 ) {
-        const formattedName = formatString( ui.name, 20 );
+        const formattedName = formatString(
+ ui.name,
+20 
+);
         out += `${indent}${ref.id}: ${ref.id} ${formattedName} {\n`;
         const nextKey = parentKey ? `${parentKey}.${ref.id}` : ref.id;
         ref.nested.forEach( nr => {
-            out += buildUIHierarchy( nr, indentLevel + 1, uis, nextKey, uiColorMap );
+            out += buildUIHierarchy(
+ nr,
+indentLevel + 1,
+uis,
+nextKey,
+uiColorMap 
+);
         } );
         out += `${indent}}\n`;
     } else {
-        const formattedName = formatString( ui.name, 20 );
+        const formattedName = formatString(
+ ui.name,
+20 
+);
         out += `${indent}${ref.id}: ${ref.id} ${formattedName}\n`;
     }
     return out;
@@ -175,7 +197,7 @@ const translateToD2 = ( parsedData ) => {
         uiClasses += `      fill: \${ui${ui.id}.fill}\n`;
         uiClasses += `      stroke: \${ui${ui.id}.stroke}\n`;
         uiClasses += `      stroke-width: 6\n`;
-        uiClasses += `      3d: true\n`;
+        uiClasses += `      3d: false\n`;
         uiClasses += `    }\n`;
         uiClasses += `  }\n`;
         labelUiClasses += `  label_ui${ui.id}: {\n`;
@@ -212,18 +234,30 @@ const translateToD2 = ( parsedData ) => {
         const uiOrder = fragment.draws
             .flatMap( draw => draw.uiRefs.flatMap( ref => flattenUIRefs( ref ) ) )
             .filter( ( v, i, a ) => a.indexOf( v ) === i );
-        const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
+        const sortedTransitions = ordenarTransiciones(
+ fragment.transitions,
+uiOrder 
+);
 
         // 1) Fragment start
         d2 += `  ${fragLetter}.style.fill: "${bgColor}"\n`;
         d2 += `  ${fragLetter}.style.stroke-dash: 1\n`;
-        d2 += `  ${fragLetter}: ${formatString( fragment.name, 20 )} {\n`;
+        d2 += `  ${fragLetter}: ${formatString(
+ fragment.name,
+20 
+)} {\n`;
 
         // 2) Transition arrows at the start of the fragment
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
-            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace(
+ /\./g,
+'_' 
+)}_${toId.replace(
+ /\./g,
+'_' 
+)}`;
             d2 += `    ${fromId} -> ${lblId}\n`;
             d2 += `    ${lblId} -> ${toId}:{style.stroke-dash:5}\n`;
         } );
@@ -232,7 +266,13 @@ const translateToD2 = ( parsedData ) => {
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
-            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace(
+ /\./g,
+'_' 
+)}_${toId.replace(
+ /\./g,
+'_' 
+)}`;
 
             // 1) Background color of the label is the same as the origin node color
             // 1) Find the deepest nested UI reference
@@ -241,13 +281,22 @@ const translateToD2 = ( parsedData ) => {
             d2 += `    ${lblId}.class: label_ui${originRef.id}\n`;
             let action = `${t.action} "${t.target}"`;
             if( t.condition ) action += ` AND (${t.condition})`;
-            d2 += `    ${lblId}: ${formatString( action, t.width ?? defaultWidth )}\n`;
+            d2 += `    ${lblId}: ${formatString(
+ action,
+t.width ?? defaultWidth 
+)}\n`;
         } );
 
         // 4) UI hierarchy and other definitions
         fragment.draws.forEach( draw => {
             draw.uiRefs.forEach( ref => {
-                d2 += buildUIHierarchy( ref, 2, parsedData.uis, '', uiColorMap );
+                d2 += buildUIHierarchy(
+ ref,
+2,
+parsedData.uis,
+'',
+uiColorMap 
+);
             } );
         } );
 
@@ -276,7 +325,11 @@ const buildHierarchyObject = ( ref, uis, uiColorMap ) => {
     };
     if( ref.nested ) {
         node.children = ref.nested
-            .map( nr => buildHierarchyObject( nr, uis, uiColorMap ) )
+            .map( nr => buildHierarchyObject(
+ nr,
+uis,
+uiColorMap 
+) )
             .filter( Boolean );
     }
     return node;
@@ -312,7 +365,7 @@ export const translateToD2Structure = ( parsedData ) => {
                 fill: v.fill,
                 stroke: v.stroke,
                 strokeWidth: 6,
-                '3d': true
+                '3d': false
             }
         };
         structure.labelClasses[ ui.id ] = {
@@ -332,7 +385,10 @@ export const translateToD2Structure = ( parsedData ) => {
         const uiOrder = fragment.draws
             .flatMap( d => d.uiRefs.flatMap( r => flattenUIRefs( r ) ) )
             .filter( ( v, i, a ) => a.indexOf( v ) === i );
-        const sortedTransitions = ordenarTransiciones( fragment.transitions, uiOrder );
+        const sortedTransitions = ordenarTransiciones(
+ fragment.transitions,
+uiOrder 
+);
 
         const fragObj = {
             id: fragLetter,
@@ -348,7 +404,13 @@ export const translateToD2Structure = ( parsedData ) => {
         sortedTransitions.forEach( ( t, tIdx ) => {
             const fromId = formatTransitionUIRef( t.from );
             const toId = formatTransitionUIRef( t.to );
-            const lblId = `lbl_${tIdx + 1}_${fromId.replace( /\./g, '_' )}_${toId.replace( /\./g, '_' )}`;
+            const lblId = `lbl_${tIdx + 1}_${fromId.replace(
+ /\./g,
+'_' 
+)}_${toId.replace(
+ /\./g,
+'_' 
+)}`;
 
             // Arista: origen -> label
             fragObj.transitions.push( {
@@ -378,7 +440,11 @@ export const translateToD2Structure = ( parsedData ) => {
         // 3.2) Jerarquía de UIs
         fragment.draws.forEach( draw => {
             draw.uiRefs.forEach( ref => {
-                const obj = buildHierarchyObject( ref, parsedData.uis, uiColorMap );
+                const obj = buildHierarchyObject(
+ ref,
+parsedData.uis,
+uiColorMap 
+);
                 if( obj ) fragObj.hierarchy.push( obj );
             } );
         } );
@@ -393,34 +459,53 @@ const RendererD2 = ( { data, theme } ) => {
     const initialD2 = translateToD2( data );
     // Estructura para Forces en estado (reemplaza a `datastructure`)
     const [ sceneData, setSceneData ] = useState( translateToD2Structure( data ) );
-    console.log( 'sceneData:', sceneData );
+    console.log(
+ 'sceneData:',
+sceneData 
+);
 
     // Un solo estado de código D2 (ya no hay draftCode/renderCode separados)
     const [ renderCode, setRenderCode ] = useState( initialD2 );
     const [ modalOpen, setModalOpen ] = useState( false );
+    const [ modalLoaded, setModalLoaded ] = useState( false );
     const [ message, setMessage ] = useState( '' );
     const timer = useRef( null );
 
-    useEffect( () => () => {
+    useEffect(
+ () => () => {
         if( timer.current ) clearTimeout( timer.current );
-    }, [] );
+    },
+[] 
+);
 
-    const displayMsg = useCallback( ( msg, duration = 3000 ) => {
+    const displayMsg = useCallback(
+ ( msg, duration = 3000 ) => {
         setMessage( msg );
         if( timer.current ) clearTimeout( timer.current );
-        timer.current = setTimeout( () => setMessage( '' ), duration );
-    }, [] );
+        timer.current = setTimeout(
+ () => setMessage( '' ),
+duration 
+);
+    },
+[] 
+);
 
     // Cada vez que cambia `data` (ya debounced en App), regeneramos D2 automáticamente
-    useEffect( () => {
+    useEffect(
+ () => {
         const updated = translateToD2( data );
         setRenderCode( updated );
-    }, [ data ] );
+    },
+[ data ] 
+);
 
     // Mantener `sceneData` sincronizado con `data`
-    useEffect( () => {
+    useEffect(
+ () => {
         setSceneData( translateToD2Structure( data ) );
-    }, [ data ] );
+    },
+[ data ] 
+);
 
     // Recolor global (Dagre/ELK y Forces), usado por RenderModal
     const handleRecolor = () => {
@@ -442,10 +527,36 @@ const RendererD2 = ( { data, theme } ) => {
             .catch( console.error );
     };
 
-    const openInPlayground = () => window.open( 'https://play.d2lang.com', '_blank' );
+    const handleOpenModal = () => {
+        setModalLoaded( true );
+        setModalOpen( true );
+    };
+
+    const openInPlayground = () => window.open(
+ 'https://play.d2lang.com',
+'_blank' 
+);
 
     const alertText = message || '\u00A0';
     const alertBg = message ? 'darkred' : 'black';
+    const codeViewerElement = React.createElement(
+ CodeViewer,
+{
+        code: renderCode,
+        onChange: value => setRenderCode( value ),
+        theme,
+    } 
+);
+    const renderModalElement = React.createElement(
+ RenderModal,
+{
+        d2Source: renderCode,
+        data: sceneData,
+        isOpen: modalOpen,
+        onClose: () => setModalOpen( false ),
+        onRecolor: handleRecolor,
+    } 
+);
 
     return (
         <div className="renderer-container panel-container">
@@ -456,7 +567,7 @@ const RendererD2 = ( { data, theme } ) => {
                     </div>
                     <div className="flex space-x-2">
                         {/* Botón Update D2 eliminado; ya no es necesario */ }
-                        <button onClick={ () => setModalOpen( true ) } className="renderer-button">
+                        <button onClick={ handleOpenModal } className="renderer-button">
                             View Diagram
                         </button>
                         <button onClick={ handleCopy } className="renderer-button">
@@ -480,20 +591,16 @@ const RendererD2 = ( { data, theme } ) => {
             </div>
 
             <div className="scroll-area">
-                <CodeViewer
-                    code={ renderCode }
-                    onChange={ value => setRenderCode( value ) }
-                    theme={ theme }
-                />
+                <React.Suspense fallback={ <div style={ { padding: '1rem' } }>Loading code viewer...</div> }>
+                    { codeViewerElement }
+                </React.Suspense>
             </div>
 
-            <RenderModal
-                d2Source={ renderCode }
-                data={ sceneData }
-                isOpen={ modalOpen }
-                onClose={ () => setModalOpen( false ) }
-                onRecolor={ handleRecolor }
-            />
+            { modalLoaded && (
+                <React.Suspense fallback={ <div style={ { padding: '1rem' } }>Loading diagram...</div> }>
+                    { renderModalElement }
+                </React.Suspense>
+            ) }
         </div>
     );
 };

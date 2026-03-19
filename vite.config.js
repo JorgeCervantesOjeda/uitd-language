@@ -5,7 +5,6 @@ export default defineConfig( {
   define: { 'process.env': {} },
   optimizeDeps: {
     include: [
-      '@terrastruct/d2',
       'react',
       'react-dom',
       'canvas2svg',
@@ -20,5 +19,24 @@ export default defineConfig( {
   },
   build: {
     outDir: 'dist', // Ensure this matches the directory specified in firebase.json
+    rollupOptions: {
+      output: {
+        manualChunks( id ) {
+          if( id.includes( '@monaco-editor/react' ) || id.includes( 'monaco-editor' ) ) {
+            return 'monaco';
+          }
+
+          if( id.includes( 'react' ) || id.includes( 'scheduler' ) ) {
+            return 'react-vendor';
+          }
+
+          if( id.includes( 'lodash' ) || id.includes( 'file-saver' ) ) {
+            return 'app-vendor';
+          }
+
+          return null;
+        },
+      },
+    },
   },
 } );

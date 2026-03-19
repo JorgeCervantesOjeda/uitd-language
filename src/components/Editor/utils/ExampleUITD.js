@@ -1,45 +1,52 @@
 export const ExampleUITD = `UITD "System Title" {
     UI 0 "Menu" actions {
-      clicks "Home"; 
-      clicks "Standings"; 
+      clicks "Home";
+      clicks "Standings";
       clicks "Events";
       clicks "Logout";
     }
     UI 1 "Login" actions {
       clicks "Login";
     }
-    UI 2 "Admin Home" actions {
+    UI 2 "Admin Dashboard" actions {
       deletes "user";
     }
     UI 3 "Home" actions {
-      clicks "play";
+      clicks "Play";
     }
     UI 4 "Standings" actions {
-      selects "level";
+      selects "Level";
     }
     UI 5 "Events" actions {
-      selects "level";
+      selects "Type";
     }
-    UI 6 "name" actions {
-
-    }
-    FRAGMENT "Menu Navigation and Login" {
-      WIDTH 40;
-      DRAW { 1, 0 };
-      DRAW { 2(3(0)), 4(0), 5(0) };
-      TRANSITION from 0 to 2 if user clicks "Home" AND "is Admin";
-      TRANSITION from 0 to 2(3) if user clicks "Home" AND "is Normal" WIDTH 15;
+    FRAGMENT "Reusable Menu" {
+      WIDTH 28;
+      DRAW { 0, 1, 3, 4, 5 };
+      TRANSITION from 0 to 3 if user clicks "Home";
       TRANSITION from 0 to 4 if user clicks "Standings";
       TRANSITION from 0 to 5 if user clicks "Events";
-      TRANSITION from 0 to 1 if user clicks "Logout";  
-      TRANSITION from 1 to 2 if user clicks "Login" AND "is Admin";
-      TRANSITION from 1 to 2(3) if user clicks "Login" AND "is Normal";
-      TRANSITION from 1 to 1 if user clicks "Login" AND "not OK";
+      TRANSITION from 0 to 1 if user clicks "Logout";
     }
-    FRAGMENT "Managing Standings" {
-      DRAW { 4 }
-      TRANSITION from 4 to 4 if user selects "level"; 
+
+    FRAGMENT "Login Flow" {
+      DRAW { 1, 2[0] };
+      TRANSITION from 1 to 2 if user clicks "Login";
+    }
+
+    FRAGMENT "Admin Management" {
+      DRAW { 2[0], 4 };
       TRANSITION from 2 to 4 if user deletes "user";
-      TRANSITION from 4 to 4 if user clicks "OK";
+    }
+
+    FRAGMENT "Home Play" {
+      DRAW { 3[0], 5 };
+      TRANSITION from 3 to 5 if user clicks "Play";
+    }
+
+    FRAGMENT "Browsing" {
+      DRAW { 4, 5 };
+      TRANSITION from 4 to 4 if user selects "Level";
+      TRANSITION from 5 to 5 if user selects "Type";
     }
 }`;

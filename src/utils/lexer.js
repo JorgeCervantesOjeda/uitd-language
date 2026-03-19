@@ -1,13 +1,13 @@
-import { Token, TokenType, Tokens } from './tokens';
+import { Token, TokenType, Tokens } from './tokens.js';
 
 const tokenSpec = [
     [ TokenType.KEYWORD, /\b(UITD|UI|FRAGMENT|DRAW|TRANSITION|actions|from|to|if|user|AND|clicks|submits|selects|types|toggles|uploads|downloads|saves|deletes|waits|WIDTH)\b/ ],
     [ TokenType.NUMBER, /\d+/ ],
     [ TokenType.QUOTE, /"/ ], // Quotation marks
-    [ TokenType.PUNCTUATION, /[{}(),;]/ ],
+    [ TokenType.PUNCTUATION, /[{}[\](),;]/ ],
     [ TokenType.COMMENT, /#.*/ ],
     [ TokenType.WHITESPACE, /\s+/ ],
-    [ TokenType.UNKNOWN, /[^\s{}(),;"#]+/ ] // Pattern to match unknown words
+    [ TokenType.UNKNOWN, /[^\s{}[\](),;"#]+/ ] // Pattern to match unknown words
 ];
 
 export function tokenize( code ) {
@@ -27,7 +27,12 @@ export function tokenize( code ) {
 
                 if( type === TokenType.QUOTE ) {
                     // Handle quotes and text between them
-                    tokens.push( new Token( TokenType.QUOTE, '"', line, column ) );
+                    tokens.push( new Token(
+ TokenType.QUOTE,
+'"',
+line,
+column 
+) );
 
                     // Start looking for the closing quote
                     let textStart = position + value.length;
@@ -40,18 +45,44 @@ export function tokenize( code ) {
                         if( quoteMatch ) {
                             if( quoteMatch.index === 0 ) {
                                 // Closing quote found immediately
-                                const characters = code.substring( position + 1, textStart ); // Text between opening and closing quote
-                                tokens.push( new Token( TokenType.STRING, characters, line, column + 1 ) );
-                                tokens.push( new Token( TokenType.QUOTE, '"', line, column + 1 + characters.length + 1 ) );
+                                const characters = code.substring(
+ position + 1,
+textStart 
+); // Text between opening and closing quote
+                                tokens.push( new Token(
+ TokenType.STRING,
+characters,
+line,
+column + 1 
+) );
+                                tokens.push( new Token(
+ TokenType.QUOTE,
+'"',
+line,
+column + 1 + characters.length + 1 
+) );
                                 position = textStart + quoteMatch.index + 1;
                                 column += characters.length + 2; // +2 for the quotes
                                 foundClosingQuote = true;
                                 break;
                             } else {
                                 // Closing quote found after some text
-                                const characters = code.substring( textStart, textStart + quoteMatch.index ); // Text between quotes
-                                tokens.push( new Token( TokenType.STRING, characters, line, column + 1 ) );
-                                tokens.push( new Token( TokenType.QUOTE, '"', line, column + 1 + characters.length + 1 ) );
+                                const characters = code.substring(
+ textStart,
+textStart + quoteMatch.index 
+); // Text between quotes
+                                tokens.push( new Token(
+ TokenType.STRING,
+characters,
+line,
+column + 1 
+) );
+                                tokens.push( new Token(
+ TokenType.QUOTE,
+'"',
+line,
+column + 1 + characters.length + 1 
+) );
                                 position = textStart + quoteMatch.index + 1;
                                 column += characters.length + 2; // +2 for the quotes
                                 foundClosingQuote = true;
@@ -66,13 +97,28 @@ export function tokenize( code ) {
                     // If no closing quote was found, treat the end of code as the end of the string
                     if( !foundClosingQuote ) {
                         const characters = code.substring( position + 1 ); // Text from opening quote to end of code
-                        tokens.push( new Token( TokenType.STRING, characters, line, column + 1 ) );
-                        tokens.push( new Token( TokenType.UNKNOWN, ' ', line, column + 1 + characters.length ) );
+                        tokens.push( new Token(
+ TokenType.STRING,
+characters,
+line,
+column + 1 
+) );
+                        tokens.push( new Token(
+ TokenType.UNKNOWN,
+' ',
+line,
+column + 1 + characters.length 
+) );
                         position = code.length;
                         column += characters.length + 1; // +1 for the closing quote
                     }
                 } else if( type !== TokenType.WHITESPACE ) {
-                    tokens.push( new Token( type, value, line, column ) );
+                    tokens.push( new Token(
+ type,
+value,
+line,
+column 
+) );
                     column += value.length;
                     position += value.length;
                 } else {

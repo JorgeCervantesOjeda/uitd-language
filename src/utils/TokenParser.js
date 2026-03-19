@@ -1,8 +1,8 @@
 // TokenParser.js
-import { tokenize } from './lexer';
-import { TokenType } from './tokens';
-import { getInnermostUIStr, getInnermostUIRef, formatUIRef } from './utils';
-import { validateData } from './validation';
+import { tokenize } from './lexer.js';
+import { TokenType } from './tokens.js';
+import { getInnermostUIStr, getInnermostUIRef, formatUIRef } from './utils.js';
+import { validateData } from './validation.js';
 
 export const validVerbs = [
     'clicks', 'submits', 'selects', 'types', 'toggles',
@@ -21,6 +21,7 @@ class TokenParser {
             name: '',
             uis: [],
             fragments: [],
+            declarations: [],
             errors: [],
         };
     }
@@ -60,7 +61,10 @@ class TokenParser {
 
             // Correct the string token if it has double spaces
             if( stringToken.value.includes( '  ' ) ) {
-                stringToken.value = stringToken.value.replace( / {2,}/g, ' ' );
+                stringToken.value = stringToken.value.replace(
+ / {2,}/g,
+' ' 
+);
                 this.result.errors.push( {
                     severity: 4,
                     startLineNumber: stringToken.line,
@@ -98,10 +102,16 @@ class TokenParser {
 
         try {
             // Expect UITD Declaration
-            this.expectToken( TokenType.KEYWORD, 'UITD' );
+            this.expectToken(
+ TokenType.KEYWORD,
+'UITD' 
+);
             const titleToken = this.expectToken( TokenType.STRING );
             this.result.name = titleToken.value;
-            this.expectToken( TokenType.PUNCTUATION, '{' );
+            this.expectToken(
+ TokenType.PUNCTUATION,
+'{' 
+);
 
             // Enter UITD Section Loop
             let token = this.getNextToken();
@@ -138,13 +148,25 @@ class TokenParser {
 
     parseUI() {
         try {
-            const uiStartToken = this.expectToken( TokenType.KEYWORD, 'UI' );
+            const uiStartToken = this.expectToken(
+ TokenType.KEYWORD,
+'UI' 
+);
             const idToken = this.expectToken( TokenType.NUMBER );
-            const uiId = parseInt( idToken.value, 10 );
+            const uiId = parseInt(
+ idToken.value,
+10 
+);
             const nameToken = this.expectToken( TokenType.STRING );
             const uiName = nameToken.value;
-            this.expectToken( TokenType.KEYWORD, 'actions' );
-            this.expectToken( TokenType.PUNCTUATION, '{' );
+            this.expectToken(
+ TokenType.KEYWORD,
+'actions' 
+);
+            this.expectToken(
+ TokenType.PUNCTUATION,
+'{' 
+);
 
             const actions = [];
             let token = this.getNextToken();
@@ -154,7 +176,10 @@ class TokenParser {
                     const targetToken = this.expectToken( TokenType.STRING );
                     const target = targetToken.value;
                     actions.push( { verb, target, line: token.line, column: token.column } );
-                    this.expectToken( TokenType.PUNCTUATION, ';' );
+                    this.expectToken(
+ TokenType.PUNCTUATION,
+';' 
+);
                 } else {
                     throw new Error( `Unexpected token ${token.value} in UI actions at line ${token.line}, column ${token.column}` );
                 }
@@ -168,6 +193,12 @@ class TokenParser {
                 line: uiStartToken.line,
                 column: uiStartToken.column
             } );
+            this.result.declarations.push( {
+                type: 'UI',
+                id: uiId.toString(),
+                line: uiStartToken.line,
+                column: uiStartToken.column,
+            } );
         } catch( e ) {
             this.handleParsingError( e );
         }
@@ -175,10 +206,16 @@ class TokenParser {
 
     parseFragment() {
         try {
-            const fragmentStartToken = this.expectToken( TokenType.KEYWORD, 'FRAGMENT' );
+            const fragmentStartToken = this.expectToken(
+ TokenType.KEYWORD,
+'FRAGMENT' 
+);
             const nameToken = this.expectToken( TokenType.STRING );
             const fragmentName = nameToken.value;
-            this.expectToken( TokenType.PUNCTUATION, '{' );
+            this.expectToken(
+ TokenType.PUNCTUATION,
+'{' 
+);
 
             // --- Inicializamos el width aquí ---
             const draws = [];
@@ -191,8 +228,14 @@ class TokenParser {
                     // --- Nuevo: capturamos WIDTH; ---
                     if( token.type === TokenType.KEYWORD && token.value === 'WIDTH' ) {
                         const widthToken = this.expectToken( TokenType.NUMBER );
-                        width = parseInt( widthToken.value, 10 );
-                        this.expectToken( TokenType.PUNCTUATION, ';' );
+                        width = parseInt(
+ widthToken.value,
+10 
+);
+                        this.expectToken(
+ TokenType.PUNCTUATION,
+';' 
+);
                     }
                     // --- DRAW & TRANSITION siguen igual ---
                     else if( token.type === TokenType.KEYWORD && token.value === 'DRAW' ) {
@@ -220,6 +263,12 @@ class TokenParser {
                 line: fragmentStartToken.line,
                 column: fragmentStartToken.column
             } );
+            this.result.declarations.push( {
+                type: 'FRAGMENT',
+                name: fragmentName,
+                line: fragmentStartToken.line,
+                column: fragmentStartToken.column,
+            } );
         } catch( e ) {
             this.handleParsingError( e );
         }
@@ -228,24 +277,36 @@ class TokenParser {
 
     parseDraw( draws ) {
         try {
-            const drawToken = this.expectToken( TokenType.KEYWORD, 'DRAW' );
-            this.expectToken( TokenType.PUNCTUATION, '{' );
-            const uiRefs = this.parseUIRefList();
-            this.expectToken( TokenType.PUNCTUATION, '}' );
-            this.expectToken( TokenType.PUNCTUATION, ';' );
+            const drawToken = this.expectToken(
+ TokenType.KEYWORD,
+'DRAW' 
+);
+            this.expectToken(
+ TokenType.PUNCTUATION,
+'{' 
+);
+            const uiRefs = this.parseDrawUIRefList();
+            this.expectToken(
+ TokenType.PUNCTUATION,
+'}' 
+);
+            this.expectToken(
+ TokenType.PUNCTUATION,
+';' 
+);
             draws.push( { uiRefs, line: drawToken.line, column: drawToken.column } );
         } catch( e ) {
             this.handleParsingError( e );
         }
     }
 
-    parseUIRefList() {
+    parseDrawUIRefList( closingToken = '}' ) {
         const uiRefs = [];
         let token = this.getNextToken();
 
-        while( !( token.type === TokenType.PUNCTUATION && ( token.value === '}' || token.value === ')' ) ) ) {
+        while( !( token.type === TokenType.PUNCTUATION && token.value === closingToken ) ) {
             this.undoGetNextToken();
-            uiRefs.push( this.parseUIRef() );
+            uiRefs.push( this.parseDrawUIRef() );
             token = this.getNextToken();
             if( token.type === TokenType.PUNCTUATION && token.value === ',' ) {
                 token = this.getNextToken();
@@ -256,28 +317,66 @@ class TokenParser {
         return uiRefs;
     }
 
-    parseUIRef() {
+    parseDrawUIRef() {
         const idToken = this.expectToken( TokenType.NUMBER );
-        let uiRef = { id: idToken.value, nested: [], full: false };
+        const uiRef = { id: idToken.value, nested: [], full: false };
         const nextToken = this.getNextToken();
-        if( nextToken.type === TokenType.PUNCTUATION && nextToken.value === '(' ) {
-            uiRef.nested = this.parseUIRefList();
-            this.expectToken( TokenType.PUNCTUATION, ')' );
+        if( nextToken.type === TokenType.PUNCTUATION &&
+            ( nextToken.value === '[' || nextToken.value === '(' ) ) {
+            const closingToken = nextToken.value === '[' ? ']' : ')';
+            uiRef.nested = this.parseDrawUIRefList( closingToken );
+            this.expectToken(
+ TokenType.PUNCTUATION,
+nextToken.value === '[' ? ']' : ')' 
+);
         } else {
             this.undoGetNextToken();
         }
         return uiRef;
     }
 
+    parseTransitionUIRef() {
+        const idToken = this.expectToken( TokenType.NUMBER );
+        const uiRef = { id: idToken.value, nested: [], full: false };
+        const nextToken = this.getNextToken();
+
+        if( nextToken.type === TokenType.PUNCTUATION && nextToken.value === '(' ) {
+            uiRef.nested = [ this.parseTransitionUIRef() ];
+            this.expectToken(
+ TokenType.PUNCTUATION,
+')'
+);
+        } else {
+            this.undoGetNextToken();
+        }
+
+        return uiRef;
+    }
+
     parseTransition( transitions ) {
         try {
-            const startToken = this.expectToken( TokenType.KEYWORD, 'TRANSITION' );
-            this.expectToken( TokenType.KEYWORD, 'from' );
-            const from = this.parseUIRef();
-            this.expectToken( TokenType.KEYWORD, 'to' );
-            const to = this.parseUIRef();
-            this.expectToken( TokenType.KEYWORD, 'if' );
-            this.expectToken( TokenType.KEYWORD, 'user' );
+            const startToken = this.expectToken(
+ TokenType.KEYWORD,
+'TRANSITION' 
+);
+            this.expectToken(
+ TokenType.KEYWORD,
+'from' 
+);
+            const from = this.parseTransitionUIRef();
+            this.expectToken(
+ TokenType.KEYWORD,
+'to' 
+);
+            const to = this.parseTransitionUIRef();
+            this.expectToken(
+ TokenType.KEYWORD,
+'if' 
+);
+            this.expectToken(
+ TokenType.KEYWORD,
+'user' 
+);
             const actionToken = this.expectToken( TokenType.KEYWORD );
             const action = actionToken.value;
             const targetToken = this.expectToken( TokenType.STRING );
@@ -296,12 +395,18 @@ class TokenParser {
             const nextWidthToken = this.getNextToken();
             if( nextWidthToken.type === TokenType.KEYWORD && nextWidthToken.value === 'WIDTH' ) {
                 const widthToken = this.expectToken( TokenType.NUMBER );
-                width = parseInt( widthToken.value, 10 );
+                width = parseInt(
+ widthToken.value,
+10 
+);
             } else {
                 this.undoGetNextToken();
             }
 
-            this.expectToken( TokenType.PUNCTUATION, ';' );
+            this.expectToken(
+ TokenType.PUNCTUATION,
+';' 
+);
 
             transitions.push( {
                 from,
@@ -339,12 +444,18 @@ class TokenParser {
                     ref.full = false;
                 }
 
-                ref.nested.forEach( nestedRef => processRef( nestedRef, ref.id ) );
+                ref.nested.forEach( nestedRef => processRef(
+ nestedRef,
+ref.id 
+) );
             };
 
             fragment.draws.forEach( ( { uiRefs } ) => {
                 uiRefs.forEach( ref => {
-                    processRef( ref, null );
+                    processRef(
+ ref,
+null 
+);
                 } );
             } );
         } );

@@ -1,23 +1,36 @@
 // src/RenderModal.jsx
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useRef, useEffect } from 'react';
-import { D2 } from '@terrastruct/d2';
+// eslint-disable-next-line no-unused-vars
 import { VisualRenderer } from './VisualRenderer';
 import useUniversalPanZoom from './../utils/useUniversalPanZoom';
 import C2S from 'canvas2svg';
 import { drawDiagram } from '../utils/drawDiagram';
 //! SS
+// eslint-disable-next-line no-unused-vars
 import GenerateHTML from './GenerateHTML'; // Clase encargada de generar el HTML
+
+const D2_MODULE_URL = 'https://esm.sh/@terrastruct/d2@0.1.23';
+
+let d2ConstructorPromise;
+
+const loadD2Constructor = async() => {
+    if( !d2ConstructorPromise ) {
+        d2ConstructorPromise = import( /* @vite-ignore */ D2_MODULE_URL )
+            .then( module => module.D2 );
+    }
+
+    return d2ConstructorPromise;
+};
 
 export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolor } ) {
     const [ svg, setSvg ] = useState( '' );
     const [ status, setStatus ] = useState( '' );
     const [ full, setFull ] = useState( false );
-    const [showGeneratedHTML, setShowGeneratedHTML] = useState(false);
+    const [ showGeneratedHTML, setShowGeneratedHTML ] = useState( false );
     //! SS
-    const handleGenerateHTML = () => setShowGeneratedHTML(true);
-    const [ viewMode, setViewMode ] = useState(
-        () => localStorage.getItem( 'viewMode' ) || 'dagre'
-    );
+    const handleGenerateHTML = () => setShowGeneratedHTML( true );
+    const [ viewMode, setViewMode ] = useState( () => localStorage.getItem( 'viewMode' ) || 'dagre' );
     const isForces = viewMode === 'forces';
 
     const [ restartTrigger, setRestartTrigger ] = useState( 0 );
@@ -35,13 +48,27 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
 
 
     // Persist layout engine choice
-    useEffect( () => {
-        localStorage.setItem( 'viewMode', viewMode );
-    }, [ viewMode ] );
+    useEffect(
+ () => {
+        localStorage.setItem(
+ 'viewMode',
+viewMode 
+);
+    },
+[ viewMode ] 
+);
 
-    // Initialize D2
     const d2 = useRef( null );
-    useEffect( () => { d2.current = new D2(); }, [] );
+
+    const ensureD2 = async() => {
+        if( d2.current ) {
+            return d2.current;
+        }
+
+        const D2Constructor = await loadD2Constructor();
+        d2.current = new D2Constructor();
+        return d2.current;
+    };
 
     // LRU cache for rendered SVGs
     const cache = useRef( new Map() );
@@ -49,12 +76,19 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
     const currentKey = useRef( '' );
 
     // Reset status when closing
-    useEffect( () => { if( !isOpen ) setStatus( '' ); }, [ isOpen ] );
+    useEffect(
+ () => { if( !isOpen ) setStatus( '' ); },
+[ isOpen ] 
+);
 
     // Compile and render D2 when open and not in custom view
-    useEffect( () => {
+    useEffect(
+ () => {
         if( !isOpen || isForces ) return;
-        console.log( '[RM FIT] about to fit; isForces=', isForces );
+        console.log(
+ '[RM FIT] about to fit; isForces=',
+isForces 
+);
 
         const layoutEngine = viewMode;
         const key = `${layoutEngine}::${d2Source}`;
@@ -70,37 +104,54 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         setStatus( 'Compiling ...' );
         ( async () => {
             try {
-                const { diagram, renderOptions } = await d2.current.compile(
+                setStatus( 'Loading D2 ...' );
+                const d2Instance = await ensureD2();
+                setStatus( 'Compiling ...' );
+                const { diagram, renderOptions } = await d2Instance.compile(
                     d2Source,
                     { layout: layoutEngine }
                 );
                 setStatus( 'Loading ...' );
-                let svgText = await d2.current.render( diagram, renderOptions );
+                let svgText = await d2Instance.render(
+ diagram,
+renderOptions 
+);
 
                 // Adjust viewBox for padding
                 svgText = svgText.replace(
-                    /viewBox="([^"]+)"/, ( m, vb ) => {
-                        const [ x, y, w, h ] = vb.split( /[,\s]+/ ).map( Number );
+ /viewBox="([^"]+)"/,
+( m, vb ) => {
+                        const [ x, y, w, h ] = vb.split( /[,\s]+/ )
+.map( Number );
                         const PADDING = -100, BORDER = 1;
                         return `viewBox="${x - PADDING - BORDER} ${y - PADDING - BORDER} ${w + PADDING * 2 + BORDER * 2} ${h + PADDING * 2 + BORDER * 2}"`;
-                    }
-                );
+                    } 
+);
 
                 if( currentKey.current !== key ) return;
-                cache.current.set( key, svgText );
+                cache.current.set(
+ key,
+svgText 
+);
                 if( cache.current.size > MAX_ENTRIES ) {
-                    const first = cache.current.keys().next().value;
+                    const first = cache.current.keys()
+.next().value;
                     cache.current.delete( first );
                 }
                 setSvg( svgText );
             } catch( e ) {
-                console.error( 'Error rendering with D2:', e );
+                console.error(
+ 'Error rendering with D2:',
+e 
+);
                 setStatus( 'Error rendering with D2:' );
             } finally {
                 if( currentKey.current === key ) setStatus( '' );
             }
         } )();
-    }, [ isOpen, d2Source, viewMode ] );
+    },
+[ isOpen, d2Source, viewMode ] 
+);
 
     const svgContainerRef = useRef( null );
     const forcesCanvasRef = useRef( null );
@@ -110,11 +161,18 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
 
     // dentro de RenderModal, tras obtener `svg` y `isForces`
     const trigger = isForces ? isOpen : svg;
-    const transform = useUniversalPanZoom( activeRef, trigger, { initialTransform } );
+    const transform = useUniversalPanZoom(
+ activeRef,
+trigger,
+{ initialTransform } 
+);
 
-    useEffect( () => {
+    useEffect(
+ () => {
         latestTransformRef.current = transform;
-    }, [ transform ] );
+    },
+[ transform ] 
+);
 
     const saveCurrentTransform = () => {
         const t = latestTransformRef.current;
@@ -126,7 +184,8 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
     };
 
     // NUEVO: captura inicial del SVG en modo "forces"
-    useEffect( () => {
+    useEffect(
+ () => {
         if( !isOpen || !isForces ) return;
         // Espera a que el canvas y params existan (después del primer render)
         const id = requestAnimationFrame( () => {
@@ -134,7 +193,9 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         } );
         return () => cancelAnimationFrame( id );
         // Disparamos en open, cambio a forces, y restart animation
-    }, [ isOpen, isForces ] );
+    },
+[ isOpen, isForces ] 
+);
 
     // Download handlers
     const downloadBlob = ( blob, filename ) => {
@@ -182,9 +243,15 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         const { minX, minY, width: sceneW, height: sceneH } = bounds;
         if( sceneW <= 0 || sceneH <= 0 ) return;
         // Canvas2SVG con el tamaño de TODA la escena; neutralizamos pan/zoom
-        const c2s = new C2S( sceneW, sceneH );
+        const c2s = new C2S(
+ sceneW,
+sceneH 
+);
         const exportTransform = { x: -minX, y: -minY, scale: 1 };
-        drawDiagram( c2s, { ...params, transform: exportTransform } );
+        drawDiagram(
+ c2s,
+{ ...params, transform: exportTransform } 
+);
         const svgContent = c2s.getSerializedSvg( true ); // fix typo c2S -> c2s
 
         setSvg( svgContent );
@@ -208,7 +275,8 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
                 labels[ id ] = { x: l.x, y: l.y };
             }
             return { nodes, labels, ts: Date.now() };
-        } catch {
+        } catch( error ) {
+            void error;
             return null;
         }
     };
@@ -218,12 +286,18 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         const snap = snapshotForcesPositions();
         if( !snap ) return;
         try {
-            localStorage.setItem( LOCAL_KEY, JSON.stringify( snap ) );
-        } catch { }
+            localStorage.setItem(
+ LOCAL_KEY,
+JSON.stringify( snap ) 
+);
+        } catch( error ) {
+            void error;
+        }
     };
 
     // NUEVO: fit al entrar a Forces (pan/zoom inicial con padding)
-    useEffect( () => {
+    useEffect(
+ () => {
         if( !isOpen || !isForces ) return;
         const cached = transformCacheRef.current.get( buildTransformKey( viewMode ) );
         if( cached ) return;
@@ -236,25 +310,57 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
             const rect = container.getBoundingClientRect();
 
             console.log( '[RM FIT] raf tick' );
-            console.log( '[RM FIT] fragmentCanvasRef.current?=', !!fragmentCanvasRef.current, 'bounds=', bounds );
+            console.log(
+ '[RM FIT] fragmentCanvasRef.current?=',
+!!fragmentCanvasRef.current,
+'bounds=',
+bounds 
+);
 
             const PADDING = 40;
-            const availW = Math.max( 1, rect.width );
-            const availH = Math.max( 1, rect.height );
-            const bw = Math.max( 1, bounds.width );
-            const bh = Math.max( 1, bounds.height );
+            const availW = Math.max(
+ 1,
+rect.width 
+);
+            const availH = Math.max(
+ 1,
+rect.height 
+);
+            const bw = Math.max(
+ 1,
+bounds.width 
+);
+            const bh = Math.max(
+ 1,
+bounds.height 
+);
             const scaleX = ( availW - 2 * PADDING ) / bw;
             const scaleY = ( availH - 2 * PADDING ) / bh;
-            const scale = Math.max( 0.05, Math.min( 10, Math.min( scaleX, scaleY ) ) );
+            const scale = Math.max(
+ 0.05,
+Math.min(
+ 10,
+Math.min(
+ scaleX,
+scaleY 
+) 
+) 
+);
             const x = PADDING - bounds.minX * scale;
             const y = PADDING - bounds.minY * scale;
-            console.log( '[RM FIT] initialTransform=', { x, y, scale } );
+            console.log(
+ '[RM FIT] initialTransform=',
+{ x, y, scale } 
+);
             setInitialTransform( { x, y, scale } );
         } );
         return () => cancelAnimationFrame( id );
-    }, [ isOpen, isForces, viewMode, d2Source ] );
+    },
+[ isOpen, isForces, viewMode, d2Source ] 
+);
 
-    useEffect( () => {
+    useEffect(
+ () => {
         if( !isOpen ) return;
         const cached = transformCacheRef.current.get( buildTransformKey( viewMode ) );
         if( cached ) {
@@ -264,55 +370,86 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         if( !isForces ) {
             setInitialTransform( null );
         }
-    }, [ isOpen, viewMode, d2Source, isForces ] );
+    },
+[ isOpen, viewMode, d2Source, isForces ] 
+);
 
     //! SS
     // Escucha eventos emitidos por GenerateHTML para centrar un punto en forces mode
-    useEffect(() => {
-        const handler = (e) => {
-            if(!isForces) return; // solo aplicar en forces
+    useEffect(
+ () => {
+        const handler = ( e ) => {
+            if( !isForces ) return; // solo aplicar en forces
             const { cx, cy } = e.detail || {};
-            if(!isFinite(cx) || !isFinite(cy)) return;
+            if( !isFinite( cx ) || !isFinite( cy ) ) return;
 
             // obtener contenedor y bounds del scene (si existen)
             const container = forcesCanvasRef.current;
-            const imp = fragmentCanvasRef.current;
-            if(!container) return;
+            if( !container ) return;
 
             // obtener tamaño viewport disponible
             const rect = container.getBoundingClientRect();
-            const viewportW = Math.max(1, rect.width);
-            const viewportH = Math.max(1, rect.height);
+            const viewportW = Math.max(
+ 1,
+rect.width 
+);
+            const viewportH = Math.max(
+ 1,
+rect.height 
+);
 
             // preferir usar el scale actual (transform.scale) si existe
-            const currentScale = Math.max(0.01, transform?.scale || 1);
+            const currentScale = Math.max(
+ 0.01,
+transform?.scale || 1 
+);
 
             // Calcular pan para centrar el punto (coordenadas de escena -> pantalla)
-            const panX = -(cx * currentScale) + viewportW / 2;
-            const panY = -(cy * currentScale) + viewportH / 2;
+            const panX = -( cx * currentScale ) + viewportW / 2;
+            const panY = -( cy * currentScale ) + viewportH / 2;
 
             // Aplicar como initialTransform para que useUniversalPanZoom lo ejecute
             // (useUniversalPanZoom escucha cambios en initialTransform y aplica pan/zoom)
-            setInitialTransform({
+            setInitialTransform( {
                 x: panX,
                 y: panY,
                 scale: currentScale
-            });
+            } );
         };
 
-        window.addEventListener('panToPoint', handler);
-        return () => window.removeEventListener('panToPoint', handler);
-    }, [ isForces, transform?.scale ]);
+        window.addEventListener(
+ 'panToPoint',
+handler 
+);
+        return () => window.removeEventListener(
+ 'panToPoint',
+handler 
+);
+    },
+[ isForces, transform?.scale ] 
+);
 
     const onDownloadSVG = () => {
         // Unificado: descargamos siempre desde el estado `svg`
         if( isForces && !svg ) {
             // Si aún no fue capturado, lo generamos on-demand
             const s = captureForcesSVG();
-            if( s ) return downloadBlob( new Blob( [ s ], { type: 'image/svg+xml' } ), 'diagram.svg' );
+            if( s ) return downloadBlob(
+ new Blob(
+ [ s ],
+{ type: 'image/svg+xml' } 
+),
+'diagram.svg' 
+);
         }
         if( svg ) {
-            return downloadBlob( new Blob( [ svg ], { type: 'image/svg+xml' } ), 'diagram.svg' );
+            return downloadBlob(
+ new Blob(
+ [ svg ],
+{ type: 'image/svg+xml' } 
+),
+'diagram.svg' 
+);
         }
     };
 
@@ -323,9 +460,18 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
             if( !imp ) return;
             const bounds = computeSceneBounds( imp.params );
             if( !bounds ) return;
-            const scale = Math.max( 0.01, transform?.scale || 1 );
-            const targetW = Math.max( 1, Math.round( bounds.width * scale ) );
-            const targetH = Math.max( 1, Math.round( bounds.height * scale ) );
+            const scale = Math.max(
+ 0.01,
+transform?.scale || 1 
+);
+            const targetW = Math.max(
+ 1,
+Math.round( bounds.width * scale ) 
+);
+            const targetH = Math.max(
+ 1,
+Math.round( bounds.height * scale ) 
+);
             const s = svg || captureForcesSVG();
             if( !s ) return;
             const img = new Image();
@@ -335,12 +481,33 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
                 cnv.height = targetH;
                 const ctx = cnv.getContext( '2d' );
                 ctx.fillStyle = '#fff';
-                ctx.fillRect( 0, 0, cnv.width, cnv.height );
-                ctx.drawImage( img, 0, 0, cnv.width, cnv.height );
-                cnv.toBlob( blob => downloadBlob( blob, 'diagram.jpg' ), 'image/jpeg', 0.92 );
+                ctx.fillRect(
+ 0,
+0,
+cnv.width,
+cnv.height 
+);
+                ctx.drawImage(
+ img,
+0,
+0,
+cnv.width,
+cnv.height 
+);
+                cnv.toBlob(
+ blob => downloadBlob(
+ blob,
+'diagram.jpg' 
+),
+'image/jpeg',
+0.92 
+);
                 URL.revokeObjectURL( img.src );
             };
-            img.src = URL.createObjectURL( new Blob( [ s ], { type: 'image/svg+xml' } ) );
+            img.src = URL.createObjectURL( new Blob(
+ [ s ],
+{ type: 'image/svg+xml' } 
+) );
             return;
         }
 
@@ -349,14 +516,30 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         const m = svg.match( /viewBox="([^"]+)"/ );
         let viewW = 0, viewH = 0;
         if( m && m[ 1 ] ) {
-            const parts = m[ 1 ].split( /[,\s]+/ ).map( Number );
+            const parts = m[ 1 ].split( /[,\s]+/ )
+.map( Number );
             // viewBox = x y w h
-            viewW = Math.max( 0, parts[ 2 ] || 0 );
-            viewH = Math.max( 0, parts[ 3 ] || 0 );
+            viewW = Math.max(
+ 0,
+parts[ 2 ] || 0 
+);
+            viewH = Math.max(
+ 0,
+parts[ 3 ] || 0 
+);
         }
-        const scale = Math.max( 0.01, transform?.scale || 1 ); // ahora transform.scale refleja svg-pan-zoom
-        const targetW = Math.max( 1, Math.round( ( viewW || 1000 ) * scale ) );
-        const targetH = Math.max( 1, Math.round( ( viewH || 1000 ) * scale ) );
+        const scale = Math.max(
+ 0.01,
+transform?.scale || 1 
+); // ahora transform.scale refleja svg-pan-zoom
+        const targetW = Math.max(
+ 1,
+Math.round( ( viewW || 1000 ) * scale ) 
+);
+        const targetH = Math.max(
+ 1,
+Math.round( ( viewH || 1000 ) * scale ) 
+);
 
         const img = new Image();
         img.onload = () => {
@@ -365,13 +548,34 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
             cnv.height = targetH;
             const ctx = cnv.getContext( '2d' );
             ctx.fillStyle = '#fff';
-            ctx.fillRect( 0, 0, cnv.width, cnv.height );
+            ctx.fillRect(
+ 0,
+0,
+cnv.width,
+cnv.height 
+);
             // Escalamos el SVG completo al tamaño destino (zoom actual)
-            ctx.drawImage( img, 0, 0, cnv.width, cnv.height );
-            cnv.toBlob( blob => downloadBlob( blob, 'diagram.jpg' ), 'image/jpeg', 0.92 );
+            ctx.drawImage(
+ img,
+0,
+0,
+cnv.width,
+cnv.height 
+);
+            cnv.toBlob(
+ blob => downloadBlob(
+ blob,
+'diagram.jpg' 
+),
+'image/jpeg',
+0.92 
+);
             URL.revokeObjectURL( img.src );
         };
-        img.src = URL.createObjectURL( new Blob( [ svg ], { type: 'image/svg+xml' } ) );
+        img.src = URL.createObjectURL( new Blob(
+ [ svg ],
+{ type: 'image/svg+xml' } 
+) );
     };
 
     // === SAVE: exporta lo que esté en localStorage[LOCAL_KEY] ===
@@ -379,7 +583,10 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         try {
             const raw = localStorage.getItem( LOCAL_KEY );
             if( !raw ) { alert( 'No hay layout guardado.' ); return; }
-            const blob = new Blob( [ raw ], { type: 'application/json' } );
+            const blob = new Blob(
+ [ raw ],
+{ type: 'application/json' } 
+);
             const a = document.createElement( 'a' );
             a.href = URL.createObjectURL( blob );
             a.download = 'forcesLayout.json';
@@ -398,7 +605,10 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         ev.target.value = '';
         if( !file ) return;
         const text = await file.text();
-        localStorage.setItem( LOCAL_KEY, text );
+        localStorage.setItem(
+ LOCAL_KEY,
+text 
+);
         setLayoutVersion( v => v + 1 );
     };
 
@@ -407,43 +617,92 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
         saveCurrentTransform();
         if( isForces ) {
             const snap = snapshotForcesPositions();
-            console.log( '[RM CLOSE] isForces=', true, 'snapNodes=', Object.keys( snap?.nodes || {} ).length, 'snapLabels=', Object.keys( snap?.labels || {} ).length );
-            try { saveForcesSnapshot(); } catch { }
+            console.log(
+ '[RM CLOSE] isForces=',
+true,
+'snapNodes=',
+Object.keys( snap?.nodes || {} ).length,
+'snapLabels=',
+Object.keys( snap?.labels || {} ).length 
+);
+            try {
+                saveForcesSnapshot();
+            } catch( error ) {
+                void error;
+            }
             try {
                 const raw = localStorage.getItem( LOCAL_KEY );
-                console.log( '[RM CLOSE] savedToLocal=', !!raw, 'length=', raw ? raw.length : 0 );
-            } catch { }
+                console.log(
+ '[RM CLOSE] savedToLocal=',
+!!raw,
+'length=',
+raw ? raw.length : 0 
+);
+            } catch( error ) {
+                void error;
+            }
         } else {
-            console.log( '[RM CLOSE] isForces=', false );
+            console.log(
+ '[RM CLOSE] isForces=',
+false 
+);
         }
         onClose();
     };
 
-    useEffect( () => {
+    useEffect(
+ () => {
         if( prevOpenRef.current && !isOpen ) {
             saveCurrentTransform();
         }
         prevOpenRef.current = isOpen;
-    }, [ isOpen ] );
+    },
+[ isOpen ] 
+);
 
     // Guardar snapshot si se cambia de modo de vista saliendo de "forces"
-    useEffect( () => {
+    useEffect(
+ () => {
         // cuando el modo anterior era forces y ahora no, persistimos
         let prev = isForces;
         return () => {
-            console.log( '[RM CLEANUP] prevWasForces=', prev );
+            console.log(
+ '[RM CLEANUP] prevWasForces=',
+prev 
+);
             if( prev ) {
-                console.log( '[RM CLEANUP] fragmentCanvasRef.current?=', !!fragmentCanvasRef.current );
+                console.log(
+ '[RM CLEANUP] fragmentCanvasRef.current?=',
+!!fragmentCanvasRef.current 
+);
                 const snap = snapshotForcesPositions();
-                console.log( '[RM CLEANUP] snapNodes=', Object.keys( snap?.nodes || {} ).length, 'snapLabels=', Object.keys( snap?.labels || {} ).length );
-                try { saveForcesSnapshot(); } catch { }
+                console.log(
+ '[RM CLEANUP] snapNodes=',
+Object.keys( snap?.nodes || {} ).length,
+'snapLabels=',
+Object.keys( snap?.labels || {} ).length 
+);
+                try {
+                    saveForcesSnapshot();
+                } catch( error ) {
+                    void error;
+                }
                 try {
                     const raw = localStorage.getItem( LOCAL_KEY );
-                    console.log( '[RM CLEANUP] savedToLocal=', !!raw, 'length=', raw ? raw.length : 0 );
-                } catch { }
+                    console.log(
+ '[RM CLEANUP] savedToLocal=',
+!!raw,
+'length=',
+raw ? raw.length : 0 
+);
+                } catch( error ) {
+                    void error;
+                }
             }
         };
-    }, [ isForces ] );
+    },
+[ isForces ] 
+);
 
 
     if( !isOpen ) return null;
@@ -483,7 +742,7 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
                             HTML
                         </button>
                         {showGeneratedHTML && (
-                            <GenerateHTML onClose={() => setShowGeneratedHTML(false)}
+                            <GenerateHTML onClose={() => setShowGeneratedHTML( false )}
                                 svg={svg}
                                 panZoomRef={transform}
                             />
@@ -516,7 +775,11 @@ export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolo
                     </button>
                     <button
                         onClick={ () => {
-                            try { localStorage.removeItem( 'forcesLayout' ); } catch { }
+                            try {
+                                localStorage.removeItem( 'forcesLayout' );
+                            } catch( error ) {
+                                void error;
+                            }
                             setRestartTrigger( c => c + 1 );
                         } }
                         className='restart-btn'

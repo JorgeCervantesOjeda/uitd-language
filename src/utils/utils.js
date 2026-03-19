@@ -1,7 +1,7 @@
 
 // Utility function to get the innermost UI string from a UI reference string
 export const getInnermostUIStr = ( uiRefStr ) => {
-    const parts = uiRefStr.split( /[\(\)]+/ );
+    const parts = uiRefStr.split( /\[|\]|\(|\)/ );
     return parts[ parts.length - 1 ] === '' ? parts[ parts.length - 2 ] : parts[ parts.length - 1 ];
 };
 
@@ -16,7 +16,16 @@ export function getInnermostUIRef( uiRef ) {
 // Format UI reference into a string
 export const formatUIRef = ( uiRef ) => {
     if( uiRef.nested.length > 0 ) {
-        return `${uiRef.id}(${uiRef.nested.map( nestedRef => formatUIRef( nestedRef ) ).join( ',' )})`;
+        return `${uiRef.id}(${uiRef.nested.map( nestedRef => formatUIRef( nestedRef ) )
+.join( ',' )})`;
+    }
+    return uiRef.id;
+};
+
+export const formatDrawRef = ( uiRef ) => {
+    if( uiRef.nested.length > 0 ) {
+        return `${uiRef.id}[${uiRef.nested.map( nestedRef => formatDrawRef( nestedRef ) )
+.join( ', ' )}]`;
     }
     return uiRef.id;
 };
@@ -26,8 +35,11 @@ export const debounce = ( func, delay ) => {
     let timeoutId;
     return ( ...args ) => {
         clearTimeout( timeoutId );
-        timeoutId = setTimeout( () => {
+        timeoutId = setTimeout(
+ () => {
             func( ...args );
-        }, delay );
+        },
+delay 
+);
     };
 };

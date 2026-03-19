@@ -1,10 +1,151 @@
-import { getInnermostUIRef, formatUIRef } from './utils';
+import { getInnermostUIRef, getInnermostUIStr, formatUIRef } from './utils.js';
+
+const buildPathRef = ( pathIds ) =>
+    pathIds.reduceRight(
+        ( nested, id ) => ( nested === null ? id : `${id}(${nested})` ),
+        null
+    );
+
+const buildNestedRefWithAncestors = ( ancestors, ref ) =>
+    ancestors.reduceRight(
+        ( nested, id ) => `${id}(${nested})`,
+        formatUIRef( ref )
+    );
+
+const collectDrawnUIRefs = ( uiRefs ) => {
+    const drawnUIRefs = new Set();
+
+    const visit = ( ref, ancestors = [] ) => {
+        const currentPath = [ ...ancestors, ref.id.toString() ];
+
+        drawnUIRefs.add( buildPathRef( currentPath ) );
+        drawnUIRefs.add( buildNestedRefWithAncestors(
+ ancestors,
+ref 
+) );
+
+        ref.nested.forEach( nestedRef => visit(
+ nestedRef,
+currentPath 
+) );
+    };
+
+    uiRefs.forEach( ref => visit( ref ) );
+
+    return drawnUIRefs;
+};
+
+const normalizeComparableText = ( value = '' ) =>
+    value.replace(
+ /\s+/g,
+' ' 
+)
+.trim()
+.toLowerCase();
+
+const addInclusionEdge = ( inclusionGraph, parentId, childId ) => {
+    if( !inclusionGraph.has( parentId ) ) {
+        inclusionGraph.set(
+ parentId,
+new Set() 
+);
+    }
+
+    inclusionGraph.get( parentId )
+.add( childId );
+};
+
+const buildInclusionGraph = ( fragments ) => {
+    const inclusionGraph = new Map();
+
+    const visit = ( ref ) => {
+        ref.nested.forEach( nestedRef => {
+            addInclusionEdge(
+                inclusionGraph,
+                ref.id.toString(),
+                nestedRef.id.toString()
+            );
+            visit( nestedRef );
+        } );
+    };
+
+    fragments.forEach( fragment => {
+        fragment.draws.forEach( draw => {
+            draw.uiRefs.forEach( ref => visit( ref ) );
+        } );
+    } );
+
+    return inclusionGraph;
+};
+
+const getDescendantUIIds = ( inclusionGraph, rootId ) => {
+    const descendants = new Set();
+    const pending = [ rootId ];
+
+    while( pending.length > 0 ) {
+        const currentId = pending.pop();
+        const childIds = inclusionGraph.get( currentId ) || new Set();
+
+        childIds.forEach( childId => {
+            if( descendants.has( childId ) ) return;
+            descendants.add( childId );
+            pending.push( childId );
+        } );
+    }
+
+    return descendants;
+};
+
+const collectStandaloneDrawnUIIds = ( uiRefs ) => {
+    const standaloneUIIds = new Set();
+
+    uiRefs.forEach( ref => {
+        standaloneUIIds.add( ref.id.toString() );
+    } );
+
+    return standaloneUIIds;
+};
+
+const collectReusableUIIds = ( fragments ) => {
+    const reusableUIIds = new Set();
+
+    const visit = ( ref ) => {
+        ref.nested.forEach( nestedRef => {
+            reusableUIIds.add( nestedRef.id.toString() );
+            visit( nestedRef );
+        } );
+    };
+
+    fragments.forEach( fragment => {
+        fragment.draws.forEach( draw => {
+            draw.uiRefs.forEach( ref => visit( ref ) );
+        } );
+    } );
+
+    return reusableUIIds;
+};
+
+const isPositiveInteger = ( value ) => Number.isInteger( value ) && value > 0;
+
+const comparePositions = ( left, right ) => {
+    if( left.line !== right.line ) {
+        return left.line - right.line;
+    }
+
+    return left.column - right.column;
+};
+
+const quote = ( value ) => `"${value}"`;
 
 export const validateData = ( parsedData ) => {
     const markers = [];
     const uiNames = new Set();
     const fragmentNames = new Set();
     const uiIds = new Set();
+    const uiDeclarations = new Map();
+    const inclusionGraph = buildInclusionGraph( parsedData.fragments );
+    const reusableUIIds = collectReusableUIIds( parsedData.fragments );
+    const transitionsByOriginUI = new Map();
 
     
     // Check if at least 1 UI is defined
@@ -19,18 +160,11 @@ export const validateData = ( parsedData ) => {
         } );
     }
 
-    // Check for UIs with no actions and duplicate UI names
+    const firstFragmentDeclaration = ( parsedData.declarations || [] )
+        .find( declaration => declaration.type === 'FRAGMENT' );
+
+    // Check for duplicate UI names and declaration order
     parsedData.uis.forEach( ui => {
-        if( ui.actions.length === 0 ) {
-            markers.push( {
-                severity: 4,
-                startLineNumber: ui.line,
-                startColumn: ui.column,
-                endLineNumber: ui.line,
-                endColumn: ui.column + ui.name.length,
-                message: `UI ${ui.id} has no actions defined.`,
-            } );
-        }
         if( uiIds.has( ui.id.toString() ) ) {
             markers.push( {
                 severity: 8,
@@ -38,10 +172,17 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + ui.name.length,
-                message: `Duplicate UI Id: ${ui.id.toString()}.`,
+                message: `Duplicate UI ID: ${quote( ui.id.toString() )}.`,
             } );
         } else {
             uiIds.add( ui.id.toString() );
+            uiDeclarations.set(
+ ui.id.toString(),
+{
+                line: ui.line,
+                column: ui.column,
+            } 
+);
         }
         if( uiNames.has( ui.name ) ) {
             markers.push( {
@@ -50,10 +191,25 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + ui.name.length,
-                message: `Duplicate UI name: ${ui.name}.`,
+                message: `Duplicate UI name: ${quote( ui.name )}.`,
             } );
         } else {
             uiNames.add( ui.name );
+        }
+
+        if( firstFragmentDeclaration && comparePositions(
+            { line: ui.line, column: ui.column },
+            { line: firstFragmentDeclaration.line, column: firstFragmentDeclaration.column }
+        ) > 0 ) {
+            markers.push( {
+                severity: 8,
+                startLineNumber: ui.line,
+                startColumn: ui.column,
+                endLineNumber: ui.line,
+                endColumn: ui.column + 3 + ui.id.toString().length,
+                message: `UI ${quote( ui.id )} is declared after a FRAGMENT. Define all UI blocks before any fragment references them.`,
+                code: 'ui-after-fragment'
+            } );
         }
     } );
 
@@ -66,29 +222,97 @@ export const validateData = ( parsedData ) => {
                 startColumn: fragment.column,
                 endLineNumber: fragment.line,
                 endColumn: fragment.column + fragment.name.length,
-                message: `Duplicate fragment name: ${fragment.name}.`,
+                message: `Duplicate fragment name: ${quote( fragment.name )}.`,
             } );
         } else {
             fragmentNames.add( fragment.name );
         }
     } );
 
+    parsedData.fragments.forEach( fragment => {
+        fragment.transitions.forEach( transition => {
+            const originUIId = getInnermostUIRef( transition.from )
+.toString();
+            const currentList = transitionsByOriginUI.get( originUIId ) || [];
+            currentList.push( transition );
+            transitionsByOriginUI.set(
+ originUIId,
+currentList 
+);
+        } );
+    } );
+
+    parsedData.fragments.forEach( fragment => {
+        if( fragment.width !== null && !isPositiveInteger( fragment.width ) ) {
+            markers.push( {
+                severity: 8,
+                startLineNumber: fragment.line,
+                startColumn: fragment.column,
+                endLineNumber: fragment.line,
+                endColumn: fragment.column + fragment.name.length,
+                message: `Fragment ${quote( fragment.name )} has invalid WIDTH ${quote( fragment.width )}. WIDTH must be a positive integer.`,
+                code: 'invalid-width'
+            } );
+        }
+
+        const reusableOriginUIIds = [
+            ...new Set( fragment.transitions
+                    .map( transition => getInnermostUIRef( transition.from )
+.toString() )
+                    .filter( uiId => reusableUIIds.has( uiId ) ) )
+        ];
+
+        if( reusableOriginUIIds.length === 0 ) return;
+
+        const standaloneDrawnUIIds = collectStandaloneDrawnUIIds( fragment.draws.flatMap( draw => draw.uiRefs ) );
+
+        if( reusableOriginUIIds.length > 1 ) {
+            markers.push( {
+                severity: 4,
+                startLineNumber: fragment.line,
+                startColumn: fragment.column,
+                endLineNumber: fragment.line,
+                endColumn: fragment.column + fragment.name.length,
+                message: `Fragment ${quote( fragment.name )} mixes transitions from multiple reusable UIs (${reusableOriginUIIds.map( quote )
+                    .join( ', ' )}). Prefer a dedicated fragment for each reusable UI when it improves clarity.`,
+                code: 'mixed-reusable-fragment'
+            } );
+        }
+
+        const dedicatedReusableUIId = reusableOriginUIIds[ 0 ];
+        const hasTransitionsFromOtherUIs = fragment.transitions.some( transition => getInnermostUIRef( transition.from )
+.toString() !== dedicatedReusableUIId );
+
+        if( hasTransitionsFromOtherUIs ) {
+            markers.push( {
+                severity: 4,
+                startLineNumber: fragment.line,
+                startColumn: fragment.column,
+                endLineNumber: fragment.line,
+                endColumn: fragment.column + fragment.name.length,
+                message: `Fragment ${quote( fragment.name )} contains transitions from reusable UI ${quote( dedicatedReusableUIId )} and other UIs. Prefer keeping dedicated reusable UI fragments focused on the reusable UI when it improves readability.`,
+                code: 'mixed-reusable-fragment'
+            } );
+        }
+
+        if( !standaloneDrawnUIIds.has( dedicatedReusableUIId ) ) {
+            markers.push( {
+                severity: 8,
+                startLineNumber: fragment.line,
+                startColumn: fragment.column,
+                endLineNumber: fragment.line,
+                endColumn: fragment.column + fragment.name.length,
+                message: `Fragment ${quote( fragment.name )} documents transitions from reusable UI ${quote( dedicatedReusableUIId )} but does not draw that UI as a standalone reference. Dedicated reusable UI fragments must draw the reusable UI standalone.`,
+                code: 'missing-reusable-standalone-draw'
+            } );
+        }
+    } );
+
     // Check for undrawn UIs referenced in transitions and duplicate transitions
     parsedData.fragments.forEach( fragment => {
-        const drawnUIs = new Set();
+        const drawnUIRefs = collectDrawnUIRefs( fragment.draws.flatMap( draw => draw.uiRefs ) );
         const uniqueTransitions = new Set(); // Track unique transitions
         const transitionsByAction = new Map();
-
-        const collectDrawnUIs = ( ref ) => {
-            drawnUIs.add( ref.id.toString() );
-            ref.nested.forEach( nestedRef => collectDrawnUIs( nestedRef ) );
-        };
-
-        fragment.draws.forEach( ( { uiRefs } ) => {
-            uiRefs.forEach( ref => {
-                collectDrawnUIs( ref );
-            } );
-        } );
 
         // Detect ambiguous transitions:
         // same origin + action + target with one unconditional and one/more conditional transitions.
@@ -97,7 +321,10 @@ export const validateData = ( parsedData ) => {
             const actionKey = `${fromRef}:${transition.action}:${transition.target}`;
             const list = transitionsByAction.get( actionKey ) || [];
             list.push( transition );
-            transitionsByAction.set( actionKey, list );
+            transitionsByAction.set(
+ actionKey,
+list 
+);
         } );
 
         transitionsByAction.forEach( ( list, actionKey ) => {
@@ -113,7 +340,7 @@ export const validateData = ( parsedData ) => {
                     startColumn: transition.verbColumn,
                     endLineNumber: transition.line,
                     endColumn: transition.verbColumn + transition.action.length + 1 + 1 + transition.target.length + 1,
-                    message: `Ambiguous transitions for ${actionKey}: an unconditional transition overlaps with conditional transition(s).`,
+                    message: `Ambiguous transitions for ${quote( actionKey )}: an unconditional transition overlaps with conditional transition(s).`,
                     code: 'ambiguous-transition'
                 } );
             } );
@@ -123,9 +350,23 @@ export const validateData = ( parsedData ) => {
             // Use fromUI, toUI, and actionKey as requested
             const fromUI = getInnermostUIRef( transition.from );
             const toUI = getInnermostUIRef( transition.to );
-            const actionKey = `${fromUI}:${transition.action}:${transition.target}:${transition.condition || ''}`;
+            const fromRef = formatUIRef( transition.from );
+            const toRef = formatUIRef( transition.to );
+            const actionKey = `${fromRef}:${toRef}:${transition.action}:${transition.target}:${transition.condition || ''}`;
 
-            // Check for duplicate transitions (same 'from' UI, action, and condition)
+            if( transition.width !== null && !isPositiveInteger( transition.width ) ) {
+                markers.push( {
+                    severity: 8,
+                    startLineNumber: transition.line,
+                    startColumn: transition.column,
+                    endLineNumber: transition.line,
+                    endColumn: transition.column + 20,
+                    message: `Transition from ${quote( fromRef )} to ${quote( toRef )} has invalid WIDTH ${quote( transition.width )}. WIDTH must be a positive integer.`,
+                    code: 'invalid-width'
+                } );
+            }
+
+            // Check for duplicate transitions within the same fragment
             if( uniqueTransitions.has( actionKey ) ) {
                 markers.push( {
                     severity: 8,
@@ -133,7 +374,7 @@ export const validateData = ( parsedData ) => {
                     startColumn: transition.column,
                     endLineNumber: transition.line,
                     endColumn: transition.column + 20,
-                    message: `Duplicate transition found from ${fromUI}, action ${transition.action} "${transition.target}"` +
+                    message: `Duplicate transition found from ${quote( fromRef )} to ${quote( toRef )}, action ${quote( `${transition.action} "${transition.target}"` )}` +
                         ( transition.condition ? ` AND "${transition.condition}"` : '' ) + '.',
                 } );
             } else {
@@ -141,47 +382,85 @@ export const validateData = ( parsedData ) => {
             }
 
             // Check if 'from' and 'to' UIs are drawn in the fragment
-            const checkUI = ( uiRef, uiId ) => {
-                if( !drawnUIs.has( uiId ) ) {
-                    const uiRefString = formatUIRef( uiRef );
+            const checkUI = ( uiRef ) => {
+                const uiRefString = formatUIRef( uiRef );
+
+                if( !drawnUIRefs.has( uiRefString ) ) {
+                    const onlyDrawnNested = !uiRefString.includes( '(' ) &&
+                        [ ...drawnUIRefs ].some( drawnRef => drawnRef !== uiRefString && getInnermostUIStr( drawnRef ) === uiRefString );
+
                     markers.push( {
                         severity: 8,
                         startLineNumber: transition.line,
                         startColumn: transition.column + 16,
                         endLineNumber: transition.line,
                         endColumn: transition.column + 16 + uiRefString.length + 4 + 2,
-                        message: `Undrawn UI ${uiRefString} referenced in transition.`,
+                        message: onlyDrawnNested
+                            ? `Undrawn UI ${quote( uiRefString )} referenced in transition. UI ${quote( uiRefString )} is only drawn as a nested instance in this fragment; draw it standalone to use it in transitions.`
+                            : `Undrawn UI ${quote( uiRefString )} referenced in transition.`,
                     } );
                 }
             };
-            checkUI( transition.from, fromUI );
-            checkUI( transition.to, toUI );
+            checkUI( transition.from );
+            checkUI( transition.to );
 
             // Check if the 'from' and 'to' UIs exist
             const fromUIExists = uiIds.has( fromUI );
             const toUIExists = uiIds.has( toUI );
+            const fromDeclaration = uiDeclarations.get( fromUI );
+            const toDeclaration = uiDeclarations.get( toUI );
 
             if( !fromUIExists ) {
-                const uiRefString = formatUIRef( transition.from );
+                const uiRefString = fromRef;
                 markers.push( {
                     severity: 8,
                     startLineNumber: transition.line,
                     startColumn: transition.column,
                     endLineNumber: transition.line,
                     endColumn: transition.column + 16 + uiRefString.length,
-                    message: `Referenced 'from' UI ${uiRefString} does not exist.`,
+                    message: `Referenced "from" UI ${quote( uiRefString )} does not exist.`,
                 } );
             }
 
             if( !toUIExists ) {
-                const uiRefString = formatUIRef( transition.to );
+                const uiRefString = toRef;
                 markers.push( {
                     severity: 8,
                     startLineNumber: transition.line,
                     startColumn: transition.column,
                     endLineNumber: transition.line,
                     endColumn: transition.column + 16 + uiRefString.length,
-                    message: `Referenced 'to' UI ${uiRefString} does not exist.`,
+                    message: `Referenced "to" UI ${quote( uiRefString )} does not exist.`,
+                } );
+            }
+
+            if( fromDeclaration && comparePositions(
+                fromDeclaration,
+                { line: transition.line, column: transition.column }
+            ) > 0 ) {
+                markers.push( {
+                    severity: 8,
+                    startLineNumber: transition.line,
+                    startColumn: transition.column,
+                    endLineNumber: transition.line,
+                    endColumn: transition.column + 16 + fromRef.length,
+                    message: `Referenced "from" UI ${quote( fromRef )} is used before its UI declaration.`,
+                    code: 'forward-ui-reference'
+                } );
+            }
+
+            if( toDeclaration && comparePositions(
+                toDeclaration,
+                { line: transition.line, column: transition.column }
+            ) > 0 ) {
+                markers.push( {
+                    severity: 8,
+                    startLineNumber: transition.line,
+                    startColumn: transition.column,
+                    endLineNumber: transition.line,
+                    endColumn: transition.column + 16 + toRef.length,
+                    message: `Referenced "to" UI ${quote( toRef )} is used before its UI declaration.`,
+                    code: 'forward-ui-reference'
                 } );
             }
 
@@ -195,8 +474,36 @@ export const validateData = ( parsedData ) => {
                     startColumn: transition.verbColumn,
                     endLineNumber: transition.line,
                     endColumn: transition.verbColumn + transition.action.length + 1 + 1 + transition.target.length + 1, // verbo + espacio + comillas + target
-                    message: `Action ${transition.action} "${transition.target}" in transition is not defined in UI ${uiRefString}.`,
+                    message: `Action ${quote( `${transition.action} "${transition.target}"` )} in transition is not defined in UI ${quote( uiRefString )}.`,
                     code: 'invalid-action'
+                } );
+            }
+
+            const descendantUIIds = getDescendantUIIds(
+ inclusionGraph,
+fromUI.toString() 
+);
+            const duplicatedByInclusion = [ ...descendantUIIds ].find( descendantUIId => {
+                const inheritedTransitions = transitionsByOriginUI.get( descendantUIId ) || [];
+
+                return inheritedTransitions.some( inheritedTransition =>
+                    inheritedTransition !== transition &&
+                    inheritedTransition.action === transition.action &&
+                    inheritedTransition.target === transition.target &&
+                    normalizeComparableText( inheritedTransition.condition ) === normalizeComparableText( transition.condition ) &&
+                    getInnermostUIRef( inheritedTransition.to )
+.toString() === toUI.toString() );
+            } );
+
+            if( duplicatedByInclusion ) {
+                markers.push( {
+                    severity: 8,
+                    startLineNumber: transition.line,
+                    startColumn: transition.column,
+                    endLineNumber: transition.line,
+                    endColumn: transition.column + 20,
+                    message: `Transition from UI ${quote( fromUI )} duplicates an inherited transition from included UI ${quote( duplicatedByInclusion )} for action ${quote( `${transition.action} "${transition.target}"` )} to UI ${quote( toUI )}. Remove the duplicate from UI ${quote( fromUI )}; the transition from UI ${quote( duplicatedByInclusion )} is already available by inclusion.`,
+                    code: 'duplicate-inclusion-transition'
                 } );
             }
         } );
@@ -205,18 +512,36 @@ export const validateData = ( parsedData ) => {
         fragment.draws.forEach( draw => {
             draw.uiRefs.forEach( uiRef => {
                 const checkUIExists = ( ref ) => {
-                    const innermostId = getInnermostUIRef( ref );
-                    if( !uiIds.has( innermostId ) ) {
-                        const uiRefString = formatUIRef( ref );
+                    const currentId = ref.id.toString();
+                    const uiRefString = formatUIRef( ref );
+
+                    if( !uiIds.has( currentId ) ) {
                         markers.push( {
                             severity: 8,
                             startLineNumber: draw.line,
                             startColumn: draw.column,
                             endLineNumber: draw.line,
                             endColumn: draw.column + 4,
-                            message: `Referenced UI ${uiRefString} in DRAW does not exist.`,
+                            message: `Referenced UI ${quote( uiRefString )} in DRAW does not exist.`,
                         } );
                     }
+
+                    const declaration = uiDeclarations.get( currentId );
+                    if( declaration && comparePositions(
+                        declaration,
+                        { line: draw.line, column: draw.column }
+                    ) > 0 ) {
+                        markers.push( {
+                            severity: 8,
+                            startLineNumber: draw.line,
+                            startColumn: draw.column,
+                            endLineNumber: draw.line,
+                            endColumn: draw.column + 4,
+                            message: `Referenced UI ${quote( uiRefString )} in DRAW is used before its UI declaration.`,
+                            code: 'forward-ui-reference'
+                        } );
+                    }
+
                     ref.nested.forEach( nestedRef => checkUIExists( nestedRef ) );
                 };
 
@@ -230,9 +555,7 @@ export const validateData = ( parsedData ) => {
         ui.actions.forEach( action => {
             const used = parsedData.fragments.some( fragment =>
                 fragment.transitions.some( transition =>
-                    getInnermostUIRef( transition.from ) === ui.id.toString() && transition.action === action.verb && transition.target === action.target
-                )
-            );
+                    getInnermostUIRef( transition.from ) === ui.id.toString() && transition.action === action.verb && transition.target === action.target ) );
             if( !used ) {
                 markers.push( {
                     severity: 4,
@@ -240,7 +563,7 @@ export const validateData = ( parsedData ) => {
                     startColumn: action.column,
                     endLineNumber: action.line,
                     endColumn: action.column + 1 + action.verb.length + 1 + action.target.length + 1,
-                    message: `Unused action: ${action.verb} "${action.target}" in UI ${ui.id}.`,
+                    message: `Unused action: ${quote( `${action.verb} "${action.target}"` )} in UI ${quote( ui.id )}.`,
                 } );
             }
         } );
@@ -258,9 +581,7 @@ export const validateData = ( parsedData ) => {
                         return uiRef.nested.some( nestedRef => checkNestedUIRefs( nestedRef ) );
                     };
                     return checkNestedUIRefs( ref );
-                } )
-            )
-        );
+                } ) ) );
 
         if( !isDrawn ) {
             markers.push( {
@@ -269,29 +590,54 @@ export const validateData = ( parsedData ) => {
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + ui.name.length,
-                message: `UI ${ui.id} is not drawn in any fragment.`,
+                message: `UI ${quote( ui.id )} is not drawn in any fragment.`,
             } );
         }
     } );
 
-    // Check if each UI is used as 'from' UI in at least one transition in at least one fragment
+    // Check if each UI has at least one effective outgoing transition
     parsedData.uis.forEach( ui => {
-        const isUsedAsFrom = parsedData.fragments.some( fragment =>
-            fragment.transitions.some( transition => {
-                const innermostFromUI = getInnermostUIRef( transition.from );
-                return innermostFromUI === ui.id.toString();
-            } )
-        );
+        const directTransitions = transitionsByOriginUI.get( ui.id.toString() ) || [];
+        const descendantUIIds = getDescendantUIIds(
+ inclusionGraph,
+ui.id.toString() 
+);
+        const hasInheritedTransitions = [ ...descendantUIIds ]
+            .some( descendantUIId => ( transitionsByOriginUI.get( descendantUIId ) || [] ).length > 0 );
+        const hasEffectiveOutgoingTransitions = directTransitions.length > 0 || hasInheritedTransitions;
 
-        if( !isUsedAsFrom ) {
+        if( !hasEffectiveOutgoingTransitions ) {
             markers.push( {
                 severity: 4,
                 startLineNumber: ui.line,
                 startColumn: ui.column,
                 endLineNumber: ui.line,
                 endColumn: ui.column + 3 + ui.id.toString().length,
-                message: `UI ${ui.id} is not used as 'from' UI in any transition.`,
+                message: `UI ${quote( ui.id )} has no effective outgoing transitions.`,
             } );
+        }
+
+        if( reusableUIIds.has( ui.id.toString() ) ) {
+            const hasDedicatedReusableFragment = parsedData.fragments.some( fragment => {
+                const standaloneDrawnUIIds = collectStandaloneDrawnUIIds( fragment.draws.flatMap( draw => draw.uiRefs ) );
+
+                return fragment.transitions.length > 0 &&
+                    standaloneDrawnUIIds.has( ui.id.toString() ) &&
+                    fragment.transitions.every( transition => getInnermostUIRef( transition.from )
+.toString() === ui.id.toString() );
+            } );
+
+            if( !hasDedicatedReusableFragment ) {
+                markers.push( {
+                    severity: 4,
+                    startLineNumber: ui.line,
+                    startColumn: ui.column,
+                    endLineNumber: ui.line,
+                    endColumn: ui.column + ui.name.length,
+                    message: `Reusable UI ${quote( ui.id )} should have a dedicated fragment that draws it standalone and focuses on its outgoing transitions.`,
+                    code: 'missing-reusable-fragment'
+                } );
+            }
         }
     } );
 
