@@ -30,6 +30,18 @@ export const formatDrawRef = ( uiRef ) => {
     return uiRef.id;
 };
 
+export const formatDrawRefUsingParsedSyntax = ( uiRef ) => {
+    if( uiRef.nested.length === 0 ) {
+        return uiRef.id;
+    }
+
+    const openingDelimiter = uiRef.drawDelimiter === '(' ? '(' : '[';
+    const closingDelimiter = openingDelimiter === '(' ? ')' : ']';
+
+    return `${uiRef.id}${openingDelimiter}${uiRef.nested.map( nestedRef => formatDrawRefUsingParsedSyntax( nestedRef ) )
+.join( ', ' )}${closingDelimiter}`;
+};
+
 // Debounce function to limit the rate at which a function can fire
 export const debounce = ( func, delay ) => {
     let timeoutId;

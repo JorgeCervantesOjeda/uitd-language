@@ -319,10 +319,20 @@ class TokenParser {
 
     parseDrawUIRef() {
         const idToken = this.expectToken( TokenType.NUMBER );
-        const uiRef = { id: idToken.value, nested: [], full: false };
+        const uiRef = {
+            id: idToken.value,
+            nested: [],
+            full: false,
+            drawDelimiter: null,
+            line: idToken.line,
+            column: idToken.column,
+            nestedColumn: null
+        };
         const nextToken = this.getNextToken();
         if( nextToken.type === TokenType.PUNCTUATION &&
             ( nextToken.value === '[' || nextToken.value === '(' ) ) {
+            uiRef.drawDelimiter = nextToken.value;
+            uiRef.nestedColumn = nextToken.column;
             const closingToken = nextToken.value === '[' ? ']' : ')';
             uiRef.nested = this.parseDrawUIRefList( closingToken );
             this.expectToken(

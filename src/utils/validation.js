@@ -1,4 +1,10 @@
-import { getInnermostUIRef, getInnermostUIStr, formatUIRef } from './utils.js';
+import {
+    getInnermostUIRef,
+    getInnermostUIStr,
+    formatUIRef,
+    formatDrawRef,
+    formatDrawRefUsingParsedSyntax
+} from './utils.js';
 
 const buildPathRef = ( pathIds ) =>
     pathIds.reduceRight(
@@ -136,6 +142,36 @@ const comparePositions = ( left, right ) => {
 };
 
 const quote = ( value ) => `"${value}"`;
+
+const collectLegacyDrawSyntaxMarkers = ( ref, draw ) => {
+    const markers = [];
+
+    if( ref.drawDelimiter === '(' ) {
+        const legacyRef = formatDrawRefUsingParsedSyntax( ref );
+        const preferredRef = formatDrawRef( ref );
+        const startColumn = ref.column || draw.column;
+
+        markers.push( {
+            severity: 4,
+            startLineNumber: ref.line || draw.line,
+            startColumn,
+            endLineNumber: ref.line || draw.line,
+            endColumn: startColumn + legacyRef.length,
+            message: `DRAW reference ${quote( legacyRef )} uses legacy parentheses. Prefer square brackets in DRAW, for example ${quote( preferredRef )}.`,
+            code: 'legacy-draw-parentheses'
+        } );
+    }
+
+    ref.nested.forEach( nestedRef => {
+        const nestedMarkers = collectLegacyDrawSyntaxMarkers(
+            nestedRef,
+            draw
+        );
+        markers.push( ...nestedMarkers );
+    } );
+
+    return markers;
+};
 
 export const validateData = ( parsedData ) => {
     const markers = [];
@@ -511,6 +547,12 @@ fromUI.toString()
         // Check if the referenced UIs in DRAW statements exist
         fragment.draws.forEach( draw => {
             draw.uiRefs.forEach( uiRef => {
+                const legacyDrawMarkers = collectLegacyDrawSyntaxMarkers(
+                    uiRef,
+                    draw
+                );
+                markers.push( ...legacyDrawMarkers );
+
                 const checkUIExists = ( ref ) => {
                     const currentId = ref.id.toString();
                     const uiRefString = formatUIRef( ref );
