@@ -17,11 +17,13 @@ Use npm scripts from `package.json`:
 - Indentation: 2 spaces in JS/JSX and CSS (match existing files).
 - Use ES modules (`import`/`export`) and functional React components.
 - ESLint is configured in `eslint.config.js` with spacing rules (e.g., spaces inside parens/brackets and multiline function call arguments). Run `npm run lint` before submitting.
+- Whenever you modify a file, leave that file lint-clean before finishing the task. If the repo has unrelated lint errors elsewhere, do not expand scope; clean the files you touched.
 - Naming: React components in `PascalCase` (e.g., `GraphPanel.jsx`), helpers in `camelCase` (e.g., `parseUItD.js`).
 
 ## Testing Guidelines
 - No dedicated test framework is configured in this repo. If you add tests, document the tool and add a script to `package.json`.
 - For now, validate changes by running `npm run lint` and exercising the UI via `npm run dev`.
+- Use `npm run lint` when practical to understand repo-wide status, but at minimum run `npx eslint <file1> <file2> ...` on each touched file and fix all lint errors in those files before submitting.
 
 ## Commit & Pull Request Guidelines
 - Git history is not available in this folder, so there are no observed commit message conventions. If this repo is initialized later, follow conventional commits (`feat:`, `fix:`, `chore:`) unless a maintainer specifies otherwise.
