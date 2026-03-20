@@ -2,6 +2,7 @@
 
 ## Project Structure & Module Organization
 - `src/` holds the React source. Key entry points are `src/main.jsx` and `src/App.jsx`. Components live in `src/components/`, shared helpers in `src/utils/`, and static assets in `src/assets/`.
+- `packages/uitdl-validator/` contains the shared UITDL parser/validator package and CLI that the editor consumes locally and that other projects may consume via npm.
 - `public/` contains static files copied as-is to the build output.
 - Build outputs go to `dist/` (Vite default). There is also a `build/` directory in the repo; treat it as generated output unless a task says otherwise.
 - Sample UITD files (for demos or fixtures) live at the repo root, e.g. `*.uitd`.
@@ -24,6 +25,7 @@ Use npm scripts from `package.json`:
 - No dedicated test framework is configured in this repo. If you add tests, document the tool and add a script to `package.json`.
 - For now, validate changes by running `npm run lint` and exercising the UI via `npm run dev`.
 - Use `npm run lint` when practical to understand repo-wide status, but at minimum run `npx eslint <file1> <file2> ...` on each touched file and fix all lint errors in those files before submitting.
+- If you modify the validator package in `packages/uitdl-validator/`, also run its release checks before finishing. If those validator changes are intended for other projects that consume the published npm package, prepare and publish a new package version so external consumers can use the updated validator.
 
 ## Commit & Pull Request Guidelines
 - Git history is not available in this folder, so there are no observed commit message conventions. If this repo is initialized later, follow conventional commits (`feat:`, `fix:`, `chore:`) unless a maintainer specifies otherwise.
