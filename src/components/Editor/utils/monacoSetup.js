@@ -1,4 +1,4 @@
-import { validVerbs } from '../../../utils/TokenParser';
+import { validVerbs } from '../../../index.js';
 
 export const setupMonaco = ( monacoInstance ) => {
     monacoInstance.languages.register( { id: 'uitdl' } );

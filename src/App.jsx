@@ -6,7 +6,7 @@ import React, {
     useState,
 } from 'react';
 import { debounce } from 'lodash';
-import { parseUITDL } from './utils/TokenParser';
+import { parseUITDL } from './index.js';
 import './App.css';
 
 const Editor = React.lazy( () => import( './components/Editor/Editor' ) );

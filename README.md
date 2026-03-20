@@ -1,6 +1,8 @@
 # UITD Editor
 
-This workspace contains the UITD editor app and the shared UITD parser/validator used by both the app and the command line.
+This workspace contains the UITD editor app and a publishable UITDL validator package.
+
+The shared parser/validator now lives in `packages/uitdl-validator`, and the editor consumes that shared module instead of being the source package for third-party validation.
 
 ## CLI validator
 
@@ -15,33 +17,36 @@ cat flow.uitd | npm run validate:uitd --
 The command exits with code `1` when it finds error-level validation issues.
 Relative file paths are resolved against the current project root when possible, so local `npx uitd-validate .\file.uitd` continues to work even if `npx` falls back to a broken Windows working directory.
 
-## Use from another project
+## Published package
 
-Install this workspace as a local dependency or link it, then use the exported CLI and API from the other project.
+The package intended for npm publication is `packages/uitdl-validator`.
 
-Local dependency:
+Ad hoc validation from any machine:
 
 ```bash
-npm install --save-dev ../uitd-editor
-npx uitd-validate path/to/flow.uitd
+npx uitdl-validator@latest path/to/flow.uitd
 ```
 
-Linked development setup:
+Project dependency:
 
 ```bash
-# In this repo
-npm link
-
-# In the other project
-npm link uitd-editor
-uitd-validate path/to/flow.uitd
+npm install --save-dev uitdl-validator
+npx uitd-validate path/to/flow.uitd
 ```
 
 Programmatic usage:
 
 ```js
-import { parseUITDL } from 'uitd-editor';
+import { parseUITDL } from 'uitdl-validator';
 
 const result = parseUITDL( uitdText );
 console.log( result.errors );
+```
+
+## Release checks
+
+Run the validator package smoke tests before publishing:
+
+```bash
+npm run validate:uitd:release-check
 ```

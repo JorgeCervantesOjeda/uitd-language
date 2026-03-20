@@ -1,0 +1,13 @@
+UITD "Smoke Valid" {
+  UI 1 "Start" actions {
+    clicks "Continue";
+  }
+  UI 2 "Done" actions {
+    clicks "Back";
+  }
+  FRAGMENT "Happy Path" {
+    DRAW { 1, 2 };
+    TRANSITION from 1 to 2 if user clicks "Continue";
+    TRANSITION from 2 to 1 if user clicks "Back";
+  }
+}

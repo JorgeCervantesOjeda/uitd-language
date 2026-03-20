@@ -1,0 +1,24 @@
+{
+  "name": "uitdl-validator",
+  "version": "0.1.1",
+  "description": "UITDL parser and CLI validator",
+  "type": "module",
+  "bin": {
+    "uitd-validate": "scripts/validate-uitd.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./validate-cli": "./scripts/validate-uitd.js"
+  },
+  "scripts": {
+    "pack:dry-run": "npm pack --dry-run --cache ./.npm-cache",
+    "release:check": "npm run pack:dry-run && node ./scripts/release-check.js"
+  },
+  "files": [
+    "scripts/validate-uitd.js",
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
