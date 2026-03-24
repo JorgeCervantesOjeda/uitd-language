@@ -23,9 +23,48 @@ const loadD2Constructor = async() => {
     return d2ConstructorPromise;
 };
 
+const formatRenderError = ( error ) => {
+    if( !error ) return 'Unknown D2 error.';
+
+    if( typeof error === 'string' ) return error;
+
+    const parts = [];
+
+    if( typeof error.message === 'string' && error.message.trim() ) {
+        parts.push( error.message.trim() );
+    }
+
+    if( typeof error.stderr === 'string' && error.stderr.trim() ) {
+        parts.push( error.stderr.trim() );
+    }
+
+    if( error.cause && typeof error.cause === 'object' ) {
+        const causeMessage = formatRenderError( error.cause );
+        if( causeMessage ) {
+            parts.push( causeMessage );
+        }
+    }
+
+    if( parts.length > 0 ) {
+        return [ ...new Set( parts ) ].join( '\n\n' );
+    }
+
+    try {
+        return JSON.stringify(
+ error,
+null,
+2 
+);
+    } catch( stringifyError ) {
+        void stringifyError;
+        return 'Unknown D2 error.';
+    }
+};
+
 export default function RenderModal( { data, d2Source, isOpen, onClose, onRecolor } ) {
     const [ svg, setSvg ] = useState( '' );
     const [ status, setStatus ] = useState( '' );
+    const [ compileError, setCompileError ] = useState( '' );
     const [ full, setFull ] = useState( false );
     const [ showGeneratedHTML, setShowGeneratedHTML ] = useState( false );
     //! SS
@@ -77,7 +116,12 @@ viewMode
 
     // Reset status when closing
     useEffect(
- () => { if( !isOpen ) setStatus( '' ); },
+ () => {
+        if( !isOpen ) {
+            setStatus( '' );
+            setCompileError( '' );
+        }
+    },
 [ isOpen ] 
 );
 
@@ -97,10 +141,12 @@ isForces
         if( cache.current.has( key ) ) {
             setSvg( cache.current.get( key ) );
             setStatus( '' );
+            setCompileError( '' );
             return;
         }
 
         setSvg( '' );
+        setCompileError( '' );
         setStatus( 'Compiling ...' );
         ( async () => {
             try {
@@ -144,7 +190,8 @@ svgText
  'Error rendering with D2:',
 e 
 );
-                setStatus( 'Error rendering with D2:' );
+                setCompileError( formatRenderError( e ) );
+                setSvg( '' );
             } finally {
                 if( currentKey.current === key ) setStatus( '' );
             }
@@ -805,8 +852,26 @@ raw ? raw.length : 0
                                     onForcesDragEnd={ () => { if( isForces ) { saveForcesSnapshot(); captureForcesSVG(); } } }
                                 />
                             </div>
-                        )
-                        : (
+                        ) : compileError ? (
+                        <div
+                            role="alert"
+                            style={ {
+                                margin: '1rem',
+                                padding: '1rem',
+                                border: '1px solid #b42318',
+                                borderRadius: '0.5rem',
+                                backgroundColor: '#fef3f2',
+                                color: '#7a271a',
+                                overflow: 'auto',
+                                whiteSpace: 'pre-wrap'
+                            } }
+                        >
+                            <strong style={ { display: 'block', marginBottom: '0.75rem' } }>
+                                D2 could not compile the diagram.
+                            </strong>
+                            { compileError }
+                        </div>
+                    ) : (
                             <div style={ { width: '100%', height: '100%', position: 'relative' } }>
                                 <div
                                     key={ currentKey.current }
