@@ -13,6 +13,10 @@ Use npm scripts from `package.json`:
 - `npm run build`: produce a production build in `dist/`.
 - `npm run preview`: serve the production build locally.
 - `npm run lint`: run ESLint on `*.js`/`*.jsx` files.
+- `npm run d2 -- <input.d2> <output.svg>`: compile a D2 diagram using the globally installed `d2` CLI or the Windows fallback path resolver in `scripts/run-d2.js`.
+- `npm run d2:elk -- <input.d2> <output.svg>`: compile with the ELK layout engine.
+- `npm run d2:dagre -- <input.d2> <output.svg>`: compile with the Dagre layout engine.
+- `d2` can be installed globally on this Windows machine and used directly from the CLI; the current setup has been verified with the official installer path `C:\Program Files\D2\d2.exe`.
 
 ## Coding Style & Naming Conventions
 - Indentation: 2 spaces in JS/JSX and CSS (match existing files).
