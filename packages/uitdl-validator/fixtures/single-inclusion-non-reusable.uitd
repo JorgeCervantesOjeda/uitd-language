@@ -1,0 +1,15 @@
+UITD "Single Inclusion Non Reusable" {
+  UI 1 "Nested Action" actions {
+    clicks "Continue";
+  }
+  UI 2 "Access" actions {
+  }
+  UI 3 "Done" actions {
+    clicks "Back";
+  }
+  FRAGMENT "Access" {
+    DRAW { 2[1], 3 };
+    TRANSITION from 2(1) to 3 if user clicks "Continue";
+    TRANSITION from 3 to 2 if user clicks "Back";
+  }
+}

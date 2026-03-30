@@ -101,11 +101,16 @@ const collectStandaloneDrawnUIIds = ( uiRefs ) => {
 };
 
 const collectReusableUIIds = ( fragments ) => {
-    const reusableUIIds = new Set();
+    const containerIdsByChildId = new Map();
 
     const visit = ( ref ) => {
         ref.nested.forEach( nestedRef => {
-            reusableUIIds.add( nestedRef.id.toString() );
+            const parentId = ref.id.toString();
+            const childId = nestedRef.id.toString();
+            const containerIds = containerIdsByChildId.get( childId ) || new Set();
+
+            containerIds.add( parentId );
+            containerIdsByChildId.set( childId, containerIds );
             visit( nestedRef );
         } );
     };
@@ -116,7 +121,11 @@ const collectReusableUIIds = ( fragments ) => {
         } );
     } );
 
-    return reusableUIIds;
+    return new Set(
+        [ ...containerIdsByChildId.entries() ]
+            .filter( ( [ , containerIds ] ) => containerIds.size >= 2 )
+            .map( ( [ childId ] ) => childId )
+    );
 };
 
 const isPositiveInteger = ( value ) => Number.isInteger( value ) && value > 0;
