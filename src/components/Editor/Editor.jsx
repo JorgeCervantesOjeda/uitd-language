@@ -5,7 +5,7 @@ import EditorHeader from './EditorHeader';
 import ErrorListPortal from './ErrorListPortal';
 import handleFormatCode from './utils/formatCode';
 import setErrors from './utils/setErrors';
-import { setupMonaco } from './utils/monacoSetup';
+import { getAutocompleteContextAtPosition, setupMonaco } from './utils/monacoSetup';
 import '../../App.css';
 import { debounce } from 'lodash';
 import { saveAs } from 'file-saver';
@@ -24,6 +24,7 @@ const Editor = ( { uitdlText, onChange, markers, theme } ) => {
     // Referencias
     const editorRef = useRef( null );
     const markersRef = useRef( markers );
+    const lastSuggestRegionRef = useRef( null );
 
     // Estados principales
     const [ lastSaved, setLastSaved ] = useState( Date.now() );
@@ -181,6 +182,131 @@ setErrorsState
 markersRef.current,
 setErrorsState 
 );
+
+        const triggerContextSuggestIfNeeded = ( selectWholeToken = false ) => {
+            const selection = editor.getSelection();
+            const model = editor.getModel();
+            const position = editor.getPosition();
+
+            if( !selection || !selection.isEmpty() || !model || !position ) {
+                lastSuggestRegionRef.current = null;
+                return;
+            }
+
+            const context = getAutocompleteContextAtPosition(
+                model,
+                position
+            );
+
+            if( !context ) {
+                lastSuggestRegionRef.current = null;
+                return;
+            }
+
+            const contextEndColumn = context.rangeEndColumn ?? position.column;
+            if(
+                selectWholeToken &&
+                position.column > context.rangeStartColumn &&
+                position.column < contextEndColumn
+            ) {
+                editor.setSelection( {
+                    startLineNumber: position.lineNumber,
+                    startColumn: context.rangeStartColumn,
+                    endLineNumber: position.lineNumber,
+                    endColumn: contextEndColumn
+                } );
+            }
+
+            const modelVersion = typeof model.getVersionId === 'function' ?
+                model.getVersionId() :
+                0;
+            const contextRegion = [
+                modelVersion,
+                position.lineNumber,
+                context.rangeStartColumn,
+                context.type,
+                context.rangeStartColumn,
+                contextEndColumn
+            ].join( ':' );
+
+            if( lastSuggestRegionRef.current === contextRegion ) {
+                return;
+            }
+
+            lastSuggestRegionRef.current = contextRegion;
+            const triggerSuggest = () => {
+                const currentModel = editor.getModel();
+                const currentPosition = editor.getPosition();
+
+                if( !currentModel || !currentPosition ) {
+                    return;
+                }
+
+                const currentContext = getAutocompleteContextAtPosition(
+                    currentModel,
+                    currentPosition
+                );
+
+                if( !currentContext ) {
+                    return;
+                }
+
+                const currentVersion = typeof currentModel.getVersionId === 'function' ?
+                    currentModel.getVersionId() :
+                    0;
+                const currentRegion = [
+                    currentVersion,
+                    currentPosition.lineNumber,
+                    currentContext.rangeStartColumn,
+                    currentContext.type,
+                    currentContext.rangeStartColumn,
+                    currentContext.rangeEndColumn ?? currentPosition.column
+                ].join( ':' );
+
+                if( currentRegion !== lastSuggestRegionRef.current ) {
+                    return;
+                }
+
+                editor.trigger(
+                    'contextual-suggest',
+                    'editor.action.triggerSuggest',
+                    {}
+                );
+            };
+
+            [ 0, 80, 180 ].forEach( delay => {
+                window.setTimeout(
+                    () => {
+                        triggerSuggest();
+                    },
+                    delay
+                );
+            } );
+        };
+
+        editor.onMouseUp( () => {
+            window.setTimeout(
+                () => {
+                    triggerContextSuggestIfNeeded( true );
+                },
+                0
+            );
+        } );
+
+        editor.onDidChangeCursorPosition( event => {
+            if( event.source === 'mouse' || event.source === 'keyboard' ) {
+                triggerContextSuggestIfNeeded( true );
+                return;
+            }
+
+            window.setTimeout(
+                () => {
+                    triggerContextSuggestIfNeeded( true );
+                },
+                0
+            );
+        } );
+
         collapseAll();
     },
 [] 
@@ -628,6 +754,12 @@ value
                         readOnly: false,
                         minimap: { enabled: true },
                         hover: { enabled: true },
+                        quickSuggestions: {
+                            other: true,
+                            comments: false,
+                            strings: true,
+                        },
+                        suggestOnTriggerCharacters: true,
                         folding: true,
                         foldingStrategy: 'auto',
                         showFoldingControls: 'always',
