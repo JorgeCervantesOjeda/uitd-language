@@ -41,7 +41,7 @@ export const setupMonaco = ( monacoInstance ) => {
                 {
                     label: 'FRAGMENT',
                     kind: monacoInstance.languages.CompletionItemKind.Snippet,
-                    insertText: 'FRAGMENT "${1:description}" {\n\tDRAW { ${2:id}[${3:nestedId}] };\n\tTRANSITION from ${2:id}(${3:nestedId}) to ${4:id} if user ${5:clicks} "${6:target}";\n}',
+                    insertText: 'FRAGMENT "${1:description}" {\n\tDRAW { ${2:drawIds} };\n\tTRANSITION from ${3:fromId} to ${4:toId} if user ${5:clicks} "${6:target}";\n}',
                     insertTextRules: monacoInstance.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     documentation: 'Define a fragment with draw and transitions',
                 },
