@@ -108,6 +108,16 @@ const formatTransitionUIRef = ( pathIds ) => pathIds.reduceRight(
     null
 );
 
+const buildReferenceSortText = ( reference ) => {
+    const numericParts = reference.match( /\d+/g ) ?? [ reference ];
+
+    return numericParts.map( part => part.padStart(
+        8,
+        '0'
+    ) )
+        .join( '.' );
+};
+
 const getLineStartOffsets = ( text ) => {
     const offsets = [ 0 ];
 
@@ -334,7 +344,7 @@ const buildUIReferenceSuggestions = (
                 `Valid transition reference in the current fragment${labelSuffix}` :
                 `Defined UI ${reference}${labelSuffix}`,
             filterText: `${filterPrefix} ${reference} ${ui?.name || ''}`.trim(),
-            sortText: reference,
+            sortText: buildReferenceSortText( reference ),
             range
         };
     } );
@@ -578,12 +588,6 @@ export const getAutocompleteContextAtPosition = ( model, position ) => {
     }
 
     const text = model.getValue();
-    const uiContext = collectUIContext( text );
-
-    if( uiContext.length === 0 ) {
-        return null;
-    }
-
     const lineContent = model.getLineContent( position.lineNumber );
     return getTransitionContext(
         lineContent,

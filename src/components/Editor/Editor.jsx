@@ -274,7 +274,7 @@ setErrorsState
                 );
             };
 
-            [ 0, 80, 180 ].forEach( delay => {
+            [ 0, 80 ].forEach( delay => {
                 window.setTimeout(
                     () => {
                         triggerSuggest();
