@@ -373,6 +373,26 @@ const buildCompletionRange = ( monacoInstance, position, transitionContext ) => 
     return replaceRange;
 };
 
+const getHoverReferenceRange = ( lineContent, position ) => {
+    const transitionContext = getTransitionContext(
+        lineContent,
+        position
+    );
+
+    if(
+        transitionContext &&
+        ( transitionContext.type === 'transition-from' ||
+            transitionContext.type === 'transition-to' )
+    ) {
+        return {
+            startColumn: transitionContext.rangeStartColumn,
+            endColumn: transitionContext.rangeEndColumn ?? position.column
+        };
+    }
+
+    return null;
+};
+
 const getTransitionContext = ( lineContent, position ) => {
     const cursorIndex = position.column - 1;
     const completedTransitionMatch = lineContent.match( /(\bTRANSITION\s+from\s+)([0-9()]+)(\s+to\s+)([0-9()]+)(\s+if\s+user\s+)([A-Za-z]+)(\s+")([^"]*)(")/ );
@@ -582,6 +602,25 @@ drawMatch.index
     return null;
 };
 
+const buildUIHoverContents = ( ui, reference ) => {
+    if( !ui ) {
+        return [];
+    }
+
+    const header = ui.name ?
+        `**UI ${ui.id}**\n\n${ui.name}` :
+        `**UI ${ui.id}**`;
+
+    if( !reference || reference === ui.id ) {
+        return [ { value: header } ];
+    }
+
+    return [
+        { value: header },
+        { value: `Ref: \`${reference}\`` }
+    ];
+};
+
 export const getAutocompleteContextAtPosition = ( model, position ) => {
     if( !model || !position ) {
         return null;
@@ -780,6 +819,67 @@ export const setupMonaco = ( monacoInstance ) => {
 
             return { suggestions: buildStaticSuggestions( monacoInstance ) };
         },
+    } 
+);
+
+    monacoInstance.languages.registerHoverProvider(
+ 'uitdl',
+{
+        provideHover: ( model, position ) => {
+            const word = model.getWordAtPosition( position );
+
+            if( !word || !/^\d+$/.test( word.word ) ) {
+                return null;
+            }
+
+            const context = getAutocompleteContextAtPosition(
+                model,
+                position
+            );
+
+            if(
+                !context ||
+                ( context.type !== 'transition-from' &&
+                    context.type !== 'transition-to' &&
+                    context.type !== 'draw-ui' )
+            ) {
+                return null;
+            }
+
+            const text = model.getValue();
+            const uiContext = collectUIContext( text );
+            const ui = uiContext.find( candidate => candidate.id === word.word );
+
+            if( !ui ) {
+                return null;
+            }
+
+            const lineContent = model.getLineContent( position.lineNumber );
+            const hoverRange = getHoverReferenceRange(
+                lineContent,
+                position
+            );
+            const reference = hoverRange ?
+                lineContent.slice(
+                    hoverRange.startColumn - 1,
+                    hoverRange.endColumn - 1
+                )
+                    .trim() :
+                word.word;
+
+            return {
+                range: new monacoInstance.Range(
+                    position.lineNumber,
+                    word.startColumn,
+                    position.lineNumber,
+                    word.endColumn
+                ),
+                contents: buildUIHoverContents(
+                    ui,
+                    reference
+                )
+            };
+        }
     } 
 );
 
