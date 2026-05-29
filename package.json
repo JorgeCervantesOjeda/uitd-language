@@ -9,6 +9,7 @@
     "d2": "node ./scripts/run-d2.js",
     "d2:dagre": "node ./scripts/run-d2.js --layout dagre",
     "d2:elk": "node ./scripts/run-d2.js --layout elk",
+    "uitd:elk": "node ./scripts/render-uitd-elk.mjs",
     "validate:uitd": "node ./scripts/validate-uitd.js",
     "validate:uitd:release-check": "npm --prefix ./packages/uitdl-validator run release:check",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
