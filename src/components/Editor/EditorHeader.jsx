@@ -1,3 +1,5 @@
+// src/components/Editor/EditorHeader.jsx
+// Header controls for file actions, editor actions, errors, and user help.
 import React from 'react';
 import DropdownMenu from './menus/DropdownMenu';
 
@@ -9,6 +11,9 @@ const typeStyles = {
     info: { color: '#1565c0', bg: '#e3f2fd' },
     warning: { color: '#f9a825', bg: '#fffde7' }
 };
+
+const NOTEBOOKLM_URL = import.meta.env.VITE_NOTEBOOKLM_URL ||
+    'https://notebooklm.google.com/notebook/1c4545e3-9271-4806-8629-fd51e3d34447';
 
 const EditorHeader = ( {
     isModified,
@@ -99,6 +104,15 @@ const EditorHeader = ( {
                     <button className="renderer-button" onClick={ toggleErrors } title={ showErrors ? "Hide errors" : "Show errors" }>
                         <span className="material-icons">{ showErrors ? "visibility_off" : "visibility" }</span>
                     </button>
+                    <a
+                        className="renderer-button"
+                        href={ NOTEBOOKLM_URL }
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Preguntar sobre la app"
+                    >
+                        <span className="material-icons">help_outline</span>
+                    </a>
                 </div>
             </div>
             <div
